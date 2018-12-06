@@ -1,0 +1,16 @@
+{
+  "id": "Diff",
+  "name": "Diff",
+  "host": {
+    "app": "XD",
+    "minVersion": "13.0.0"
+  },
+  "version": "1.0.0",
+  "uiEntryPoints": [
+    {
+      "type": "menu",
+      "label": "Export Json",
+      "commandId": "exportJson"
+    }
+  ]
+}

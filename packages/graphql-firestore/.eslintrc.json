@@ -1,0 +1,27 @@
+{
+    "parser": "babel-eslint",
+    "parserOptions": {
+      "ecmaVersion": 2018,
+      "sourceType": "module",
+      "ecmaFeatures": {
+        "jsx": true,
+        "modules": true,
+        "sourceType": "module",
+        "experimentalObjectRestSpread": true
+      }
+    },
+    "extends": ["airbnb", "prettier"],
+    "plugins": ["import", "prettier"],
+    "env": {
+      "es6": true,
+      "browser": false,
+      "node": true,
+      "jest": true,
+      "webextensions": false
+    },
+    "rules": {
+      "import/no-unresolved": "off",
+      "consistent-return": "off"
+    }
+  }
+  

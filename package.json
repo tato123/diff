@@ -1,0 +1,21 @@
+{
+  "name": "root",
+  "private": true,
+  "devDependencies": {
+    "lerna": "^3.5.1"
+  },
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ],
+    "nohoist": [
+      "**/react-scripts",
+      "**/react-scripts/**"
+    ]
+  },
+  "scripts": {
+    "start": "lerna run --parallel start:dev",
+    "build": "lerna run --parallel build",
+    "test": "lerna run --parallel test"
+  }
+}
