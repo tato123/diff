@@ -1,0 +1,6 @@
+service: tester
+runtime: nodejs10
+env: standard
+instance_class: B8
+manual_scaling:
+  instances: 1

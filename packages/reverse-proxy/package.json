@@ -4,20 +4,28 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js",
-    "start:dev": "nodemon index.js",
+    "start": "node hello.js",
+    "start:dev": "nodemon test.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "browser-sync": "^2.26.3",
+    "bs-html-injector": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^6.2.0",
     "express": "^4.16.4",
     "http-proxy": "^1.17.0",
     "http-proxy-interceptor": "^0.8.6",
     "http-proxy-middleware": "^0.19.1",
+    "ioredis": "^4.2.0",
     "trumpet": "^1.7.2"
   },
   "devDependencies": {
     "nodemon": "^1.18.7"
+  },
+  "engines": {
+    "node": "10.x.x"
   }
 }
