@@ -1,7 +1,6 @@
-module.exports = () => {
+module.exports = (target, script) => {
     const bs = require("browser-sync").create();
-    const target = process.env.TARGET || 'https://www.getdiff.app';
-    const script = process.env.SCRIPT_URL || '';
+
 
     return new Promise((resolve, reject) => {
         // Start a Browsersync proxy
