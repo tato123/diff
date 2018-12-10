@@ -48,6 +48,9 @@ async function main() {
     })
 
 
+    /**
+     * List all of the reservable instances
+     */
     app.get('/reserve', async (req,res) => {
         try {
             const reserables =  await reservation.getReservable();
@@ -65,26 +68,26 @@ async function main() {
     app.post('/reserve', async (req, res) => {
     
         try {
-            const proxyTarget = req.query.proxyTarget;
-            if (!proxyTarget) {
+            const encodedProxyTarget = req.query.proxyTarget;
+            if (!encodedProxyTarget) {
                 return res.status(400).send({
                     errors: [{
                         message: 'A proxy target is required'
                     }]
                 })
             }
-
-            console.log('Reserving an instance for a new test target', req.query.proxyTarget)
-
-            // marks an instance as reserved,
-            // we record it in case we need to bounce 
-            // a server 
-            const instanceUrl = await reservation.recordReservation(req.query.proxyTarget);
+            const proxyTarget = decodeURIComponent(encodedProxyTarget);
             
-            // actually does the activation
-            const response = await reservation.activateReservation(instanceUrl, proxyTarget);
+            
 
-            res.status(201).send(response);
+            console.log('Reserving an instance for a new test target', proxyTarget)
+
+            const instanceUrl = await reservation.reserveFirstAvailable(proxyTarget);
+
+            res.status(200).send({
+                status: 'reserved',
+                url:instanceUrl
+            });
         } catch (error) {
             console.log('error', error)
             res.status(404).send(error.errors);

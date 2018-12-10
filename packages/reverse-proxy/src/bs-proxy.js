@@ -1,32 +1,18 @@
 module.exports = (target, script) => {
     const bs = require("browser-sync").create();
+    console.log('------------------------------')
+    console.log('[proxy-target]: ' + target);
+    console.log('[inject script target]: '+ script);
+    console.log(`<script async src="${script}"></script>`);
 
+
+    
 
     return new Promise((resolve, reject) => {
         // Start a Browsersync proxy
         bs.init({
             proxy: {
-                target: target,
-                middleware: [
-                    {
-                        route: "/_ah/health",
-                        handle: function (req, res, next) {
-                            res.end('ok');
-                        }
-                    },
-                    {
-                        route: "/_ah/start",
-                        handle: function (req, res, next) {
-                            res.end('ok');
-                        }
-                    },
-                    {
-                        route: "/_ah/stop",
-                        handle: function (req, res, next) {
-                            res.end('ok');
-                        }
-                    }
-                ]
+                target: target
             },
             notify: false,
             open: false,
@@ -39,7 +25,7 @@ module.exports = (target, script) => {
                 rule: {
                     match: /<\/head>/i,
                     fn: function (snippet, match) {
-                        return `<script async src="${script}"></script>` + snippet + match;
+                        return `<script src="${script}"></script>` + snippet + match;
                     }
                 }
             },

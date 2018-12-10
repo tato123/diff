@@ -1,11 +1,11 @@
 'use strict';
-const defaultScript = 'https://storage.googleapis.com/diff-exp-js/runner.js';
+
 const reservation = require('./reservation');
 
 const shortid = require('shortid');
 const appsId = 'experiments-224320';
 
-const createVersionHandler = async (appengine, reverseProxyServerVersion = 'reverse-proxy', injectScript = defaultScript) => {
+const createVersionHandler = async (appengine, reverseProxyServerVersion = 'reverse-proxy') => {
 
     const versionId = 'p-'+shortid.generate().toLowerCase();
     console.log('versionId', versionId);
@@ -15,16 +15,13 @@ const createVersionHandler = async (appengine, reverseProxyServerVersion = 'reve
         runtime: "nodejs10",
         env: "standard",
         instance_class: "B4",
-        basicScaling: {
-            maxInstances: 1
+        manual_scaling: {
+            instances: 1
         },
         deployment: {
             zip: {
                 sourceUrl: 'https://storage.googleapis.com/proxy-template-staging/reverse-proxy.zip'
             }
-        },
-        envVariables: {
-            SCRIPT_URL: injectScript
         }
     }
 

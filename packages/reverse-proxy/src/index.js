@@ -9,15 +9,26 @@ const proxy = require('http-proxy-middleware')
 const port = process.env.PORT || 8080;
 const app = express()
 
+const removeRoute = require('express-remove-route');
+
+let reserved = false;
+
 app.use(cors({origin:true}))
 
 
-app.get('/', (req,res) => {
-    res.status(200).send('no reservation present');
+app.get('/', (req,res, next) => {
+    if (!reserved) {
+        return res.status(200).send('no reservation present');
+    }
+    next();
 })
 
 app.get('/_ah/start', (req, res) => {
     res.status(200).send('no reservation present');
+})
+
+app.get('/_ah/health', (req, res) => {
+    res.status(200).send('ok');
 })
 
 /**
@@ -50,9 +61,10 @@ app.get('/reserve', (req, res) => {
         
         // create the proxy (without context)
         var exampleProxy = proxy(options)
-        
-    
+        removeRoute(app, '/');
         app.use('/', exampleProxy)
+
+        reserved = true;
 
         res.status(200).send(external);
     })

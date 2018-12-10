@@ -1,7 +1,8 @@
-const {db} = require('./firestore');
+const { db } = require('./firestore');
+const fetch = require('node-fetch');
 
-
-const createReservation = (versionId, url, ready=false) => {
+const defaultScript = 'https://storage.googleapis.com/diff-exp-js/runner.js';
+const createReservation = (versionId, url, ready = false) => {
     const docRef = db.collection('instances').doc();
     return docRef.set({
         versionId,
@@ -12,9 +13,24 @@ const createReservation = (versionId, url, ready=false) => {
 }
 
 
-const reserveInstance = async (proxyTarget) => {
-  
+const reserveFirstAvailable = async (proxyTarget) => {
+    // get an instance
+    const reservable = await getReservable();
+    const instanceUrl = reservable[0].data.url;
+    const invokeUrl = `${instanceUrl}/reserve?proxyTarget=${encodeURIComponent(proxyTarget)}&script=${encodeURIComponent(defaultScript)}`;
+    console.log('Reserving instance with url', invokeUrl);
+    const response = await fetch(invokeUrl);
 
+    if (response.ok) {
+
+        const instanceRef = await db.collection('instances').doc(reservable[0].id).update({
+            proxyTarget
+        });
+
+        return instanceUrl;
+    }
+
+    throw new Error(response.statusText)
 }
 
 const getReservable = async () => {
@@ -23,14 +39,14 @@ const getReservable = async () => {
 
     let docs = []
     querySnapshot.forEach(docSnapshot => {
-        docs.push(docSnapshot.data());
+        docs.push({id: docSnapshot.id, data: docSnapshot.data()});
     })
 
     return docs;
 }
 
 module.exports = {
-    reserveInstance,
+    reserveFirstAvailable,
     createReservation,
     getReservable
 
