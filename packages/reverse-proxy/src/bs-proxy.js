@@ -1,14 +1,13 @@
-'use strict';
-
-var bs = require("browser-sync").create();
-
-
 module.exports = () => {
+    const bs = require("browser-sync").create();
+    const target = process.env.TARGET || 'https://www.getdiff.app';
+    const script = process.env.SCRIPT_URL || '';
+
     return new Promise((resolve, reject) => {
         // Start a Browsersync proxy
         bs.init({
             proxy: {
-                target: "https://www.atlanticbt.com",
+                target: target,
                 middleware: [
                     {
                         route: "/_ah/health",
@@ -41,7 +40,7 @@ module.exports = () => {
                 rule: {
                     match: /<\/head>/i,
                     fn: function (snippet, match) {
-                        return `<script async src="${process.env.SCRIPT_URL}"></script>` + snippet + match;
+                        return `<script async src="${script}"></script>` + snippet + match;
                     }
                 }
             },

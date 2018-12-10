@@ -4,3 +4,7 @@ env: standard
 instance_class: B8
 manual_scaling:
   instances: 1
+
+env_variables:
+  TARGET: https://www.getdiff.app
+  SCRIPT_URL: https://storage.googleapis.com/diff-exp-js/runner.js

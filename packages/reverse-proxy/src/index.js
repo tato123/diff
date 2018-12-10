@@ -1,8 +1,5 @@
 const browsersync = require('./bs-proxy');
 
-// read our external values
-require('dotenv').config()
-
 // load all of our necessary scripts
 const express = require('express');
 const cors = require('cors')
