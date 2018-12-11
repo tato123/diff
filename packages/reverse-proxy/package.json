@@ -15,6 +15,7 @@
     "dotenv": "^6.2.0",
     "express": "^4.16.4",
     "express-remove-route": "^1.0.0",
+    "firebase-admin": "^6.3.0",
     "http-proxy-middleware": "^0.19.1",
     "underscore": "^1.9.1"
   },

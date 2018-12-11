@@ -11,6 +11,7 @@ import { WebSocketLink } from "apollo-link-ws";
 import { getMainDefinition } from "apollo-utilities";
 import { ApolloProvider } from "react-apollo";
 
+import "normalize.css";
 import "./index.css";
 
 // Create an http link:
