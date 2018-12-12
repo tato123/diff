@@ -1,0 +1,9 @@
+dispatch:
+  - url: "api.stage-getdiff.app/*"
+    service: api
+
+  - url: "tester.stage-getdiff.app/*"
+    service: tester
+
+  - url: "www.stage-getdiff.app/*"
+    service: default

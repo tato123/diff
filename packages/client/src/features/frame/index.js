@@ -19,7 +19,11 @@ const Container = styled.div`
 
 const Frame = () => (
   <Container>
-    <iframe src="https://p-f9jpegyzu-dot-tester-dot-experiments-224320.appspot.com/" />
+    <iframe
+      title="Content Frame"
+      id="contentFrame"
+      src="https://p-f9jpegyzu-dot-tester-dot-experiments-224320.appspot.com/"
+    />
   </Container>
 );
 

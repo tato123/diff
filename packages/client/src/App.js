@@ -6,6 +6,8 @@ import List from "./features/list";
 import styled from "styled-components";
 import Logo from "./components/Logo";
 
+import { ModalProvider } from "styled-react-modal";
+
 const Container = styled.div`
   display: grid;
   grid-template-areas: ". .";
@@ -68,24 +70,26 @@ Master.Frame = styled.div`
 class App extends Component {
   render() {
     return (
-      <Container>
-        <Detail>
-          <Detail.Header>
-            <Logo />
-          </Detail.Header>
-          <Detail.Frame>
-            <List />
-          </Detail.Frame>
-        </Detail>
-        <Master>
-          <Master.Header>
-            <FrameHeader />
-          </Master.Header>
-          <Master.Frame>
-            <Frame />
-          </Master.Frame>
-        </Master>
-      </Container>
+      <ModalProvider>
+        <Container>
+          <Detail>
+            <Detail.Header>
+              <Logo />
+            </Detail.Header>
+            <Detail.Frame>
+              <List />
+            </Detail.Frame>
+          </Detail>
+          <Master>
+            <Master.Header>
+              <FrameHeader />
+            </Master.Header>
+            <Master.Frame>
+              <Frame />
+            </Master.Frame>
+          </Master>
+        </Container>
+      </ModalProvider>
     );
   }
 }

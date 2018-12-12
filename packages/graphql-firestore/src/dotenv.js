@@ -8,5 +8,3 @@ console.log("Environment is", env);
 dotenv.config({
   path: path.resolve(__dirname, `../.env.${env}`)
 });
-
-console.log("running dotenv", process.env.IS_PRESENT);
