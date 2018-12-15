@@ -8,6 +8,10 @@ const presets = [
         useBuiltIns: "usage",
       },
     ],
+    "@babel/preset-react"
   ];
+
+  const plugins = ["@babel/plugin-transform-modules-commonjs"];
+
   
-  module.exports = { presets };
+  module.exports = { presets, plugins };

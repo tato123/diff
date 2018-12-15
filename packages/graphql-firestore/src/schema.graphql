@@ -1,0 +1,66 @@
+type Event {
+  type: String!
+  comment: String
+  url: String!
+  id: String
+  selector: String
+}
+
+type Invite {
+  email: String
+  firstName: String
+  invitedBy: String
+  lastName: String
+  status: String
+  workspaceId: String
+  id: String
+}
+
+type User {
+  aud: String
+  email: String
+  email_verified: Boolean
+  exp: Int
+  family_name: String
+  gender: String
+  given_name: String
+  iat: Int
+  iss: String
+  locale: String
+  name: String
+  nickname: String
+  picture: String
+  plan: String
+  sub: String
+  updated_at: String
+}
+
+type Query {
+  allEvents: [Event]
+  allInvites: [Invite]
+  allUsers: [User]
+}
+
+type DocChange {
+  type: String
+  data: Event
+}
+
+type Subscription {
+  events: [DocChange]
+}
+
+type UploadResult {
+  status: String!
+}
+
+scalar Upload
+
+input UploadDesignInput {
+  name: String!
+  upload: Upload
+}
+
+type Mutation {
+  uploadDesign(input: UploadDesignInput): UploadResult
+}

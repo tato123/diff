@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "cross-env NODE_ENV=production node src/index.js",
-    "start:dev": "cross-env NODE_ENV=development nodemon src/index.js",    
+    "start:dev": "cross-env NODE_ENV=development nodemon src/index.js",
     "test": "echo \"no test yet\""
   },
   "author": "",
@@ -13,11 +13,14 @@
   "dependencies": {
     "@axelspringer/graphql-google-pubsub": "^1.1.3",
     "@google-cloud/debug-agent": "^3.0.0",
+    "@google-cloud/storage": "^2.3.3",
     "@google-cloud/trace-agent": "^3.4.0",
     "cross-env": "^5.2.0",
     "dotenv": "^6.2.0",
+    "fast-crc32c": "^1.0.4",
     "firebase-admin": "^6.3.0",
-    "graphql-yoga": "^1.16.7"
+    "graphql-yoga": "^1.16.7",
+    "string-to-stream": "^1.1.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0",

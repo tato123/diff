@@ -1,15 +1,16 @@
 const { GraphQLServer } = require("graphql-yoga");
-
-const { GooglePubSub } = require("@axelspringer/graphql-google-pubsub");
+const path = require("path");
 const admin = require("firebase-admin");
 const collectionUtils = require("./utils/collections");
+const pubsub = require("./pubsub");
+const { Storage } = require("@google-cloud/storage");
 
-const pubsubOptions = {};
-const topic2SubName = topicName => `${topicName}`;
-const messageHandler = ({ data }) => {
-  const d = JSON.parse(data.toString("utf-8"));
-  return d;
-};
+// Creates a client
+const storage = new Storage({
+  projectId: "experiments-224320"
+});
+const myBucket = storage.bucket("stage-diff-fake_account");
+const str = require("string-to-stream");
 
 var serviceAccount = require("./key.json");
 
@@ -22,68 +23,6 @@ const db = admin.firestore();
 const settings = { timestampsInSnapshots: true };
 db.settings(settings);
 
-const pubsub = new GooglePubSub(pubsubOptions, topic2SubName, messageHandler);
-
-const typeDefs = `
- 
-  type Event {
-    type: String!
-    comment: String
-    url: String!
-    id: String
-    selector: String
-  }
-
-  type Invite {
-    email: String
-    firstName: String
-    invitedBy: String
-    lastName: String
-    status: String
-    workspaceId: String
-    id: String
-  }
-
-  type User {
-    aud: String
-    email: String
-    email_verified: Boolean
-    exp: Int
-    family_name: String
-    gender: String
-    given_name: String
-    iat: Int
-    iss: String
-    locale: String
-    name: String
-    nickname: String
-    picture: String
-    plan: String
-    sub: String
-    updated_at: String
-  }
-
-  type Query {
-    allEvents: [Event]    
-    allInvites: [Invite]
-    allUsers: [User]
-  }
-
-  type Counter {
-    count: Int!
-    countStr: String
-  }
-
-  type DocChange {
-    type: String,
-    data: Event
-  }
-
-  type Subscription {
-    events: [DocChange]
-  }
-`;
-
 const EVENT_TOPIC = "onEventChange";
 
 const resolvers = {
@@ -94,6 +33,39 @@ const resolvers = {
   },
   Event: {
     url: event => event.url.href
+  },
+  Mutation: {
+    uploadDesign: (root, args, context, info) => {
+      console.log("received upload design request", args.input.name);
+
+      const id = Math.floor(Math.random() * 100000);
+      const file = myBucket.file(`${id}-design`);
+
+      return new Promise((resolve, reject) => {
+        str(args.input.upload)
+          .pipe(
+            file.createWriteStream({
+              metadata: {
+                contentType: "application/json",
+                metadata: {
+                  custom: "metadata"
+                }
+              }
+            })
+          )
+          .on("error", err => {
+            console.error("could not upload file", err);
+            reject({
+              status: "error"
+            });
+          })
+          .on("finish", () => {
+            resolve({
+              status: "done"
+            });
+          });
+      });
+    }
   },
   Subscription: {
     events: {
@@ -123,10 +95,15 @@ const resolvers = {
 const port = process.env.PORT || 8080;
 
 const options = {
-  port
+  port,
+  endpoint: "/graphql"
 };
 
-const server = new GraphQLServer({ typeDefs, resolvers, context: { pubsub } });
+const server = new GraphQLServer({
+  typeDefs: path.resolve(__dirname, "./schema.graphql"),
+  resolvers,
+  context: { pubsub }
+});
 
 server.start(options, () =>
   console.log(`Server is running on localhost:${port}`)
