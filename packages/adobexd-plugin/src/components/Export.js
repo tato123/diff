@@ -22,22 +22,25 @@ const Export = ({ selection }) => (
         }
       `}
     >
-      {mutate => (
-        <button
-          uxp-variant="cta"
-          onClick={() =>
-            mutate({
-              variables: {
-                input: {
-                  name: "test",
-                  upload: jsonTool(selection)
+      {(uploadDesign, { data }) => (
+        <React.Fragment>
+          <div>Result: {data && data.uploadDesign.status}</div>
+          <button
+            uxp-variant="cta"
+            onClick={() =>
+              uploadDesign({
+                variables: {
+                  input: {
+                    name: "test",
+                    upload: jsonTool(selection)
+                  }
                 }
-              }
-            })
-          }
-        >
-          Export
-        </button>
+              })
+            }
+          >
+            Export
+          </button>
+        </React.Fragment>
       )}
     </Mutation>
   </div>
