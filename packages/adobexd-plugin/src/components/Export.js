@@ -1,5 +1,5 @@
 import React from "react";
-import jsonTool from "../json";
+import { serialize } from "adobexd-object-utils";
 import gql from "graphql-tag";
 import { Mutation } from "react-apollo";
 
@@ -32,7 +32,7 @@ const Export = ({ selection }) => (
                 variables: {
                   input: {
                     name: "test",
-                    upload: jsonTool(selection)
+                    upload: JSON.stringify(serialize(selection.items))
                   }
                 }
               })
