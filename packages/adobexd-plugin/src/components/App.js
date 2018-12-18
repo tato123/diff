@@ -7,13 +7,15 @@ import history from "../history";
 import Login from "./Login";
 import Export from "./Export";
 
+import { ApolloClient } from "apollo-client";
+import { InMemoryCache } from "apollo-cache-inmemory";
+import { createUploadLink } from "apollo-upload-client";
+
 import styled from "styled-components";
 
-// configure apollo
-import ApolloClient from "apollo-boost";
-
 const client = new ApolloClient({
-  uri: "http://localhost:8081/graphql"
+  cache: new InMemoryCache(),
+  link: createUploadLink({ uri: "http://localhost:8081/graphql" })
 });
 
 const App = ({ dialog, selection }) => (

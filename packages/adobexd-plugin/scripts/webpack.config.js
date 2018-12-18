@@ -53,7 +53,9 @@ module.exports = {
     ]
   },
   externals: {
-    scenegraph: "scenegraph"
+    scenegraph: "scenegraph",
+    application: "application",
+    uxp: "uxp"
   },
   plugins: [new CopyWebpackPlugin(["src/manifest.json"]), new XdpmPlugin()]
 };

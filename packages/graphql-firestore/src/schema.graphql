@@ -56,11 +56,10 @@ type UploadResult {
 
 scalar Upload
 
-input UploadDesignInput {
+input UploadDesignMeta {
   name: String!
-  upload: Upload
 }
 
 type Mutation {
-  uploadDesign(input: UploadDesignInput): UploadResult
+  uploadDesign(file: Upload!, metaData: UploadDesignMeta): UploadResult
 }

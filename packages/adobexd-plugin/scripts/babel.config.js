@@ -1,17 +1,19 @@
 const presets = [
-    [
-      "@babel/env",
-      {
-        targets: {
-          node: true          
-        },
-        useBuiltIns: "usage",
+  [
+    "@babel/env",
+    {
+      targets: {
+        node: true
       },
-    ],
-    "@babel/preset-react"
-  ];
+      useBuiltIns: "usage"
+    }
+  ],
+  "@babel/preset-react"
+];
 
-  const plugins = ["@babel/plugin-transform-modules-commonjs"];
+const plugins = [
+  "@babel/plugin-transform-modules-commonjs",
+  "@babel/plugin-proposal-class-properties"
+];
 
-  
-  module.exports = { presets, plugins };
+module.exports = { presets, plugins };

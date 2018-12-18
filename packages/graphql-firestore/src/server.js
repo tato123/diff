@@ -25,6 +25,41 @@ db.settings(settings);
 
 const EVENT_TOPIC = "onEventChange";
 
+const processUpload = async (upload, metaData) => {
+  console.log("received upload design request", metaData);
+
+  const id = Math.floor(Math.random() * 100000);
+  const file = myBucket.file(`${id}-design`);
+
+  // from our file
+  const result = await upload;
+
+  return new Promise((resolve, reject) => {
+    str(result)
+      .pipe(
+        file.createWriteStream({
+          metadata: {
+            contentType: "image/svg+xml",
+            metadata: {
+              custom: "metadata"
+            }
+          }
+        })
+      )
+      .on("error", err => {
+        console.error("could not upload file", err);
+        reject({
+          status: "error"
+        });
+      })
+      .on("finish", () => {
+        resolve({
+          status: "done"
+        });
+      });
+  });
+};
+
 const resolvers = {
   Query: {
     allEvents: collectionUtils.allCollection(db, "events"),
@@ -35,37 +70,7 @@ const resolvers = {
     url: event => event.url.href
   },
   Mutation: {
-    uploadDesign: (root, args, context, info) => {
-      console.log("received upload design request", args.input.name);
-
-      const id = Math.floor(Math.random() * 100000);
-      const file = myBucket.file(`${id}-design`);
-
-      return new Promise((resolve, reject) => {
-        str(args.input.upload)
-          .pipe(
-            file.createWriteStream({
-              metadata: {
-                contentType: "application/json",
-                metadata: {
-                  custom: "metadata"
-                }
-              }
-            })
-          )
-          .on("error", err => {
-            console.error("could not upload file", err);
-            reject({
-              status: "error"
-            });
-          })
-          .on("finish", () => {
-            resolve({
-              status: "done"
-            });
-          });
-      });
-    }
+    uploadDesign: (obj, { file, metaData }) => processUpload(file, metaData)
   },
   Subscription: {
     events: {
@@ -96,7 +101,11 @@ const port = process.env.PORT || 8080;
 
 const options = {
   port,
-  endpoint: "/graphql"
+  endpoint: "/graphql",
+  bodyParserOptions: {
+    limit: "50mb",
+    extended: true
+  }
 };
 
 const server = new GraphQLServer({
