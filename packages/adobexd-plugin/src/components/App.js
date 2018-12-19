@@ -18,16 +18,29 @@ const client = new ApolloClient({
   link: createUploadLink({ uri: "http://localhost:8081/graphql" })
 });
 
-const App = ({ dialog, selection }) => (
-  <ApolloProvider client={client}>
-    <Router history={history}>
-      <Switch>
-        <Route exact path="/login" component={Login} />
-        <Route exact path="/signup" component={Dialog} />
-        <Route render={() => <Export selection={selection} />} />
-      </Switch>
-    </Router>
-  </ApolloProvider>
-);
+export default class App extends React.Component {
+  componentDidCatch(error) {
+    // in the future display an error to the user
+    console.log(error);
+  }
 
-export default App;
+  render() {
+    const {
+      props: { dialog, selection }
+    } = this;
+
+    return (
+      <ApolloProvider client={client}>
+        <Router history={history}>
+          <Switch>
+            <Route exact path="/login" component={Login} />
+            <Route exact path="/signup" component={Dialog} />
+            <Route
+              render={() => <Export dialog={dialog} selection={selection} />}
+            />
+          </Switch>
+        </Router>
+      </ApolloProvider>
+    );
+  }
+}
