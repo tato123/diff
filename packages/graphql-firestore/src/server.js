@@ -64,7 +64,8 @@ const resolvers = {
   Query: {
     allEvents: collectionUtils.allCollection(db, "events"),
     allInvites: collectionUtils.allCollection(db, "invites"),
-    allUsers: collectionUtils.allCollection(db, "users")
+    allUsers: collectionUtils.allCollection(db, "users"),
+    allComponents: collectionUtils.allCollection(db, "components")
   },
   Event: {
     url: event => event.url.href

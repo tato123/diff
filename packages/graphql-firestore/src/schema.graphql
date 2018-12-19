@@ -35,10 +35,19 @@ type User {
   updated_at: String
 }
 
+type Component {
+  created: String
+  metageneration: String
+  name: String
+  updated: String
+  url: String
+}
+
 type Query {
   allEvents: [Event]
   allInvites: [Invite]
   allUsers: [User]
+  allComponents: [Component]
 }
 
 type DocChange {
