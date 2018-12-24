@@ -1,9 +1,7 @@
-type Event {
-  type: String!
-  comment: String
-  url: String!
-  id: String
-  selector: String
+type Origin {
+  host: String
+  origin: String
+  accountId: String
 }
 
 type Invite {
@@ -44,15 +42,10 @@ type Component {
 }
 
 type Query {
-  allEvents: [Event]
   allInvites: [Invite]
   allUsers: [User]
   allComponents: [Component]
-}
-
-type DocChange {
-  type: String
-  data: Event
+  origin(Host: String): Origin
 }
 
  type Counter {

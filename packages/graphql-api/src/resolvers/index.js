@@ -4,7 +4,6 @@ const Subscription = require('./Subscription');
 const Model = require('./Model')
 
 
-
 module.exports = Object.assign({
     Query, Mutation, Subscription
 }, Model)
