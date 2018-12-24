@@ -1,5 +1,5 @@
 {
-  "id": "Diff",
+  "id": "930cae91",
   "name": "Diff",
   "host": {
     "app": "XD",
@@ -9,8 +9,9 @@
   "uiEntryPoints": [
     {
       "type": "menu",
-      "label": "Export Json",
-      "commandId": "exportJson"
+      "label": "Diff",
+      "commandId": "diffPlugin",
+      "shortcut": { "mac": "Cmd+Shift+D", "win": "Ctrl+Shift+D" }
     }
   ]
 }

@@ -1,21 +1,29 @@
-const { getXDWrapper } = require("xd-json-wrapper");
+import reactShim from "./react-shim";
+import React from "react";
+import ReactDOM from "react-dom";
+import App from "./components/App";
 
-const {Rectangle, Color} = require("scenegraph"); 
+function main(selection) {
+  let dialog;
 
-function exportJson(selection) { 
-    
-    let xdNodes = null;
-    if (Array.isArray(selection.items)) {
-        xdNodes = selection.items.map(item => getXDWrapper(item).toJSON())        
+  function getDialog() {
+    if (dialog == null) {
+      dialog = document.createElement("dialog");
+      ReactDOM.render(<App dialog={dialog} selection={selection} />, dialog);
     }
-    const output = {
-        nodes: xdNodes
-    }
-    console.log(JSON.stringify(output))
+    return dialog;
+  }
+
+  return document.body
+    .appendChild(getDialog())
+    .showModal()
+    .then(result => {
+      console.log("dialog closed");
+    });
 }
 
 module.exports = {
-    commands: {
-        exportJson: exportJson
-    }
+  commands: {
+    diffPlugin: main
+  }
 };

@@ -1,0 +1,28 @@
+{
+  "name": "@diff/client-bridge",
+  "version": "1.0.0",
+  "description": "Bridge library that handles most of the client side execution",
+  "main": "src/index.js",
+  "scripts": {
+    "prebuild": "rimraf dist",
+    "build": "cross-env NODE_ENV=production webpack --config webpack.config.js --progress",
+    "watch": "cross-env NODE_ENV=development webpack --config webpack.config.js --progress --watch",
+    "start:dev": "npm run watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tato123/diff.git"
+  },
+  "keywords": [
+    "Diff"
+  ],
+  "author": "Jonathan Fontanez <jfontanez@getdiff.app>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tato123/diff/issues"
+  },
+  "homepage": "https://github.com/tato123/diff#readme",
+  "devDependencies": {
+    "babel-loader": "^8.0.4"
+  }
+}

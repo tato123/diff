@@ -1,0 +1,24 @@
+service: aws-functions
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  role: arn:aws:iam::290983348596:role/service-role/lambda-edge
+  stage: dev
+  region: us-east-1
+  memorySize: 512 # optional, in MB, default is 1024
+  timeout: 10 # optional, in seconds, default is 6
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:us-east-1:290983348596:table/Origins"
+
+functions:
+  hello:
+    handler: src/proxy.edgeProxy
