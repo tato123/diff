@@ -55,8 +55,13 @@ type DocChange {
   data: Event
 }
 
+ type Counter {
+    count: Int!
+    countStr: String
+  }
+
 type Subscription {
-  events: [DocChange]
+  events: Counter!
 }
 
 type UploadResult {
