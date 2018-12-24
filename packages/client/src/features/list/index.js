@@ -1,8 +1,19 @@
 import React from "react";
 import styled from "styled-components";
-import Dropzone from "react-dropzone";
 import Messanger from "./Messanger";
 import { CheckBox } from "grommet";
+import { Query } from "react-apollo";
+import gql from "graphql-tag";
+
+const GET_COMPONENTS = gql`
+  {
+    allComponents {
+      created
+      name
+      url
+    }
+  }
+`;
 
 const Container = styled.div`
   display: flex;
@@ -34,20 +45,6 @@ const ContentRow = styled(Row)`
   align-items: center;
 `;
 
-const StyledDropArea = styled.div``;
-
-const pDelta = {
-  html: `<p data-df="p.01" style="font-size:1rem;line-height:1.8;">{{value}}</p>`,
-  css: "p",
-  id: "p.01"
-};
-
-const h2Delta = {
-  html: `<h2 data-df="p.02" style="font-size:2rem;font-family:Arial;font-weight:bold;line-height:1.5;">{{value}}</h2>`,
-  css: "h2",
-  id: "p.02"
-};
-
 const h1Delta = {
   html: `<h1 data-df="p.03" style="font-size:5rem;font-family:Arial;font-weight:100;line-height:1.5;">{{value}}</h1>`,
   css: "h1",
@@ -55,64 +52,36 @@ const h1Delta = {
 };
 
 const List = () => (
-  <Messanger>
-    {sendMessage => (
-      <Container>
-        <HeaderRow>Previewing changes for:</HeaderRow>
-        <ContentRow>
-          <CheckBox
-            toggle
-            onChange={evt =>
-              sendMessage({
-                type: !!evt.target.checked ? "apply" : "remove",
-                ...pDelta
-              })
+  <Container>
+    <HeaderRow>Previewing changes for:</HeaderRow>
+    <Query query={GET_COMPONENTS}>
+      {({ loading, error, data }) => {
+        if (loading) return "Loading...";
+        if (error) return `Error! ${error.message}`;
+
+        return (
+          <Messanger>
+            {sendMessage =>
+              data.allComponents.map(component => (
+                <ContentRow>
+                  <CheckBox
+                    toggle
+                    onChange={evt =>
+                      sendMessage({
+                        type: !!evt.target.checked ? "apply" : "remove",
+                        ...h1Delta
+                      })
+                    }
+                  />
+                  <label>{component.name}</label>
+                </ContentRow>
+              ))
             }
-          />
-          <label>Paragraphs</label>
-        </ContentRow>
-        <ContentRow>
-          <CheckBox
-            toggle
-            onChange={evt =>
-              sendMessage({
-                type: !!evt.target.checked ? "apply" : "remove",
-                ...h1Delta
-              })
-            }
-          />
-          <label>H1</label>
-        </ContentRow>
-        <ContentRow>
-          <CheckBox
-            toggle
-            onChange={evt =>
-              sendMessage({
-                type: !!evt.target.checked ? "apply" : "remove",
-                ...h2Delta
-              })
-            }
-          />
-          <label>H2</label>
-        </ContentRow>
-      </Container>
-    )}
-  </Messanger>
+          </Messanger>
+        );
+      }}
+    </Query>
+  </Container>
 );
 
 export default List;
-
-// <form
-// onSubmit={evt => {
-//   evt.preventDefault();
-//   sendMessage({
-//     css: evt.target.css.value,
-//     html: evt.target.text.value
-//   });
-//   return false;
-// }}
-// >
-// <textarea name="text" />
-// <input name="css" type="text" placeholder=".css" />
-// <button type="submit">button</button>
-// </form>
