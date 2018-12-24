@@ -66,7 +66,9 @@ function defaultPage() {
       "content-type": [
         { key: "Content-Type", value: "text/html; charset=utf-8" }
       ],
-      "content-encoding": [{ key: "Content-Encoding", value: "gzip" }]
+      "content-encoding": [{ key: "Content-Encoding", value: "gzip" }],
+      "expires" :  [{ key: "Expires", value: "0" }],
+      "cache-control":[{ key: "Cache-control", value: "no-cache,no-store" }]
     },
     body: base64EncodedBody,
     bodyEncoding: "base64",
