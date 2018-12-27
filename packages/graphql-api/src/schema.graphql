@@ -48,10 +48,10 @@ type Query {
   origin(Host: String): Origin
 }
 
- type Counter {
-    count: Int!
-    countStr: String
-  }
+type Counter {
+  count: Int!
+  countStr: String
+}
 
 type Subscription {
   events: Counter!
@@ -67,6 +67,17 @@ input UploadDesignMeta {
   name: String!
 }
 
+input SiteChangeInput {
+  origin: String!
+  changes: String!
+}
+
+type CreateSiteChangeResult {
+  status: String!
+  versionUrl: String
+}
+
 type Mutation {
   uploadDesign(file: Upload!, metaData: UploadDesignMeta): UploadResult
+  createSiteChange(siteChange: SiteChangeInput!): CreateSiteChangeResult
 }

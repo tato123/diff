@@ -7,8 +7,7 @@ const presets = [
       },
       useBuiltIns: "usage"
     }
-  ],
-  "@babel/preset-react"
+  ]
 ];
 
 const plugins = [

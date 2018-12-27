@@ -1,0 +1,9 @@
+0 silly argv { _: [ 'bootstrap' ],
+0 silly argv   lernaVersion: '3.5.1',
+0 silly argv   '$0':
+0 silly argv    '..\\..\\..\\..\\AppData\\Roaming\\npm\\node_modules\\lerna\\cli.js' }
+1 notice cli v3.5.1
+2 verbose rootPath C:\Users\Jonathan\Repositories\github\tato123\diff
+3 error JSONError: Unexpected token } in JSON at position 1375 while parsing near '...k-cli": "^3.1.2",  }}' in packages\client-bridge\package.json
+3 error     at module.exports (C:\Users\Jonathan\Repositories\github\tato123\diff\node_modules\parse-json\index.js:26:19)
+3 error     at parse (C:\Users\Jonathan\Repositories\github\tato123\diff\node_modules\load-json-file\index.js:8:29)

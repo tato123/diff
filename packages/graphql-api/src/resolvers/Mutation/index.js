@@ -1,40 +1,47 @@
 const str = require("string-to-stream");
 
 const processUpload = async (upload, metaData) => {
-    console.log("received upload design request", metaData);
-  
-    const id = Math.floor(Math.random() * 100000);
-    const file = myBucket.file(`${id}-design`);
-  
-    // from our file
-    const result = await upload;
-  
-    return new Promise((resolve, reject) => {
-      str(result)
-        .pipe(
-          file.createWriteStream({
+  console.log("received upload design request", metaData);
+
+  const id = Math.floor(Math.random() * 100000);
+  const file = myBucket.file(`${id}-design`);
+
+  // from our file
+  const result = await upload;
+
+  return new Promise((resolve, reject) => {
+    str(result)
+      .pipe(
+        file.createWriteStream({
+          metadata: {
+            contentType: "image/svg+xml",
             metadata: {
-              contentType: "image/svg+xml",
-              metadata: {
-                custom: "metadata"
-              }
+              custom: "metadata"
             }
-          })
-        )
-        .on("error", err => {
-          console.error("could not upload file", err);
-          reject({
-            status: "error"
-          });
+          }
         })
-        .on("finish", () => {
-          resolve({
-            status: "done"
-          });
+      )
+      .on("error", err => {
+        console.error("could not upload file", err);
+        reject({
+          status: "error"
         });
-    });
+      })
+      .on("finish", () => {
+        resolve({
+          status: "done"
+        });
+      });
+  });
+};
+
+const createSiteChange = async (parent, args, context) => {
+  return {
+    status: "failed"
   };
+};
 
 module.exports = {
-    uploadDesign: (obj, { file, metaData }) => processUpload(file, metaData)
-}
+  uploadDesign: (obj, { file, metaData }) => processUpload(file, metaData),
+  createSiteChange
+};

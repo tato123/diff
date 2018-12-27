@@ -1,43 +1,97 @@
-window.addEventListener("load", function(event) {
-  window.addEventListener("message", evt => {
-    console.log("[Child] received a message", evt.data);
-    const data = evt.data;
-    const id = data.id;
+import finder from "@medv/finder";
+import client from "./graphql/client";
+import gql from "graphql-tag";
 
-    if (data.type === "apply") {
-      const domElements = document.querySelectorAll(data.css);
-      domElements.forEach(element => {
-        const html = data.html.replace("{{value}}", element.innerText);
-        element.insertAdjacentHTML("afterend", html);
+const deltas = {};
 
-        element.setAttribute(
-          "data-df-di",
-          window.getComputedStyle(element).display || "initial"
-        );
-        element.style.display = "none";
-        element.setAttribute("data-df-og", id);
-      });
-    } else if (data.type === "remove") {
-      // remove old ids
-      document
-        .querySelectorAll(`[data-df="${id}"]`)
-        .forEach(e => e.parentNode.removeChild(e));
+function getSelector(node) {
+  try {
+    const selector = finder(node, {
+      seedMinLength: 4,
+      optimizedMinLength: 2,
+      threshold: 1000
+    });
+    return selector;
+  } catch (error) {
+    // do nothing
+  }
+}
 
-      // re-enable
-      document
-        .querySelectorAll(`[data-df-og="${id}"]`)
-        .forEach(e => (e.style.display = e.getAttribute("data-df-di")));
+const characterDataBlackList = ["body"];
+
+const styleMutator = mutation => {
+  const selector = getSelector(mutation.target);
+
+  if (selector == null || selector === undefined) {
+    return;
+  }
+
+  deltas[selector] = Object.assign({}, deltas[selector], {
+    style: window.getComputedStyle(mutation.target).cssText
+  });
+};
+
+const characterDataMutator = mutation => {
+  const selector = getSelector(mutation.target.parentNode);
+
+  if (selector == null || selector === undefined) {
+    return;
+  }
+
+  if (characterDataBlackList.includes(selector)) {
+    return;
+  }
+
+  deltas[selector] = Object.assign({}, deltas[selector], {
+    characterData: mutation.target.textContent
+  });
+};
+
+const observer = new MutationObserver(mutations => {
+  mutations.forEach(mutation => {
+    if (mutation.type === "attributes" && mutation.attributeName === "style") {
+      styleMutator(mutation);
+    }
+
+    if (mutation.type === "characterData") {
+      characterDataMutator(mutation);
     }
   });
-
-  const button = document.createElement("input");
-  button.type = "button";
-  button.value = "im a button";
-  button.onclick = () => {
-    window.parent.postMessage("hi im sending something", "*");
-  };
-  document.body.appendChild(button);
-
-  console.log("I loaded a script!!!");
-  console.log("All resources finished loading!");
 });
+
+window.printDeltas = function() {
+  console.log(JSON.stringify(deltas, null, 4));
+};
+
+window.applyChanges = function(data) {
+  Object.keys(data).forEach(key => {
+    const element = document.querySelector(key);
+    const record = data[key];
+    try {
+      // apply character changes
+      element.innerText = record.characterData;
+    } catch (error) {
+      console.warn("cant apply character change to ", key);
+    }
+
+    try {
+      element.setAttribute("style", record.style);
+    } catch (error) {
+      console.warn("cant apply style change to ", key);
+    }
+  });
+};
+
+// Notify me of style changes
+const observerConfig = {
+  attributes: true,
+  attributeFilter: ["style"],
+  attributeOldValue: true,
+  characterData: true,
+  characterDataOldValue: true,
+  childList: true,
+  subtree: true
+};
+
+const targetNode = document.body;
+observer.observe(targetNode, observerConfig);
