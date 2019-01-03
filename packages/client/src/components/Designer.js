@@ -1,90 +1,83 @@
-import React from 'react';
-import List from "../features/list";
+import React from "react";
+import Textfield from "@atlaskit/textfield";
 import styled from "styled-components";
-import Logo from "./Logo";
-import Frame from "../features/frame";
+import EmptyState from "./Empty";
+import { Mutation, Query } from "react-apollo";
+import { CREATE_SITE, ALL_ORIGINS } from "../graphql/mutations";
 
-import FrameHeader from "../features/frame/header";
-
-import { ModalProvider } from "styled-react-modal";
-
-const Container = styled.div`
-  display: grid;
-  grid-template-areas: ". .";
-  grid-template-columns: 0.3fr 1fr;
-  grid-template-rows: 1fr;
-  width: 100vw;
-  height: 100vh;
+const Page = styled.div`
+  margin: 0 15%;
+  margin-top: 16px;
 `;
 
-const Detail = styled.div`
-  border-right: 1px solid #ccc;
-  display: grid;
-  grid-template-areas:
-    "header"
-    "frame";
-  grid-template-rows: 64px 1fr;
-  grid-template-columns: 1fr;
-`;
-
-Detail.Header = styled.div`
-  grid-area: header;
-  border-bottom: 1px solid #ccc;
+const CardContainer = styled.div`
   display: flex;
   flex: 1 auto;
-  width: 100%;
+  flex-direction: row;
+  flex-wrap: wrap;
+`;
 
-  img {
-    height: 40px;
-    width: auto;
-    margin: 0;
-    padding-left: 6px;
+const Card = styled.div`
+  width: 390px;
+  height: 330px;
+  border: 2px solid #dfe1e6;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 16px 16px 0px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
 
-    align-self: center;
-    display: flex;
+  &:hover {
+    background-color: #ebecf0;
   }
 `;
 
-Detail.Frame = styled.div`
-  grid-area: frame;
-`;
+export default class Designer extends React.Component {
+  onSubmit = mutation => evt => {
+    evt.preventDefault();
+    const site = evt.target.website.value;
+    mutation({ variables: { input: { url: site } } });
 
-const Master = styled.div`
-  display: grid;
-  grid-template-areas:
-    "header"
-    "frame";
-  grid-template-rows: 64px 1fr;
-  grid-template-columns: 1fr;
-`;
+    return false;
+  };
 
-Master.Header = styled.div`
-  grid-area: header;
-  border-bottom: 1px solid #ccc;
-`;
+  render() {
+    return (
+      <Page>
+        <Mutation mutation={CREATE_SITE}>
+          {(createSiteOrigin, { data }) => (
+            <form onSubmit={this.onSubmit(createSiteOrigin)}>
+              <label htmlFor="auto-focus">Add a site to prototype</label>
+              <Textfield
+                name="website"
+                autoFocus
+                placeholder="Enter a website URL"
+              />
+            </form>
+          )}
+        </Mutation>
+        <Query query={ALL_ORIGINS}>
+          {({ loading, error, data }) => {
+            if (loading) return "Loading...";
+            if (error) return <EmptyState />;
 
-Master.Frame = styled.div`
-  grid-area: frame;
-`;
-export default () => (
-    <ModalProvider>
-    <Container>
-      <Detail>
-        <Detail.Header>
-          <Logo />
-        </Detail.Header>
-        <Detail.Frame>
-          <List />
-        </Detail.Frame>
-      </Detail>
-      <Master>
-        <Master.Header>
-          <FrameHeader />
-        </Master.Header>
-        <Master.Frame>
-          <Frame />
-        </Master.Frame>
-      </Master>
-    </Container>
-  </ModalProvider>
-)
+            return (
+              <CardContainer>
+                {data.allOrigins.map(origin => (
+                  <Card
+                    key={origin.host}
+                    onClick={() =>
+                      window.open(`https://${origin.host}`, "_blank")
+                    }
+                  >
+                    <label>{origin.origin}</label>
+                  </Card>
+                ))}
+              </CardContainer>
+            );
+          }}
+        </Query>
+      </Page>
+    );
+  }
+}

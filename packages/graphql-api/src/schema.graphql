@@ -46,6 +46,7 @@ type Query {
   allUsers: [User]
   allComponents: [Component]
   origin(Host: String): Origin
+  allOrigins: [Origin]
 }
 
 type Counter {
@@ -77,7 +78,16 @@ type CreateSiteChangeResult {
   versionUrl: String
 }
 
+input CreateSiteOriginInput {
+  url: String!
+}
+
+type CreateSiteOriginResult {
+  prototypeUrl: String!
+}
+
 type Mutation {
   uploadDesign(file: Upload!, metaData: UploadDesignMeta): UploadResult
   createSiteChange(siteChange: SiteChangeInput!): CreateSiteChangeResult
+  createSiteOrigin(input: CreateSiteOriginInput!): CreateSiteOriginResult
 }
