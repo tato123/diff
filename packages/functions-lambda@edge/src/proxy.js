@@ -67,8 +67,8 @@ function defaultPage() {
         { key: "Content-Type", value: "text/html; charset=utf-8" }
       ],
       "content-encoding": [{ key: "Content-Encoding", value: "gzip" }],
-      "expires" :  [{ key: "Expires", value: "0" }],
-      "cache-control":[{ key: "Cache-control", value: "no-cache,no-store" }]
+      expires: [{ key: "Expires", value: "0" }],
+      "cache-control": [{ key: "Cache-control", value: "no-cache,no-store" }]
     },
     body: base64EncodedBody,
     bodyEncoding: "base64",
@@ -127,7 +127,13 @@ module.exports.edgeProxy = async (event, context) => {
           "content-type": [
             { key: "Content-Type", value: responseHeaders["content-type"] }
           ],
-          "content-encoding": [{ key: "Content-Encoding", value: "gzip" }]
+          "content-encoding": [{ key: "Content-Encoding", value: "gzip" }],
+          "access-control-allow-origin": [
+            {
+              key: "access-control-allow-origin",
+              value: "*"
+            }
+          ]
         },
         body: base64EncodedBody,
         bodyEncoding: "base64",

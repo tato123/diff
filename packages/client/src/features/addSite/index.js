@@ -1,9 +1,10 @@
 import React from "react";
+import PropTypes from "prop-types";
 import Textfield from "@atlaskit/textfield";
 import styled from "styled-components";
-import EmptyState from "./Empty";
+import EmptyState from "../../components/Empty";
 import { Mutation, Query } from "react-apollo";
-import { CREATE_SITE, ALL_ORIGINS } from "../graphql/mutations";
+import { CREATE_SITE, ALL_ORIGINS } from "../../graphql/mutations";
 
 const Page = styled.div`
   margin: 0 15%;
@@ -33,6 +34,12 @@ const Card = styled.div`
 `;
 
 export default class Designer extends React.Component {
+  static propTypes = {
+    history: PropTypes.shape({
+      push: PropTypes.func
+    })
+  };
+
   onSubmit = mutation => evt => {
     evt.preventDefault();
     const site = evt.target.website.value;
@@ -42,6 +49,9 @@ export default class Designer extends React.Component {
   };
 
   render() {
+    const {
+      props: { history }
+    } = this;
     return (
       <Page>
         <Mutation mutation={CREATE_SITE}>
@@ -67,7 +77,10 @@ export default class Designer extends React.Component {
                   <Card
                     key={origin.host}
                     onClick={() =>
-                      window.open(`https://${origin.host}`, "_blank")
+                      history.push({
+                        pathname: "/edit",
+                        search: `?version=${encodeURIComponent(origin.host)}`
+                      })
                     }
                   >
                     <label>{origin.origin}</label>
