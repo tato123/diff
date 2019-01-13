@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@atlaskit/button": "^10.1.1",
     "@atlaskit/css-reset": "^3.0.5",
     "@atlaskit/empty-state": "^3.1.4",
     "@atlaskit/textfield": "^0.1.5",

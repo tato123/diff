@@ -20,7 +20,24 @@ function handleCustomHtml(data, headers) {
   const script = `<script src="${jsUrl}"></script>`;
   const re = /<\/body>(?![\s\S]*<\/body>[\s\S]*$)/i;
   const subst = `${script}</body>`;
-  return data.replace(re, subst);
+  const html = data.replace(re, subst);
+
+
+  const changes = `<script>window.delta = {
+    "#Content div:nth-child(1) > p": {
+        "style": "color:red"
+    },
+    "body" : {
+        style: "font-family:Arial !important;font-size: 2rem;"
+    },
+    "*": {
+        style: "text-decoration:none; font-family: inherit;"
+    }
+}</script>`;
+const headRe = /<\/head>(?![\s\S]*<\/head>[\s\S]*$)/i;
+  const headSubst = `${changes}</head>`;
+
+  return html.replace(headRe,headSubst)
 }
 
 // Performs a lookup in dynamodb to match our account
