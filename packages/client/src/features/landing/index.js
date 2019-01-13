@@ -1,5 +1,5 @@
 import React from "react";
-import PropTypes from "prop-types";
+
 import Textfield from "@atlaskit/textfield";
 import Button from "@atlaskit/button";
 import styled from "styled-components";
@@ -15,6 +15,8 @@ const Page = styled.div`
 
   img {
     object-fit: none;
+    display: flex;
+    width: 100%;
   }
 `;
 
@@ -93,7 +95,11 @@ const submitValue = (payload, { props, setSubmitting, setErrors }) => {
     .then(response => {
       setSubmitting(false);
       console.log(response.data);
-      props.history.push("/edit");
+      debugger;
+      props.history.push({
+        pathname: "/edit",
+        search: "?version=" + response.data.createSiteOrigin.prototypeUrl
+      });
     })
     .catch(e => {
       const errors = e.graphQLErrors.map(error => error.message);

@@ -1,42 +1,57 @@
 import React from "react";
 import styled from "styled-components";
-import Button from '@atlaskit/button';
-import { Link } from 'react-router-dom'
-
+import Toolbar from "./toolbar";
+import Editor from "./editor";
 
 const Page = styled.div`
   display: grid;
   grid-template-areas:
     "."
     ".";
-  grid-template-rows: 64px 1fr;
+  grid-template-rows: 1fr 64px;
   grid-template-columns: 1fr;
   width: 100%;
   height: 100%;
   overflow: hidden;
 
   .toolbar {
-    border-bottom: 1px solid #dfe1e6;
-    display: flex;
-    flex: 1;
-    align-items: center;
-    padding: 16px;
+    border-top: 1px solid #dfe1e6;
   }
+`;
+
+const SharedView = styled.div`
+  position: relative;
+  width: 100%;
+  height: 100%;
 
   iframe {
-    width: 100%;
+    width: ${props => (props.isEditing ? "calc(100% - 400px)" : "calc(100%)")};
+
     height: 100%;
-    outline: none;
-    border: 5px solid gray;
-    box-sizing: border-box;
   }
+
+  > div:last-child {
+    width: 400px;
+    height: 100%;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    transform: translateX(${props => (props.isEditing ? "0px" : "400px")});
+    overflow: hidden;
+  }
+`;
+
+const Iframe = styled.iframe`
+  outline: none;
+  box-sizing: border-box;
 `;
 
 export default class Designer extends React.Component {
   state = {
     version: null,
     changed: false,
-    deltas: {}
+    deltas: {},
+    isEditing: false
   };
 
   componentDidMount() {
@@ -44,42 +59,41 @@ export default class Designer extends React.Component {
     const params = new URLSearchParams(this.props.location.search);
     this.setState({ version: `https://${params.get("version")}` });
 
-    window.addEventListener('message', evt => {
+    window.addEventListener("message", evt => {
       const data = evt.data;
-      if (data.source === 'getDiff-client' && data.type === 'SITE_CHANGE') {
-        console.log(data)
-        this.setState({changed: true, deltas:data.payload})
+      if (data.source === "getDiff-client" && data.type === "SITE_CHANGE") {
+        console.log(data);
+        this.setState({ changed: true, deltas: data.payload });
       }
     });
   }
 
-  getDiff=()=> {
-    const frame = document.querySelector('#frame');
-    frame.contentWindow.postMessage({
-      type: 'getDiff'
-    }, '*')
-  }
+  getDiff = () => {
+    const frame = document.querySelector("#frame");
+    frame.contentWindow.postMessage(
+      {
+        type: "getDiff"
+      },
+      "*"
+    );
+  };
+
+  onEdit = () => {
+    this.setState(state => ({ isEditing: !state.isEditing }));
+  };
 
   render() {
+    const {
+      state: { isEditing, version }
+    } = this;
+
     return (
       <Page>
-        <div className="toolbar">
-        <Link to="/">Home</Link>
-        <span style={{margin: "0 16px"}}>
-      {this.state.changed && (<div>Site updated ({Object.keys(this.state.deltas).length} changes) </div>)}
-      </span>
-      <span style={{justifyContent: "flex-end", display: 'flex', flex: '1 auto'}}>
-        <Button onClick={this.getDiff}>Publish changes</Button>
-        </span>
-        </div>
-        <div>
-          <iframe
-            id="frame"
-            src={this.state.version}
-           
-          />
-        </div>
-        
+        <SharedView isEditing={isEditing}>
+          <Iframe id="frame" src={version} title="prototype" />
+          <Editor />
+        </SharedView>
+        <Toolbar onEdit={this.onEdit} />
       </Page>
     );
   }

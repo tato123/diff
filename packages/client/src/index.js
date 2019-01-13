@@ -10,25 +10,21 @@ import { HttpLink } from "apollo-link-http";
 import { WebSocketLink } from "apollo-link-ws";
 import { getMainDefinition } from "apollo-utilities";
 import { ApolloProvider } from "react-apollo";
-import { setContext } from 'apollo-link-context';
-
-import auth from './Auth'
+// import { setContext } from "apollo-link-context";
 
 import "normalize.css";
+
 import "./index.css";
 
-
-const authLink = setContext((_, { headers }) => {
-  
-  // return the headers to the context so httpLink can read them
-  return {
-    headers: {
-      ...headers,
-      authorization: auth.getIdToken()
-    }
-  }
-});
-
+// const authLink = setContext((_, { headers }) => {
+//   // return the headers to the context so httpLink can read them
+//   return {
+//     headers: {
+//       ...headers,
+//       authorization: auth.getIdToken()
+//     }
+//   };
+// });
 
 // Create an http link:
 const httpLink = new HttpLink({
@@ -40,7 +36,7 @@ const wsLink = new WebSocketLink({
   uri: process.env.REACT_APP_GRAPHQL_WS_SERVER,
   options: {
     reconnect: true
-  },
+  }
   // connectionParams: () => ({
   //   authorization: `Bearer ${localStorage.getItem('mytoken')}`,
   // }),
@@ -61,7 +57,7 @@ const link = split(
 const cache = new InMemoryCache();
 
 const client = new ApolloClient({
-  link: authLink.concat(link),
+  link,
   cache
 });
 
