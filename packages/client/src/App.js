@@ -1,14 +1,13 @@
 import React, { Component } from "react";
 import "@atlaskit/css-reset/dist/bundle.css";
 
-import AddSite from "./features/addSite";
+import Landing from "./features/landing";
 import Designer from "./features/designer";
-// import Callback from "./components/Callback";
-// import GuardedRoute from "./components/GuardedRoute";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import { createGlobalStyle, ThemeProvider } from "styled-components";
 
-const GlobalStyle = createGlobalStyle`
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { injectGlobal, ThemeProvider } from "styled-components";
+
+const GlobalStyle = injectGlobal`
   html, body, #root {
     width: 100%;
     height: 100%;
@@ -25,10 +24,9 @@ export default () => (
       <Router>
         <Switch>
           <Route exact path="/edit" component={Designer} />
-          <Route exact path="/" component={AddSite} />
+          <Route exact path="/" component={Landing} />
         </Switch>
       </Router>
-      <GlobalStyle whiteColor />
     </React.Fragment>
   </ThemeProvider>
 );
