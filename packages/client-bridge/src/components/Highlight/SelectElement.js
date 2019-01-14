@@ -56,7 +56,7 @@ export default class Selectors extends React.Component {
           onCancel("escapped");
         }
 
-        cancelInspection();
+        this.getSelector();
       },
       error => {
         cancelInspection();

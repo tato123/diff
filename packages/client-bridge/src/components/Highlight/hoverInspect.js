@@ -228,12 +228,12 @@ export default class Inspector {
     if (this.options.mode === "all") {
       document.removeEventListener("mousemove", this.handleMouseMove);
     }
-    setTimeout(() => {
-      try {
-        document.body.removeChild(this.$host);
-      } catch (error) {
-        console.warn("Error occured removing element", error.message);
-      }
-    }, 600);
+    // setTimeout(() => {
+    //   try {
+    //     document.body.removeChild(this.$host);
+    //   } catch (error) {
+    //     console.warn("Error occured removing element", error.message);
+    //   }
+    // }, 600);
   }
 }

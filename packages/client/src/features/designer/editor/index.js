@@ -6,6 +6,7 @@ const View = styled.div`
   display: flex;
   padding: 16px;
   box-sizing: border-box;
+  overflow: auto;
 `;
 
 const props = {
@@ -16,8 +17,61 @@ const props = {
         text. It's a convenient tool for mock-ups.`
 };
 
-export default ({ open }) => (
+const CellPreview = (key, value) => {
+  if (key.indexOf("color") !== -1) {
+    return (
+      <React.Fragment>
+        <div
+          style={{
+            width: "12px",
+            height: "12px",
+            backgroundColor: value,
+            display: "flex",
+            alignSelf: "center",
+            marginRight: "4px",
+            border: "1px solid #eee"
+          }}
+        />
+        <div>{value}</div>
+      </React.Fragment>
+    );
+  }
+
+  return <span>{value}</span>;
+};
+
+const MapStyle = style => {
+  const props = style.split(":");
+  const whiteList = [
+    "color",
+    "font-size",
+    "font-weight",
+    "background",
+    "background-color",
+    "font-family"
+  ];
+
+  const key = props[0].trim();
+  const value = props[1];
+
+  if (whiteList.includes(key)) {
+    return (
+      <div style={{ display: "flex" }}>
+        <div style={{ marginRight: "16px" }}>{key}:</div>
+        {CellPreview(key, value)}
+      </div>
+    );
+  }
+  return null;
+};
+
+export default ({ styles }) => (
   <View>
-    <EmptyState {...props} />
+    {styles == null && <EmptyState {...props} />}
+    {styles != null && (
+      <div>
+        <span>{styles.map(MapStyle)}</span>
+      </div>
+    )}
   </View>
 );

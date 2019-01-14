@@ -1,5 +1,5 @@
-import _ from 'lodash-es';
-import { fromEvent, of, Observable, race } from 'rxjs';
+import _ from "lodash-es";
+import { fromEvent, of, Observable, race } from "rxjs";
 import {
   takeUntil,
   debounceTime,
@@ -9,13 +9,13 @@ import {
   filter,
   tap,
   map
-} from 'rxjs/operators';
+} from "rxjs/operators";
 
-import { injectGlobal } from 'styled-components';
-import Inspector from './hoverinspect';
+import { injectGlobal } from "styled-components";
+import Inspector from "./hoverinspect";
 
-const SELECTION_CLASS: string = 'diff-selected';
-const HIGHLIGHT_CLASS: string = 'diff-highlight';
+const SELECTION_CLASS: string = "diff-selected";
+const HIGHLIGHT_CLASS: string = "diff-highlight";
 
 injectGlobal`
   .diff-selected {
@@ -29,7 +29,7 @@ interface HTMLEvent extends MouseEvent {
 }
 
 // common selector attribute
-const SELECTABLE_ATTR: string = 'data-diff-selectable';
+const SELECTABLE_ATTR: string = "data-diff-selectable";
 const inspector = new Inspector();
 
 /**
@@ -39,7 +39,7 @@ const inspector = new Inspector();
  */
 const isNotSelectableElement = (evt: HTMLEvent): boolean =>
   evt.target.hasAttribute(SELECTABLE_ATTR) &&
-  evt.target.getAttribute(SELECTABLE_ATTR) === 'false';
+  evt.target.getAttribute(SELECTABLE_ATTR) === "false";
 
 /**
  * Since we are using an opt-out strategy, by default everything is
@@ -53,7 +53,7 @@ const isSelectableElement = (evt: HTMLEvent): boolean => {
 
   return (
     evt.target.hasAttribute(SELECTABLE_ATTR) &&
-    evt.target.getAttribute(SELECTABLE_ATTR) === 'true'
+    evt.target.getAttribute(SELECTABLE_ATTR) === "true"
   );
 };
 
@@ -71,7 +71,7 @@ const inspect = (): Observable<HTMLElement> => {
   clearStyles();
   inspector.activate();
 
-  const clicks: Observable<Event> = fromEvent(window, 'click', {
+  const clicks: Observable<Event> = fromEvent(window, "click", {
     capture: true
   }).pipe(
     filter(evt => {
@@ -93,13 +93,13 @@ const inspect = (): Observable<HTMLElement> => {
     })
   );
 
-  const escape: Observable<Event> = fromEvent(window, 'keyup', {
+  const escape: Observable<Event> = fromEvent(window, "keyup", {
     capture: true
   }).pipe(
     filter(evt => {
       const typedEvent = evt as HTMLEvent;
 
-      if (typedEvent.key === 'Escape') {
+      if (typedEvent.key === "Escape") {
         // throw new Error('Interrupt');
         return true;
       }
@@ -108,7 +108,7 @@ const inspect = (): Observable<HTMLElement> => {
     map(e => null)
   );
 
-  const move = fromEvent(document.body, 'mousemove');
+  const move = fromEvent(document.body, "mousemove");
 
   const stopAndClear = () => {
     clearStyles();
@@ -143,12 +143,12 @@ const inspect = (): Observable<HTMLElement> => {
     }),
     last(),
     catchError(err => {
-      if (err.name !== 'EmptyError') {
+      if (err.name !== "EmptyError") {
         // ignore this error, while it's never good to raise
         // errors as a valid state, it is raised on a special condition where
         // the user closes the launcher without ever hovering over an element
         console.error(err.message);
-      } else if (err.message === 'Interrupt') {
+      } else if (err.message === "Interrupt") {
         // an interrupt was registered and we shouldn't allow the observable
         // to pass through
         return of(null);

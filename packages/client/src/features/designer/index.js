@@ -37,7 +37,6 @@ const SharedView = styled.div`
     top: 0px;
     right: 0px;
     transform: translateX(${props => (props.isEditing ? "0px" : "400px")});
-    overflow: hidden;
   }
 `;
 
@@ -50,7 +49,7 @@ export default class Designer extends React.Component {
   state = {
     version: null,
     changed: false,
-    deltas: {},
+    styles: null,
     isEditing: false
   };
 
@@ -62,8 +61,15 @@ export default class Designer extends React.Component {
     window.addEventListener("message", evt => {
       const data = evt.data;
       if (data.source === "getDiff-client" && data.type === "SITE_CHANGE") {
-        console.log(data);
         this.setState({ changed: true, deltas: data.payload });
+      } else if (
+        data.source === "getDiff-client" &&
+        data.type === "SELECTED_ELEMENT"
+      ) {
+        console.log("got a new styles", data);
+        this.setState({ styles: data.payload.styles });
+      } else {
+        console.log("data", data);
       }
     });
   }
@@ -84,14 +90,13 @@ export default class Designer extends React.Component {
 
   render() {
     const {
-      state: { isEditing, version }
+      state: { isEditing, version, styles }
     } = this;
-
+    console.log("styles", styles);
     return (
       <Page>
         <SharedView isEditing={isEditing}>
           <Iframe id="frame" src={version} title="prototype" />
-          <Editor />
         </SharedView>
         <Toolbar onEdit={this.onEdit} />
       </Page>

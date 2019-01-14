@@ -65,7 +65,7 @@ const Designer = ({
           onChange={handleChange}
           value={values.website}
           type="text"
-          placeholder="Prototype a website by typing a URL"
+          placeholder="Enter a website"
         />
         <Button
           appearance="primary"
@@ -73,14 +73,14 @@ const Designer = ({
           isLoading={isSubmitting}
           style={{ height: "40px" }}
         >
-          Create Prototype
+          Prototype changes
         </Button>
       </Row>
       <Row>
         <div style={{ textAlign: "center", width: "100%" }}>
-          Create a new prototype by entering a URL in the text bar. Diff lets
-          you edit your website just like Chrome devtools, except you can share
-          your changes with anyone using a prototype URL.
+          Diff lets you share changes that you make to a site with devtools so
+          you don't need to take a screenshot. You can just send a unique URL.
+          You can test design changes directly in your browser
         </div>
       </Row>
     </form>
@@ -94,8 +94,7 @@ const submitValue = (payload, { props, setSubmitting, setErrors }) => {
     .createSite({ variables: { input: { url: website } } })
     .then(response => {
       setSubmitting(false);
-      console.log(response.data);
-      debugger;
+
       props.history.push({
         pathname: "/edit",
         search: "?version=" + response.data.createSiteOrigin.prototypeUrl

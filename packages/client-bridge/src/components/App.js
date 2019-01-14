@@ -1,19 +1,11 @@
 import React from "react";
 import ShadowDom from "./ShadowDom";
-import SelectElement from "./Highlight";
+import SendMessage from "./SendMessage";
 
 export default () => (
   <ShadowDom>
     <div>
-      <div>test</div>
-      <SelectElement
-        onSelect={values => {
-          console.log("selected", values);
-        }}
-        onCancel={() => {
-          console.log("canceled");
-        }}
-      />
+      <SendMessage>{send => <div />}</SendMessage>
     </div>
   </ShadowDom>
 );
