@@ -2,100 +2,13 @@
 
 const axios = require("axios");
 const zlib = require("zlib");
-const AWS = require("aws-sdk");
+const hostUtils = require("./host");
+const handleCustomHtml = require("./html");
 
-const dynamoDb = new AWS.DynamoDB({
-  region: "us-east-1"
-});
-
-// environment values not supported in lambda@edge
-const SCRIPT_URL =
-  "https://s3.amazonaws.com/getdiff-static-client/clientBridge.js";
-const DYNAMODB_TABLE = "Origins";
-
-// handles javascript injection to our bridge
-function handleCustomHtml(data, headers) {
-  console.log("Lambda modifying html content");
-  const jsUrl = SCRIPT_URL;
-  const script = `<script src="${jsUrl}"></script>`;
-  const re = /<\/body>(?![\s\S]*<\/body>[\s\S]*$)/i;
-  const subst = `${script}</body>`;
-  const html = data.replace(re, subst);
-
-
-  const changes = `<script>window.delta = {
-    "#Content div:nth-child(1) > p": {
-        "style": "color:red"
-    },
-    "body" : {
-        style: "font-family:Arial !important;font-size: 2rem;"
-    },
-    "*": {
-        style: "text-decoration:none; font-family: inherit;"
-    }
-}</script>`;
-const headRe = /<\/head>(?![\s\S]*<\/head>[\s\S]*$)/i;
-  const headSubst = `${changes}</head>`;
-
-  return html.replace(headRe,headSubst)
-}
-
-// Performs a lookup in dynamodb to match our account
-function getHost(host, scheme, uri, querystring) {
-  const params = {
-    TableName: DYNAMODB_TABLE,
-    Key: {
-      Host: {
-        S: host
-      }
-    }
-  };
-
-  return new Promise((resolve, reject) => {
-    // fetch todo from the database
-    dynamoDb.getItem(params, function(err, data) {
-      if (err) {
-        console.log(err, err.stack); // an error occurred
-        return resolve(null);
-      } else if (!data.Item) {
-        console.log("No mapping origin found");
-        return resolve(null);
-      }
-      const origin = data.Item.Origin.S;
-      return resolve(origin);
-    });
-  });
-}
-
-function defaultPage() {
-  const html = `
-    <html>
-      <head></head>
-      <body><h1>Sorry, I cant route there dave</h1></body>
-    </html>
-  `;
-
-  const buffer = zlib.gzipSync(html);
-  const base64EncodedBody = buffer.toString("base64");
-
-  const response = {
-    headers: {
-      "content-type": [
-        { key: "Content-Type", value: "text/html; charset=utf-8" }
-      ],
-      "content-encoding": [{ key: "Content-Encoding", value: "gzip" }],
-      expires: [{ key: "Expires", value: "0" }],
-      "cache-control": [{ key: "Cache-control", value: "no-cache,no-store" }]
-    },
-    body: base64EncodedBody,
-    bodyEncoding: "base64",
-    status: "200",
-    statusDescription: "OK"
-  };
-
-  return response;
-}
-
+/**
+ * Our edge proxy that is responsible for reading the requests and
+ * returning a modified version of the site if there is one.
+ */
 module.exports.edgeProxy = async (event, context) => {
   const request = event.Records[0].cf.request;
   const headers = request.headers;
@@ -116,10 +29,15 @@ module.exports.edgeProxy = async (event, context) => {
   console.log("------------------");
 
   try {
-    const originHost = await getHost(viewHost, scheme, uri, querystring);
+    const originHost = await hostUtils.getHost(
+      viewHost,
+      scheme,
+      uri,
+      querystring
+    );
     if (originHost == null) {
       console.log("No origin available, sending default page");
-      return defaultPage();
+      return hostUtils.defaultPage();
     }
 
     const url = `${scheme}://${originHost}${uri}${

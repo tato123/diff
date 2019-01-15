@@ -1,7 +1,8 @@
 import React from "react";
 import styled from "styled-components";
 import Toolbar from "./toolbar";
-import Editor from "./editor";
+import { compose, graphql } from "react-apollo";
+import { SAVE_VERSION } from "../../graphql/mutations";
 
 const Page = styled.div`
   display: grid;
@@ -45,34 +46,37 @@ const Iframe = styled.iframe`
   box-sizing: border-box;
 `;
 
-export default class Designer extends React.Component {
+class Designer extends React.Component {
   state = {
     version: null,
     changed: false,
     styles: null,
-    isEditing: false
+    isEditing: false,
+    count: 0
   };
 
   componentDidMount() {
-    console.log(this.props.location.search);
     const params = new URLSearchParams(this.props.location.search);
     this.setState({ version: `https://${params.get("version")}` });
 
-    window.addEventListener("message", evt => {
-      const data = evt.data;
-      if (data.source === "getDiff-client" && data.type === "SITE_CHANGE") {
-        this.setState({ changed: true, deltas: data.payload });
-      } else if (
-        data.source === "getDiff-client" &&
-        data.type === "SELECTED_ELEMENT"
-      ) {
-        console.log("got a new styles", data);
-        this.setState({ styles: data.payload.styles });
-      } else {
-        console.log("data", data);
-      }
-    });
+    window.addEventListener("message", this.eventHandler);
   }
+
+  componentWillUnmount() {
+    window.removeEventListener(this.eventHandler);
+  }
+
+  eventHandler = evt => {
+    const data = evt.data;
+    if (data.source === "getDiff-client" && data.type === "SITE_CHANGE") {
+      const deltas = data.payload;
+      this.setState({
+        changed: true,
+        deltas,
+        count: Object.keys(deltas).length
+      });
+    }
+  };
 
   getDiff = () => {
     const frame = document.querySelector("#frame");
@@ -88,18 +92,28 @@ export default class Designer extends React.Component {
     this.setState(state => ({ isEditing: !state.isEditing }));
   };
 
+  onSave = () => {
+    const payload = {
+      site: this.state.version,
+      deltas: this.state.deltas
+    };
+  };
+
   render() {
     const {
-      state: { isEditing, version, styles }
+      state: { isEditing, version, count }
     } = this;
-    console.log("styles", styles);
     return (
       <Page>
         <SharedView isEditing={isEditing}>
           <Iframe id="frame" src={version} title="prototype" />
         </SharedView>
-        <Toolbar onEdit={this.onEdit} />
+        <Toolbar onEdit={this.onEdit} onSave={this.onSave} count={count} />
       </Page>
     );
   }
 }
+
+export default compose(graphql(SAVE_VERSION, { name: "saveSiteVersion" }))(
+  Designer
+);

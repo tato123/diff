@@ -11,7 +11,7 @@ const View = styled.div`
 
 const Toolbar = ({ count, onSave, onEdit, onShare }) => (
   <View className="toolbar">
-    <div>{Object.keys(count).length || 0} changes</div>
+    <div>{count} elements with changes</div>
     <div
       style={{
         justifyContent: "center",
@@ -19,7 +19,6 @@ const Toolbar = ({ count, onSave, onEdit, onShare }) => (
         display: "flex"
       }}
     >
-      <Button onClick={onEdit}>Edit</Button>
       <Button onClick={onShare}>Share</Button>
     </div>
     <span
@@ -28,7 +27,9 @@ const Toolbar = ({ count, onSave, onEdit, onShare }) => (
         display: "flex"
       }}
     >
-      <Button onClick={onSave}>Save</Button>
+      <Button onClick={onSave} isDisabled={count === 0}>
+        Save
+      </Button>
     </span>
   </View>
 );

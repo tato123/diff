@@ -16,3 +16,11 @@ export const ALL_ORIGINS = gql`
     }
   }
 `;
+
+export const SAVE_VERSION = gql`
+  mutation SaveSiteDeltas($input: SaveSiteDeltasInput!) {
+    SaveSiteDeltas(input: $input) {
+      prototypeUrl
+    }
+  }
+`;

@@ -1,0 +1,11 @@
+#Content div:nth-child(1) > p {
+  color: red;
+}
+body {
+  font-family: Arial !important;
+  font-size: 2rem;
+}
+* {
+  text-decoration: none;
+  font-family: inherit;
+}
