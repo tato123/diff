@@ -9,16 +9,25 @@ const compose = (...fns) => input => {
 };
 
 const rewriteHtml = (userOrigin, versionId) => html => {
-  const rewrite = utils.rewriteLinks({ hostname: userOrigin }, versionId);
-  var bound = rewrite.fn.bind(null, { headers: { host: versionId } }, {});
-  var actual = html.replace(rewrite.match, bound);
+  console.log("Rewriting html links....");
+  const respondFn = (d, p = "") => {
+    const rewrite = utils.rewriteLinks({ hostname: p + userOrigin }, versionId);
+    var bound = rewrite.fn.bind(null, { headers: { host: versionId } }, {});
+    var actual = html.replace(rewrite.match, bound);
 
-  console.log(actual);
+    return actual;
+  };
 
-  return actual;
+  // urls can be normalized due to the way
+  // chrome now handles urls, we want to make sure
+  // each url type is. This was just quicker than rewriting the regex again
+  const r1 = respondFn(html);
+  const r = respondFn(r1, "www.");
+  return r;
 };
 
 const injectScript = (versionId, isStyled = false) => html => {
+  console.log("Injecting scripts....");
   // 1. Inject the script content
   const jsUrl = SCRIPT_URL;
   const params = [
@@ -36,8 +45,8 @@ const injectScript = (versionId, isStyled = false) => html => {
 };
 
 // handles javascript injection to our bridge
-module.exports = (data, userOrigin, versionId, isStyled = false) =>
+module.exports = (data, originHost, versionHost, isStyled = false) =>
   compose(
-    injectScript(versionId, isStyled),
-    rewriteHtml(userOrigin, versionId)
+    injectScript(versionHost, isStyled),
+    rewriteHtml(originHost, versionHost)
   )(data);

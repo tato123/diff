@@ -83,8 +83,38 @@ const createSiteOrigin = async (parent, args, context) => {
   });
 };
 
+const saveSiteDeltas = async (parent, args, context) => {
+  const versionUrl = args.input.versionUrl;
+  const deltas = args.input.deltas;
+
+  console.log("saving site deltas", versionUrl, deltas);
+
+  const params = {
+    TableName: "Deltas",
+    Item: {
+      VersionUrl: { S: versionUrl },
+      Changes: { S: deltas }
+    }
+  };
+
+  // Call DynamoDB to read the item from the table
+  return new Promise((resolve, reject) => {
+    dynamo.putItem(params, (err, data) => {
+      if (err) {
+        console.log("Error", err);
+        return reject(err);
+      }
+
+      return resolve({
+        prototypeUrl: versionUrl
+      });
+    });
+  });
+};
+
 module.exports = {
   uploadDesign: (obj, { file, metaData }) => processUpload(file, metaData),
   createSiteChange,
-  createSiteOrigin
+  createSiteOrigin,
+  saveSiteDeltas
 };

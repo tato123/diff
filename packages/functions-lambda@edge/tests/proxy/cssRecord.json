@@ -1,0 +1,100 @@
+{
+  "Records": [
+    {
+      "cf": {
+        "config": {
+          "distributionDomainName": "d3q5jsgo92fzky.cloudfront.net",
+          "distributionId": "E1ZD9VWSKXRMV",
+          "eventType": "origin-request"
+        },
+        "request": {
+          "clientIp": "108.253.230.121",
+          "headers": {
+            "host": [
+              {
+                "key": "Host",
+                "value": "58a46ba7.site.stage-getdiff.app"
+              }
+            ],
+            "cookie": [
+              {
+                "key": "Cookie",
+                "value": "_fbp=fb.1.1547607586269.1283092915; _ga=GA1.2.920397465.1547607586; _gat=1; _gid=GA1.2.455299567.1547607586"
+              }
+            ],
+            "cloudfront-forwarded-proto": [
+              {
+                "key": "CloudFront-Forwarded-Proto",
+                "value": "https"
+              }
+            ],
+            "user-agent": [
+              {
+                "key": "User-Agent",
+                "value": "Amazon CloudFront"
+              }
+            ],
+            "via": [
+              {
+                "key": "Via",
+                "value": "2.0 2c24202d8becc1fa818e2a9ae7411b24.cloudfront.net (CloudFront)"
+              }
+            ],
+            "x-forwarded-for": [
+              {
+                "key": "X-Forwarded-For",
+                "value": "108.253.230.121"
+              }
+            ],
+            "accept-encoding": [
+              {
+                "key": "Accept-Encoding",
+                "value": "gzip"
+              }
+            ],
+            "pragma": [
+              {
+                "key": "Pragma",
+                "value": "no-cache"
+              }
+            ],
+            "dnt": [
+              {
+                "key": "dnt",
+                "value": "1"
+              }
+            ],
+            "cache-control": [
+              {
+                "key": "Cache-Control",
+                "value": "no-cache"
+              }
+            ]
+          },
+          "method": "GET",
+          "origin": {
+            "custom": {
+              "customHeaders": {
+                "x-diff-proxy": [
+                  {
+                    "key": "x-diff-proxy",
+                    "value": "true"
+                  }
+                ]
+              },
+              "domainName": "www.getdiff.app",
+              "keepaliveTimeout": 5,
+              "path": "",
+              "port": 443,
+              "protocol": "https",
+              "readTimeout": 30,
+              "sslProtocols": ["TLSv1.2"]
+            }
+          },
+          "querystring": "",
+          "uri": "/content/cache/minify/154d7.css"
+        }
+      }
+    }
+  ]
+}

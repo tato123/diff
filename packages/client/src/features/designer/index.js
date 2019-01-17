@@ -93,10 +93,18 @@ class Designer extends React.Component {
   };
 
   onSave = () => {
-    const payload = {
-      site: this.state.version,
-      deltas: this.state.deltas
+    const input = {
+      versionUrl: this.state.version,
+      deltas: JSON.stringify(this.state.deltas)
     };
+    this.props
+      .saveSiteVersion({ variables: { input } })
+      .then(response => {
+        console.log(response);
+      })
+      .catch(error => {
+        console.error(error);
+      });
   };
 
   render() {

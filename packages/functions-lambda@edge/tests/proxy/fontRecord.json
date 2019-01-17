@@ -1,0 +1,106 @@
+{
+  "Records": [
+    {
+      "cf": {
+        "config": {
+          "distributionDomainName": "d3q5jsgo92fzky.cloudfront.net",
+          "distributionId": "E1ZD9VWSKXRMV",
+          "eventType": "origin-request"
+        },
+        "request": {
+          "clientIp": "108.253.230.121",
+          "headers": {
+            "host": [
+              {
+                "key": "Host",
+                "value": "96f301de.site.stage-getdiff.app"
+              }
+            ],
+            "cookie": [
+              {
+                "key": "Cookie",
+                "value": "AWSALB=UCyPixa744VLd8uG7krjPLe5TViqCIqf6DZweeiwXoww1Svcd9ofMZ2RyxxCPMfMH33cyUFEtdictQjHE1tJtSL7JG4iodRDp16uXj7RWuUbyrjZC0GU3phz50p0; _ga=GA1.2.1545579113.1545511085; _gid=GA1.2.2004948830.1547417124; _octo=GH1.1.1858239516.1547427291; _pdfps=%5B%5D; optimizelyEndUserId=oeu1546478631537r0.9080750329801441; permutive-id=b3a2bff3-d9a3-46a7-84d3-7bbacfa476be; permutive-session=%7B%22session_id%22%3A%22777c3b65-6d67-4147-baaa-6760f2ec8056%22%2C%22last_updated%22%3A%222019-01-14T00%3A52%3A09.212Z%22%7D; solokey=fc277b3b1547610205950; visitor_id472402=71267991; visitor_id472402-hash=2d6285b9d1c2cc713865b29d905acf71602530a9c1bfcb849ea844110511723625da2bafed04e580ef3a0891d004f15d8af1316b"
+              }
+            ],
+            "cloudfront-forwarded-proto": [
+              {
+                "key": "CloudFront-Forwarded-Proto",
+                "value": "https"
+              }
+            ],
+            "user-agent": [
+              {
+                "key": "User-Agent",
+                "value": "Amazon CloudFront"
+              }
+            ],
+            "via": [
+              {
+                "key": "Via",
+                "value": "2.0 01b00ded82405e6c5be64787abc6bcc9.cloudfront.net (CloudFront)"
+              }
+            ],
+            "x-forwarded-for": [
+              {
+                "key": "X-Forwarded-For",
+                "value": "108.253.230.121"
+              }
+            ],
+            "accept-encoding": [
+              {
+                "key": "Accept-Encoding",
+                "value": "gzip"
+              }
+            ],
+            "pragma": [
+              {
+                "key": "Pragma",
+                "value": "no-cache"
+              }
+            ],
+            "origin": [
+              {
+                "key": "origin",
+                "value": "https://96f301de.site.stage-getdiff.app"
+              }
+            ],
+            "dnt": [
+              {
+                "key": "dnt",
+                "value": "1"
+              }
+            ],
+            "cache-control": [
+              {
+                "key": "Cache-Control",
+                "value": "no-cache"
+              }
+            ]
+          },
+          "method": "GET",
+          "origin": {
+            "custom": {
+              "customHeaders": {
+                "x-diff-proxy": [
+                  {
+                    "key": "x-diff-proxy",
+                    "value": "true"
+                  }
+                ]
+              },
+              "domainName": "www.getdiff.app",
+              "keepaliveTimeout": 5,
+              "path": "",
+              "port": 443,
+              "protocol": "https",
+              "readTimeout": 30,
+              "sslProtocols": ["TLSv1.2"]
+            }
+          },
+          "querystring": "dzjyt7",
+          "uri": "/content/themes/atlanticbt/assets/css/fonts/icomoon.ttf"
+        }
+      }
+    }
+  ]
+}

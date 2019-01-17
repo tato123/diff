@@ -86,8 +86,18 @@ type CreateSiteOriginResult {
   prototypeUrl: String!
 }
 
+input SaveSiteDeltasInput {
+  versionUrl: String!
+  deltas: String!
+}
+
+type SaveSiteDeltasResult {
+  prototypeUrl: String!
+}
+
 type Mutation {
   uploadDesign(file: Upload!, metaData: UploadDesignMeta): UploadResult
   createSiteChange(siteChange: SiteChangeInput!): CreateSiteChangeResult
   createSiteOrigin(input: CreateSiteOriginInput!): CreateSiteOriginResult
+  saveSiteDeltas(input: SaveSiteDeltasInput!): SaveSiteDeltasResult
 }
