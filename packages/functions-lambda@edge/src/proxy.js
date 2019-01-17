@@ -69,12 +69,15 @@ module.exports.edgeProxy = async (event, context, callback) => {
         method,
         responseType: "arraybuffer"
       });
+      const buffer = zlib.gzipSync(arrayData);
+      const base64EncodedBody = buffer.toString("base64");
 
       const response = {
         headers: {
           "content-type": [
             { key: "Content-Type", value: responseHeaders["content-type"] }
           ],
+          "content-encoding": [{ key: "Content-Encoding", value: "gzip" }],
           "access-control-allow-origin": [
             {
               key: "access-control-allow-origin",
@@ -82,7 +85,8 @@ module.exports.edgeProxy = async (event, context, callback) => {
             }
           ]
         },
-        body: arrayData,
+        body: base64EncodedBody,
+        bodyEncoding: "base64",
         status: "200",
         statusDescription: "OK"
       };
