@@ -72,7 +72,7 @@ class Designer extends React.Component {
   }
 
   componentWillUnmount() {
-    window.removeEventListener(this.eventHandler);
+    window.removeEventListener("message", this.eventHandler);
   }
 
   handleWorkerMessage = m => {
