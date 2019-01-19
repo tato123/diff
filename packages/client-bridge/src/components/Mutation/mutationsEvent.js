@@ -49,8 +49,6 @@ const characterDataMutator = mutation => {
 
 const observer = new MutationObserver(mutations => {
   mutations.forEach(mutation => {
-    
-
     if (mutation.type === "attributes" && mutation.attributeName === "style") {
       styleMutator(mutation);
     }
@@ -59,8 +57,10 @@ const observer = new MutationObserver(mutations => {
       characterDataMutator(mutation);
     }
 
-
-    window.parent.postMessage({type:"SITE_CHANGE", source:'getDiff-client', payload:deltas}, '*')
+    window.parent.postMessage(
+      { type: "SITE_CHANGE", source: "getDiff-client", payload: deltas },
+      "*"
+    );
   });
 });
 
@@ -69,14 +69,14 @@ window.printDeltas = function() {
 };
 
 window.getDeltas = () => {
-    return deltas;
-}
+  return deltas;
+};
 
-window.applyChanges = (data) => {
+window.applyChanges = data => {
   Object.assign(deltas, data);
 
-  const applyRecordToElement = record => (element) => {
-    if ( record.characterData) {
+  const applyRecordToElement = record => element => {
+    if (record.characterData) {
       try {
         // apply character changes
         element.innerText = record.characterData;
@@ -84,23 +84,20 @@ window.applyChanges = (data) => {
         console.warn("cant apply character change to ", key);
       }
     }
-    
-    if ( record.style) {
+
+    if (record.style) {
       try {
         element.setAttribute("style", record.style);
       } catch (error) {
         console.warn("cant apply style change to ", key);
       }
     }
-  }
+  };
 
   Object.keys(data).forEach(key => {
     const elements = document.querySelectorAll(key);
     const record = data[key];
-    elements.forEach(applyRecordToElement(record))
-
-    
-    
+    elements.forEach(applyRecordToElement(record));
   });
 };
 
@@ -115,8 +112,7 @@ const observerConfig = {
   subtree: true
 };
 
-
 export default () => {
-    const targetNode = document.body;
-    observer.observe(targetNode, observerConfig);
-}
+  const targetNode = document.body;
+  observer.observe(targetNode, observerConfig);
+};

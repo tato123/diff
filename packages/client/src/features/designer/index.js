@@ -3,6 +3,10 @@ import styled from "styled-components";
 import Toolbar from "./toolbar";
 import { compose, graphql } from "react-apollo";
 import { SAVE_VERSION } from "../../graphql/mutations";
+import ModalDialog, { ModalTransition } from "@atlaskit/modal-dialog";
+import StringWorker from "./stringworker";
+import _ from "lodash";
+import ReactJson from "react-json-view";
 
 const Page = styled.div`
   display: grid;
@@ -52,7 +56,9 @@ class Designer extends React.Component {
     changed: false,
     styles: null,
     isEditing: false,
-    count: 0
+    count: 0,
+    isOpen: false,
+    deltas: []
   };
 
   componentDidMount() {
@@ -60,16 +66,27 @@ class Designer extends React.Component {
     this.setState({ version: `https://${params.get("version")}` });
 
     window.addEventListener("message", this.eventHandler);
+    this.stringWorker = new Worker(StringWorker);
+
+    this.stringWorker.onmessage = _.debounce(this.handleWorkerMessage, 10);
   }
 
   componentWillUnmount() {
     window.removeEventListener(this.eventHandler);
   }
 
+  handleWorkerMessage = m => {
+    this.setState({
+      styles: m.data
+    });
+  };
+
   eventHandler = evt => {
     const data = evt.data;
     if (data.source === "getDiff-client" && data.type === "SITE_CHANGE") {
       const deltas = data.payload;
+      this.stringWorker.postMessage(deltas);
+
       this.setState({
         changed: true,
         deltas,
@@ -109,14 +126,28 @@ class Designer extends React.Component {
 
   render() {
     const {
-      state: { isEditing, version, count }
+      state: { isEditing, version, count, isOpen, styles }
     } = this;
+
     return (
       <Page>
         <SharedView isEditing={isEditing}>
           <Iframe id="frame" src={version} title="prototype" />
         </SharedView>
-        <Toolbar onEdit={this.onEdit} onSave={this.onSave} count={count} />
+        <Toolbar
+          onEdit={this.onEdit}
+          onSave={this.onSave}
+          count={count}
+          onClickChanges={() => this.setState({ isOpen: true })}
+        />
+
+        <ModalTransition>
+          {isOpen && (
+            <ModalDialog onClose={() => this.setState({ isOpen: false })}>
+              <ReactJson src={styles} collapsed={1} />
+            </ModalDialog>
+          )}
+        </ModalTransition>
       </Page>
     );
   }

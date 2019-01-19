@@ -6,7 +6,7 @@ export default class MutationListener extends React.Component {
     // do stuff
 
     this.observer = new MutationObserver(this.mutationHandler);
-    this.deltas = [];
+    this.deltas = {};
 
     // Notify me of style changes
     const observerConfig = {

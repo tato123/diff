@@ -9,9 +9,13 @@ const View = styled.div`
   padding: 16px;
 `;
 
-const Toolbar = ({ count, onSave, onEdit, onShare }) => (
+const Toolbar = ({ count, onSave, onEdit, onShare, onClickChanges }) => (
   <View className="toolbar">
-    <div>{count} elements with changes</div>
+    <div>
+      <a href="#" onClick={onClickChanges}>
+        {count} elements with changes
+      </a>
+    </div>
     <div
       style={{
         justifyContent: "center",
@@ -38,7 +42,8 @@ Toolbar.defaultProps = {
   count: 0,
   onSave: () => {},
   onEdit: () => {},
-  onShare: () => {}
+  onShare: () => {},
+  onClickChanges: () => {}
 };
 
 export default Toolbar;
