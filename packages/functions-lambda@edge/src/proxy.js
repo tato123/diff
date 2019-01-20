@@ -5,6 +5,26 @@ const zlib = require("zlib");
 const hostUtils = require("./host");
 const htmlPlugins = require("./html");
 
+
+const fetchContent = async (url, method) => {
+  // perform a head event to determine type
+  const headResponse = await axios({
+    url,
+    method: 'HEAD'
+  });
+
+  // 
+  const axiosResponse = await axios({
+    url: url,
+    method
+  });
+}
+
+const processContent = async (data, contentType) => {
+  
+}
+
+
 /**
  * Our edge proxy that is responsible for reading the requests and
  * returning a modified version of the site if there is one.
@@ -33,13 +53,15 @@ module.exports.edgeProxy = async (event, context, callback) => {
   try {
     // attempt to proxied origin host
     const startLookup = new Date();
-    const originHost = await hostUtils.getHost(
+    const {origin: originHost, protocol:originProtocol} = await hostUtils.getHost(
       versionHost,
       scheme,
       uri,
       querystring
     );
     const endLookup = new Date() - startLookup;
+
+    console.log('Mapped', versionHost, 'to', originHost)
 
     // we dont have an origin host
     if (originHost == null) {
@@ -49,9 +71,13 @@ module.exports.edgeProxy = async (event, context, callback) => {
 
     // --------------------
     // fetch proxied content
-    const url = `${scheme}://${originHost}${uri}${
+    const url = `${originProtocol}://${originHost}${uri}${
       querystring.trim().length > 0 ? "?" + querystring : ""
     }`;
+
+
+    // ---------------------------------------------
+    // change this to a head request
 
     const axiosResponse = await axios({
       url: url,

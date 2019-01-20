@@ -8,6 +8,7 @@ const dynamo = new AWS.DynamoDB({
 const uniqueSlug = require("unique-slug");
 const normalizeUrl = require("normalize-url");
 const str = require("string-to-stream");
+const sslChecker = require("ssl-checker")
 
 const processUpload = async (upload, metaData) => {
   console.log("received upload design request", metaData);
@@ -50,21 +51,34 @@ const createSiteChange = async (parent, args, context) => {
   };
 };
 
+const checkProtocol = async (origin) => {
+  try {
+    console.log('checking site', origin)
+    await sslChecker(origin);
+    return 'https'
+  } catch (error) {
+    console.error('error')
+    return 'http'
+  }
+}
+
 const createSiteOrigin = async (parent, args, context) => {
   const randomSlug = uniqueSlug(args.url);
   const host = `${randomSlug}.site.stage-getdiff.app`;
   const inputUrl = new URL(normalizeUrl(args.input.url));
-
   const originUrl = inputUrl.host;
+  const protocol = await checkProtocol(originUrl)
 
   console.log("host", host);
   console.log("args", args);
+  console.log('protocol', protocol)
 
   const params = {
     TableName: "Origins",
     Item: {
       Host: { S: host },
-      Origin: { S: originUrl }
+      Origin: { S: originUrl },
+      Proto: {S: protocol}
     }
   };
 

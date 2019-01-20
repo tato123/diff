@@ -20,5 +20,5 @@ provider:
       Resource: "arn:aws:dynamodb:us-east-1:290983348596:table/Origins"
 
 functions:
-  hello:
+  edgeProxy:
     handler: src/proxy.edgeProxy

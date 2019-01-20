@@ -21,7 +21,7 @@ module.exports.getHost = (host, scheme, uri, querystring) => {
 
   return new Promise((resolve, reject) => {
     // fetch todo from the database
-    dynamoDb.getItem(params, function(err, data) {
+    dynamoDb.getItem(params, function (err, data) {
       if (err) {
         console.log(err, err.stack); // an error occurred
         return resolve(null);
@@ -30,7 +30,8 @@ module.exports.getHost = (host, scheme, uri, querystring) => {
         return resolve(null);
       }
       const origin = data.Item.Origin.S;
-      return resolve(origin);
+      const protocol = data.Item.Proto.S;
+      return resolve({origin, protocol});
     });
   });
 };
