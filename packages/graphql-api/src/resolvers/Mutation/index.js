@@ -54,8 +54,11 @@ const createSiteChange = async (parent, args, context) => {
 const checkProtocol = async (origin) => {
   try {
     console.log('checking site', origin)
-    await sslChecker(origin);
-    return 'https'
+    const result = await sslChecker(origin);
+    if (result.valid) {
+      return 'https'
+    }
+    return 'http'
   } catch (error) {
     console.error('error')
     return 'http'
@@ -65,7 +68,7 @@ const checkProtocol = async (origin) => {
 const createSiteOrigin = async (parent, args, context) => {
   const randomSlug = uniqueSlug(args.url);
   const host = `${randomSlug}.site.stage-getdiff.app`;
-  const inputUrl = new URL(normalizeUrl(args.input.url));
+  const inputUrl = new URL(normalizeUrl(args.input.url, {stripWWW: false}));
   const originUrl = inputUrl.host;
   const protocol = await checkProtocol(originUrl)
 

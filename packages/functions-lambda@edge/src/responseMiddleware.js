@@ -34,7 +34,7 @@ module.exports.generateResponse = async (request, context) => {
             contentType.indexOf("css") !== -1 ||
             contentType.indexOf("javascript") !== -1
     ) {
-
+        
 
         // check what sort of data was returned
         const output = htmlPlugins(data, originHost, versionHost, false);

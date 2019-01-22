@@ -9,7 +9,7 @@ const compose = (...fns) => input => {
 };
 
 const rewriteHtml = (userOrigin, versionId) => html => {
-  console.log("Rewriting html links....");
+  console.log("Rewriting html links....", userOrigin);
   const respondFn = (d, p = "") => {
     const rewrite = utils.rewriteLinks({ hostname: p + userOrigin }, versionId);
     var bound = rewrite.fn.bind(null, { headers: { host: versionId } }, {});
@@ -21,9 +21,7 @@ const rewriteHtml = (userOrigin, versionId) => html => {
   // urls can be normalized due to the way
   // chrome now handles urls, we want to make sure
   // each url type is. This was just quicker than rewriting the regex again
-  const r1 = respondFn(html);
-  const r = respondFn(r1, "www.");
-  return r;
+  return respondFn(html);
 };
 
 const injectScript = (versionId, isStyled = false) => html => {

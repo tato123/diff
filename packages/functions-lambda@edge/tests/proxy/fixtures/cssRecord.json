@@ -13,13 +13,13 @@
             "host": [
               {
                 "key": "Host",
-                "value": "58a46ba7.site.stage-getdiff.app"
+                "value": "a1f6b84f.site.stage-getdiff.app"
               }
             ],
             "cookie": [
               {
                 "key": "Cookie",
-                "value": "_fbp=fb.1.1547607586269.1283092915; _ga=GA1.2.920397465.1547607586; _gat=1; _gid=GA1.2.455299567.1547607586"
+                "value": "_fbp=fb.1.1548119224785.1275758276; _ga=GA1.2.1602645154.1547167157; _gid=GA1.2.1121684748.1548119223; _pdfps=%5B%5D; permutive-id=ff467b88-d094-4e8e-8eb6-0e6271e830bb; permutive-session=%7B%22session_id%22%3A%22aecf2576-9bdc-40fa-9fd3-6a8e84fbdf33%22%2C%22last_updated%22%3A%222019-01-11T00%3A48%3A00.821Z%22%7D"
               }
             ],
             "cloudfront-forwarded-proto": [
@@ -37,7 +37,7 @@
             "via": [
               {
                 "key": "Via",
-                "value": "2.0 2c24202d8becc1fa818e2a9ae7411b24.cloudfront.net (CloudFront)"
+                "value": "2.0 bad43b7a5f64a218c0ba43b47a8d182f.cloudfront.net (CloudFront)"
               }
             ],
             "x-forwarded-for": [
@@ -88,7 +88,9 @@
               "port": 443,
               "protocol": "https",
               "readTimeout": 30,
-              "sslProtocols": ["TLSv1.2"]
+              "sslProtocols": [
+                "TLSv1.2"
+              ]
             }
           },
           "querystring": "",
