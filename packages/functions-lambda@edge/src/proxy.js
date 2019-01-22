@@ -1,27 +1,41 @@
 "use strict";
 
 const axios = require("axios");
-const zlib = require("zlib");
+
 const hostUtils = require("./host");
-const htmlPlugins = require("./html");
+const responseMiddleware = require('./responseMiddleware');
 
 
-const fetchContent = async (url, method) => {
+const fetchContent = async ({ url, method }) => {
   // perform a head event to determine type
-  const headResponse = await axios({
+  const { headers } = await axios({
     url,
     method: 'HEAD'
   });
 
-  // 
+  // get the responseType this time
+  const isByteArray = headers["accept-ranges"] === "bytes";
+  const isBinary = !headers['content-type'].startsWith('text');
+  console.log('[Fetch] is byteArray?', isByteArray);
+  console.log('[Fetch] is isBinary?', isBinary);
+
+  // fetch the data
   const axiosResponse = await axios({
     url: url,
-    method
+    method,
+    ...isByteArray ? { responseType: 'arraybuffer' } : {}
   });
-}
 
-const processContent = async (data, contentType) => {
-  
+  // if its a byte array and not a binary format
+  // we need to convert it back to a string before working with it
+  const data = !isBinary && isByteArray ? Buffer.from(axiosResponse.data, 'binary').toString('utf-8') : axiosResponse.data;
+
+  return {
+    ...axiosResponse,
+    data,
+    isByteArray,
+    isBinary
+  }
 }
 
 
@@ -51,15 +65,14 @@ module.exports.edgeProxy = async (event, context, callback) => {
   console.log("------------------");
 
   try {
-    // attempt to proxied origin host
-    const startLookup = new Date();
-    const {origin: originHost, protocol:originProtocol} = await hostUtils.getHost(
+    // attempt to proxied origin host    
+    const { origin: originHost, protocol: originProtocol } = await hostUtils.getHost(
       versionHost,
       scheme,
       uri,
       querystring
     );
-    const endLookup = new Date() - startLookup;
+
 
     console.log('Mapped', versionHost, 'to', originHost)
 
@@ -69,155 +82,29 @@ module.exports.edgeProxy = async (event, context, callback) => {
       return hostUtils.defaultPage();
     }
 
-    // --------------------
-    // fetch proxied content
+    // Build our content origin url
     const url = `${originProtocol}://${originHost}${uri}${
       querystring.trim().length > 0 ? "?" + querystring : ""
-    }`;
+      }`;
+    const xFrameOrigin = `${originProtocol}://${originHost}`;
 
-
-    // ---------------------------------------------
-    // change this to a head request
-
-    const axiosResponse = await axios({
-      url: url,
+    // fetch our content
+    const { data, headers: axiosResHeaders, isBinary } = await fetchContent({
+      url,
       method
     });
-    // --------------------
 
-    const { data, headers: responseHeaders } = axiosResponse;
-
-    if (responseHeaders["accept-ranges"] === "bytes") {
-      console.log("attempting to retrieve as a byte aray");
-      // rehit this as array buffer since we don't know how to handle this yet
-      const { data: arrayData } = await axios({
-        url: url,
-        method,
-        responseType: "arraybuffer"
-      });
-      const buffer = zlib.gzipSync(arrayData);
-      const base64EncodedBody = buffer.toString("base64");
-
-      const response = {
-        headers: {
-          "content-type": [
-            { key: "Content-Type", value: responseHeaders["content-type"] }
-          ],
-          "content-encoding": [{ key: "Content-Encoding", value: "gzip" }],
-          "access-control-allow-origin": [
-            {
-              key: "access-control-allow-origin",
-              value: "*"
-            }
-          ]
-        },
-        body: base64EncodedBody,
-        bodyEncoding: "base64",
-        status: "200",
-        statusDescription: "OK"
-      };
-
-      console.log("response is ", response);
-      return response;
-    }
-
-    // if we are handling an html request, then use the modifier
-    // function
-    if (
-      responseHeaders["content-type"] &&
-      (responseHeaders["content-type"].indexOf("text/html") !== -1 ||
-        responseHeaders["content-type"].indexOf("css") !== -1 ||
-        responseHeaders["content-type"].indexOf("javascript") !== -1)
-    ) {
-      const modifiedResponse = modifyAndReturnResponse(
-        originHost,
-        versionHost,
-        data,
-        start,
-        responseHeaders,
-        endLookup
-      );
-      console.log("--[Modified Response]--");
-      console.log(request);
-      console.log("------------------");
-
-      return modifiedResponse;
-    }
-
-    // otherwise just return the result from a different origin
-    request.origin = {
-      custom: {
-        domainName: originHost,
-        port: 443,
-        protocol: "https",
-        path: "",
-        sslProtocols: ["TLSv1", "TLSv1.1", "TLSv1.2"],
-        readTimeout: 30,
-        keepaliveTimeout: 5,
-        customHeaders: {}
-      }
-    };
-
-    request.headers["host"] = [{ key: "host", value: originHost }];
+    // generate a new response
+    const response = await responseMiddleware.generateResponse(request, { data, headers: axiosResHeaders, isBinary, originHost, versionHost, xFrameOrigin });
 
     console.log("--[Event Response]--");
-    console.log(request);
+    console.log(response);
     console.log("------------------");
 
-    callback(null, request);
+    callback(null, response);
   } catch (error) {
     console.error("Failed to perform mapping", error);
+    /// todo: return an s3 failed bucket
     throw error;
   }
 };
-
-function modifyAndReturnResponse(
-  originHost,
-  versionHost,
-  data,
-  start,
-  responseHeaders,
-  endLookup
-) {
-  console.log("-------------Modifying content-------------");
-  console.log("User origin", originHost);
-  console.log("Version Id", versionHost);
-  // check what sort of data was returned
-  const output = htmlPlugins(data, originHost, versionHost, false);
-  const buffer = zlib.gzipSync(output);
-  const base64EncodedBody = buffer.toString("base64");
-  const end = new Date() - start;
-  console.log("pending cookies", responseHeaders["set-cookie"]);
-  console.log(responseHeaders);
-  const response = {
-    headers: {
-      "content-type": [
-        { key: "Content-Type", value: responseHeaders["content-type"] }
-      ],
-      "content-encoding": [{ key: "Content-Encoding", value: "gzip" }],
-      "access-control-allow-origin": [
-        {
-          key: "access-control-allow-origin",
-          value: "*"
-        }
-      ],
-      "x-diff-proxy-time": [
-        {
-          key: "x-diff-proxy-time",
-          value: new String(end || "unknown")
-        }
-      ],
-      "x-diff-proxy-lookup-time": [
-        {
-          key: "x-diff-proxy-lookup-time",
-          value: new String(endLookup || "unknown")
-        }
-      ]
-    },
-    body: base64EncodedBody,
-    bodyEncoding: "base64",
-    status: "200",
-    statusDescription: "OK"
-  };
-  return response;
-}
