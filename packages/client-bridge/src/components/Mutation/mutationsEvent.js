@@ -1,6 +1,5 @@
 import finder from "@medv/finder";
 import client from "./graphql/client";
-import gql from "graphql-tag";
 
 const deltas = {};
 

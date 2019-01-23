@@ -1,11 +1,8 @@
 "use strict";
 
-const AWS = require("aws-sdk");
 const zlib = require("zlib");
+const dynamoDb = require('./dynamo')
 
-const dynamoDb = new AWS.DynamoDB({
-  region: "us-east-1"
-});
 const DYNAMODB_TABLE = "Origins";
 
 // Performs a lookup in dynamodb to match our account

@@ -9,7 +9,7 @@ const getContentType = headers => {
 }
 
 module.exports.generateResponse = async (request, context) => {
-    const { data, headers, isBinary, originHost,versionHost } = context;
+    const { data, headers, isBinary, originHost,versionHost, editMode=false } = context;
     const contentType = getContentType(headers);
 
     console.log('contentType', contentType)

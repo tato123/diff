@@ -1,4 +1,6 @@
 const AWS = require("aws-sdk");
+const toCss = require('to-css');
+
 // Create the DynamoDB service object
 const dynamo = new AWS.DynamoDB({
   apiVersion: "2012-10-08",
@@ -103,14 +105,16 @@ const createSiteOrigin = async (parent, args, context) => {
 const saveSiteDeltas = async (parent, args, context) => {
   const versionUrl = args.input.versionUrl;
   const deltas = args.input.deltas;
+  const css = toCss(JSON.parse(deltas));
 
-  console.log("saving site deltas", versionUrl, deltas);
+  console.log("saving site deltas", versionUrl, css);
 
   const params = {
     TableName: "Deltas",
     Item: {
       VersionUrl: { S: versionUrl },
-      Changes: { S: deltas }
+      Changes: { S: deltas },
+      CSS: {S: css}
     }
   };
 

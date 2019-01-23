@@ -95,7 +95,8 @@ module.exports.edgeProxy = async (event, context, callback) => {
     });
 
     // generate a new response
-    const response = await responseMiddleware.generateResponse(request, { data, headers: axiosResHeaders, isBinary, originHost, versionHost, xFrameOrigin });
+    const editMode = querystring.indexOf('diffEditMode=true') !== -1;
+    const response = await responseMiddleware.generateResponse(request, { data, headers: axiosResHeaders, isBinary, originHost, versionHost, xFrameOrigin, editMode });
 
     console.log("--[Event Response]--");
     console.log(response);

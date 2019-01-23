@@ -20,7 +20,7 @@ const Page = styled.div`
   overflow: hidden;
 
   .toolbar {
-    border-top: 1px solid #dfe1e6;
+    border-top: 3px solid #0052CC;
   }
 `;
 
@@ -48,6 +48,7 @@ const SharedView = styled.div`
 const Iframe = styled.iframe`
   outline: none;
   box-sizing: border-box;
+  border: none;
 `;
 
 class Designer extends React.Component {
@@ -57,13 +58,12 @@ class Designer extends React.Component {
     styles: null,
     isEditing: false,
     count: 0,
-    isOpen: false,
-    deltas: []
+    isOpen: false
   };
 
   componentDidMount() {
     const params = new URLSearchParams(this.props.location.search);
-    this.setState({ version: `https://${params.get("version")}` });
+    this.setState({ version: `https://${params.get("version")}?diffEditMode=true` });
 
     window.addEventListener("message", this.eventHandler);
     this.stringWorker = new Worker(StringWorker);
@@ -76,6 +76,7 @@ class Designer extends React.Component {
   }
 
   handleWorkerMessage = m => {
+    console.log('worker message', m.data)
     this.setState({
       styles: m.data
     });
@@ -88,8 +89,7 @@ class Designer extends React.Component {
       this.stringWorker.postMessage(deltas);
 
       this.setState({
-        changed: true,
-        deltas,
+        changed: true,        
         count: Object.keys(deltas).length
       });
     }
@@ -112,7 +112,7 @@ class Designer extends React.Component {
   onSave = () => {
     const input = {
       versionUrl: this.state.version,
-      deltas: JSON.stringify(this.state.deltas)
+      deltas: JSON.stringify(this.state.styles)
     };
     this.props
       .saveSiteVersion({ variables: { input } })

@@ -7,7 +7,7 @@ import Designer from "./features/designer";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { injectGlobal, ThemeProvider } from "styled-components";
 
-const GlobalStyle = injectGlobal`
+injectGlobal`
   html, body, #root {
     width: 100%;
     height: 100%;

@@ -1,4 +1,5 @@
 const utils = require("./proxy-utils");
+const dynamoDb = require('./dynamo');
 
 // environment values not supported in lambda@edge
 const SCRIPT_URL =
@@ -24,14 +25,20 @@ const rewriteHtml = (userOrigin, versionId) => html => {
   return respondFn(html);
 };
 
-const injectScript = (versionId, isStyled = false) => html => {
+const injectScript = (versionId, isEditMode) => html => {
+  
+  // do not inject if we are not in edit mode
+  if (!isEditMode) {
+    return html;
+  }
+  
   console.log("Injecting scripts....");
   // 1. Inject the script content
   const jsUrl = SCRIPT_URL;
   const params = [
     "script",
     `data-version="${versionId}"`,
-    `data-style=${isStyled}`,
+    `data-edit=${isEditMode}`,
     `src=${jsUrl}`
   ];
 
@@ -42,9 +49,49 @@ const injectScript = (versionId, isStyled = false) => html => {
   return html.replace(re, subst);
 };
 
+const injectStyles = (versionId, isEditMode) => html => {
+
+  if (isEditMode) {
+    console.log('Editing, skipping style injection');
+    return html;
+  }
+ 
+  const params = {
+    TableName: 'Deltas',
+    Key: {
+      Host: {
+        VersionUrl: versionId
+      }
+    }
+  };
+
+  return new Promise((resolve, reject) => {
+    dynamoDb.getItem(params, function (err, data) {
+      if (err) {
+        console.log(err, err.stack); // an error occurred
+        return resolve(null);
+      } else if (!data.Item) {
+        console.log("No mapping origin found");
+        return resolve(null);
+      }
+      const css = data.Item.CSS.S;
+      const style = `<style>${css}</style>`;
+      const re = /<\/head>(?![\s\S]*<\/head>[\s\S]*$)/i;
+      const subst = `${style}</head>`;
+      const replacedHtml =  html.replace(re, subst);
+      return resolve(replacedHtml);
+    });
+  })
+  
+
+
+  
+}
+
 // handles javascript injection to our bridge
-module.exports = (data, originHost, versionHost, isStyled = false) =>
+module.exports = (data, originHost, versionHost, isEditMode) =>
   compose(
-    injectScript(versionHost, isStyled),
+    injectScript(versionHost, isEditMode),
+    injectStyles(versionHost, isEditMode),
     rewriteHtml(originHost, versionHost)
   )(data);
