@@ -87,7 +87,7 @@ type CreateSiteOriginResult {
 }
 
 input SaveSiteDeltasInput {
-  versionUrl: String!
+  host: String!
   deltas: String!
 }
 

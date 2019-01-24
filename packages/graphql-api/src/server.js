@@ -1,8 +1,7 @@
 const { GraphQLServer } = require("graphql-yoga");
 const path = require("path");
-const resolvers = require('./resolvers');
-const context = require('./context');
-
+const resolvers = require("./resolvers");
+const context = require("./context");
 
 const port = process.env.PORT || 8080;
 
@@ -12,7 +11,8 @@ const options = {
   bodyParserOptions: {
     limit: "50mb",
     extended: true
-  }
+  },
+  debug: true
 };
 
 const server = new GraphQLServer({

@@ -7,12 +7,14 @@ import ModalDialog, { ModalTransition } from "@atlaskit/modal-dialog";
 import StringWorker from "./stringworker";
 import _ from "lodash";
 import ReactJson from "react-json-view";
+import { ToastContainer, toast } from "react-toastify";
+import EditCss from "./edit-css.gif";
 
 const Page = styled.div`
   display: grid;
   grid-template-areas:
-    "."
-    ".";
+    "sharedView"
+    "footer";
   grid-template-rows: 1fr 64px;
   grid-template-columns: 1fr;
   width: 100%;
@@ -20,7 +22,8 @@ const Page = styled.div`
   overflow: hidden;
 
   .toolbar {
-    border-top: 3px solid #0052CC;
+    border-top: 3px solid #0052cc;
+    grid-area: footer;
   }
 `;
 
@@ -28,11 +31,16 @@ const SharedView = styled.div`
   position: relative;
   width: 100%;
   height: 100%;
+  grid-area: sharedView;
 
   iframe {
     width: ${props => (props.isEditing ? "calc(100% - 400px)" : "calc(100%)")};
 
     height: 100%;
+  }
+
+  .Toastify__toast {
+    bottom: 32px;
   }
 
   > div:last-child {
@@ -43,6 +51,11 @@ const SharedView = styled.div`
     right: 0px;
     transform: translateX(${props => (props.isEditing ? "0px" : "400px")});
   }
+`;
+
+const Walkthrough = styled.div`
+  height: 650px;
+  width: 100%;
 `;
 
 const Iframe = styled.iframe`
@@ -63,12 +76,22 @@ class Designer extends React.Component {
 
   componentDidMount() {
     const params = new URLSearchParams(this.props.location.search);
-    this.setState({ version: `https://${params.get("version")}?diffEditMode=true` });
+    this.setState({
+      versionId: params.get("version"),
+      version: `https://${params.get("version")}?diffEditMode=true`
+    });
 
     window.addEventListener("message", this.eventHandler);
     this.stringWorker = new Worker(StringWorker);
 
     this.stringWorker.onmessage = _.debounce(this.handleWorkerMessage, 10);
+
+    const walkthrough = localStorage.getItem("_walkthrough_01");
+    if (!walkthrough) {
+      this.setState({
+        isOpen: true
+      });
+    }
   }
 
   componentWillUnmount() {
@@ -76,7 +99,7 @@ class Designer extends React.Component {
   }
 
   handleWorkerMessage = m => {
-    console.log('worker message', m.data)
+    console.log("worker message", m.data);
     this.setState({
       styles: m.data
     });
@@ -89,7 +112,7 @@ class Designer extends React.Component {
       this.stringWorker.postMessage(deltas);
 
       this.setState({
-        changed: true,        
+        changed: true,
         count: Object.keys(deltas).length
       });
     }
@@ -111,12 +134,34 @@ class Designer extends React.Component {
 
   onSave = () => {
     const input = {
-      versionUrl: this.state.version,
+      host: this.state.versionId,
       deltas: JSON.stringify(this.state.styles)
     };
     this.props
       .saveSiteVersion({ variables: { input } })
       .then(response => {
+        navigator.clipboard.writeText(`https://${this.state.versionId}`).then(
+          function() {
+            toast.info("Prototype URL copied to clipboard", {
+              position: "bottom-right",
+              autoClose: 2000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: false
+            });
+          },
+          function() {
+            toast.error("Unable to save url to clipboard", {
+              position: "bottom-right",
+              autoClose: 2000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: false
+            });
+          }
+        );
         console.log(response);
       })
       .catch(error => {
@@ -132,6 +177,7 @@ class Designer extends React.Component {
     return (
       <Page>
         <SharedView isEditing={isEditing}>
+          <ToastContainer />
           <Iframe id="frame" src={version} title="prototype" />
         </SharedView>
         <Toolbar
@@ -144,7 +190,27 @@ class Designer extends React.Component {
         <ModalTransition>
           {isOpen && (
             <ModalDialog onClose={() => this.setState({ isOpen: false })}>
-              <ReactJson src={styles} collapsed={1} />
+              <Walkthrough>
+                <h1>Getting Started with Diff</h1>
+                <p>
+                  With diff you can modify sites using browser devtools, save
+                  those changes, and share them as a unique url
+                </p>
+
+                <h2>Step 1</h2>
+                <p>First open devtools and make your changes</p>
+                <img
+                  src={EditCss}
+                  style={{ objectFit: "contain", width: "100%" }}
+                />
+
+                <h2>Step 2</h2>
+                <p>
+                  When you're satisified with your changes click save changes at
+                  the bottom, this will save all your changes to a unique url
+                  that you can share
+                </p>
+              </Walkthrough>
             </ModalDialog>
           )}
         </ModalTransition>

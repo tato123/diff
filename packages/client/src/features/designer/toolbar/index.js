@@ -12,29 +12,23 @@ const View = styled.div`
 const Toolbar = ({ count, onSave, onEdit, onShare, onClickChanges }) => (
   <View className="toolbar">
     <div>
-      <a href="#" onClick={onClickChanges}>
-        {count} elements with changes
-      </a>
+      <div>{count} elements have modified styles</div>
     </div>
     <div
       style={{
         justifyContent: "center",
         flex: "1 auto",
-        display: "flex"
+        display: "flex",
+        marginLeft: "-10%"
       }}
     >
-      <Button onClick={onShare}>Share</Button>
-    </div>
-    <span
-      style={{
-        justifyContent: "flex-end",
-        display: "flex"
-      }}
-    >
-      <Button onClick={onSave} isDisabled={count === 0}>
-        Save
+      {/* <Button onClick={onShare} appearence="link">
+        Save to workspace
+      </Button> */}
+      <Button onClick={onSave} isDisabled={count === 0} appearance="primary">
+        Save Changes
       </Button>
-    </span>
+    </div>
   </View>
 );
 

@@ -6,6 +6,7 @@ import Designer from "./features/designer";
 
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { injectGlobal, ThemeProvider } from "styled-components";
+import "react-toastify/dist/ReactToastify.css";
 
 injectGlobal`
   html, body, #root {

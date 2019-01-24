@@ -16,5 +16,11 @@
   "devDependencies": {
     "aws-sdk": "^2.382.0",
     "jest": "^23.6.0"
-  }
+  },
+  "testPathIgnorePatterns ": [
+    "/node_modules/",
+    "../../node_modules/",
+    "<rootDir>/node_modules/",
+    "<rootDir>/../../node_modules/"
+  ]
 }

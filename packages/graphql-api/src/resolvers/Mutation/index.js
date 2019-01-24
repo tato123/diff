@@ -1,5 +1,5 @@
 const AWS = require("aws-sdk");
-const toCss = require('to-css');
+const toCss = require("to-css");
 
 // Create the DynamoDB service object
 const dynamo = new AWS.DynamoDB({
@@ -10,7 +10,7 @@ const dynamo = new AWS.DynamoDB({
 const uniqueSlug = require("unique-slug");
 const normalizeUrl = require("normalize-url");
 const str = require("string-to-stream");
-const sslChecker = require("ssl-checker")
+const sslChecker = require("ssl-checker");
 
 const processUpload = async (upload, metaData) => {
   console.log("received upload design request", metaData);
@@ -53,37 +53,46 @@ const createSiteChange = async (parent, args, context) => {
   };
 };
 
-const checkProtocol = async (origin) => {
+const checkProtocol = async origin => {
   try {
-    console.log('checking site', origin)
+    console.log("checking site", origin);
     const result = await sslChecker(origin);
     if (result.valid) {
-      return 'https'
+      return "https";
     }
-    return 'http'
+    return "http";
   } catch (error) {
-    console.error('error')
-    return 'http'
+    console.error("error");
+    return "http";
   }
-}
+};
 
 const createSiteOrigin = async (parent, args, context) => {
   const randomSlug = uniqueSlug(args.url);
   const host = `${randomSlug}.site.stage-getdiff.app`;
-  const inputUrl = new URL(normalizeUrl(args.input.url, {stripWWW: false}));
-  const originUrl = inputUrl.host;
-  const protocol = await checkProtocol(originUrl)
+
+  // cleanup url
+  const { host: inputHost } = new URL(
+    normalizeUrl(args.input.url, { stripWWW: false })
+  );
+
+  // get our hostname
+  const inputUrl =
+    inputHost.split(".").length === 2 ? `www.${inputHost}` : inputHost;
+
+  const originUrl = inputUrl;
+  const protocol = await checkProtocol(originUrl);
 
   console.log("host", host);
   console.log("args", args);
-  console.log('protocol', protocol)
+  console.log("protocol", protocol);
 
   const params = {
     TableName: "Origins",
     Item: {
       Host: { S: host },
       Origin: { S: originUrl },
-      Proto: {S: protocol}
+      Proto: { S: protocol }
     }
   };
 
@@ -103,18 +112,18 @@ const createSiteOrigin = async (parent, args, context) => {
 };
 
 const saveSiteDeltas = async (parent, args, context) => {
-  const versionUrl = args.input.versionUrl;
+  const host = args.input.host;
   const deltas = args.input.deltas;
   const css = toCss(JSON.parse(deltas));
 
-  console.log("saving site deltas", versionUrl, css);
+  console.log("saving site deltas", host, css);
 
   const params = {
     TableName: "Deltas",
     Item: {
-      VersionUrl: { S: versionUrl },
+      Host: { S: host },
       Changes: { S: deltas },
-      CSS: {S: css}
+      CSS: { S: css }
     }
   };
 
@@ -127,7 +136,7 @@ const saveSiteDeltas = async (parent, args, context) => {
       }
 
       return resolve({
-        prototypeUrl: versionUrl
+        prototypeUrl: host
       });
     });
   });

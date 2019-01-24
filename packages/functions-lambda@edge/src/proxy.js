@@ -3,41 +3,42 @@
 const axios = require("axios");
 
 const hostUtils = require("./host");
-const responseMiddleware = require('./responseMiddleware');
-
+const responseMiddleware = require("./responseMiddleware");
 
 const fetchContent = async ({ url, method }) => {
   // perform a head event to determine type
   const { headers } = await axios({
     url,
-    method: 'HEAD'
+    method: "HEAD"
   });
 
   // get the responseType this time
   const isByteArray = headers["accept-ranges"] === "bytes";
-  const isBinary = !headers['content-type'].startsWith('text');
-  console.log('[Fetch] is byteArray?', isByteArray);
-  console.log('[Fetch] is isBinary?', isBinary);
+  const isBinary = !headers["content-type"].startsWith("text");
+  console.log("[Fetch] is byteArray?", isByteArray);
+  console.log("[Fetch] is isBinary?", isBinary);
 
   // fetch the data
   const axiosResponse = await axios({
     url: url,
     method,
-    ...isByteArray ? { responseType: 'arraybuffer' } : {}
+    ...(isByteArray ? { responseType: "arraybuffer" } : {})
   });
 
   // if its a byte array and not a binary format
   // we need to convert it back to a string before working with it
-  const data = !isBinary && isByteArray ? Buffer.from(axiosResponse.data, 'binary').toString('utf-8') : axiosResponse.data;
+  const data =
+    !isBinary && isByteArray
+      ? Buffer.from(axiosResponse.data, "binary").toString("utf-8")
+      : axiosResponse.data;
 
   return {
     ...axiosResponse,
     data,
     isByteArray,
     isBinary
-  }
-}
-
+  };
+};
 
 /**
  * Our edge proxy that is responsible for reading the requests and
@@ -65,16 +66,13 @@ module.exports.edgeProxy = async (event, context, callback) => {
   console.log("------------------");
 
   try {
-    // attempt to proxied origin host    
-    const { origin: originHost, protocol: originProtocol } = await hostUtils.getHost(
-      versionHost,
-      scheme,
-      uri,
-      querystring
-    );
+    // attempt to proxied origin host
+    const {
+      origin: originHost,
+      protocol: originProtocol
+    } = await hostUtils.getHost(versionHost, scheme, uri, querystring);
 
-
-    console.log('Mapped', versionHost, 'to', originHost)
+    console.log("Mapped", versionHost, "to", originHost);
 
     // we dont have an origin host
     if (originHost == null) {
@@ -85,7 +83,7 @@ module.exports.edgeProxy = async (event, context, callback) => {
     // Build our content origin url
     const url = `${originProtocol}://${originHost}${uri}${
       querystring.trim().length > 0 ? "?" + querystring : ""
-      }`;
+    }`;
     const xFrameOrigin = `${originProtocol}://${originHost}`;
 
     // fetch our content
@@ -95,8 +93,17 @@ module.exports.edgeProxy = async (event, context, callback) => {
     });
 
     // generate a new response
-    const editMode = querystring.indexOf('diffEditMode=true') !== -1;
-    const response = await responseMiddleware.generateResponse(request, { data, headers: axiosResHeaders, isBinary, originHost, versionHost, xFrameOrigin, editMode });
+    const editMode = querystring.indexOf("diffEditMode=true") !== -1;
+    console.log("is active edit mode?", editMode);
+    const response = await responseMiddleware.generateResponse(request, {
+      data,
+      headers: axiosResHeaders,
+      isBinary,
+      originHost,
+      versionHost,
+      xFrameOrigin,
+      editMode
+    });
 
     console.log("--[Event Response]--");
     console.log(response);
