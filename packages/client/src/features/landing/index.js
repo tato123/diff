@@ -72,15 +72,15 @@ const Designer = ({
           isDisabled={errors.website}
           isLoading={isSubmitting}
           style={{ height: "40px" }}
+          type="submit"
         >
           Prototype changes
         </Button>
       </Row>
       <Row>
         <div style={{ textAlign: "center", width: "100%" }}>
-          Diff lets you share changes that you make to a site with devtools so
-          you don't need to take a screenshot. You can just send a unique URL.
-          You can test design changes directly in your browser
+          With Diff you can share changes you make with your browsers devtools.
+          Enter a URL above to get started
         </div>
       </Row>
     </form>
