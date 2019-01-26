@@ -6,7 +6,6 @@ import { SAVE_VERSION } from "../../graphql/mutations";
 import ModalDialog, { ModalTransition } from "@atlaskit/modal-dialog";
 import StringWorker from "./stringworker";
 import _ from "lodash";
-import ReactJson from "react-json-view";
 import { ToastContainer, toast } from "react-toastify";
 import EditCss from "./edit-css.gif";
 
@@ -171,7 +170,7 @@ class Designer extends React.Component {
 
   render() {
     const {
-      state: { isEditing, version, count, isOpen, styles }
+      state: { isEditing, version, count, isOpen }
     } = this;
 
     return (
@@ -202,6 +201,7 @@ class Designer extends React.Component {
                 <img
                   src={EditCss}
                   style={{ objectFit: "contain", width: "100%" }}
+                  alt="Devtool instructions"
                 />
 
                 <h2>Step 2</h2>

@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import "@atlaskit/css-reset/dist/bundle.css";
 
 import Landing from "./features/landing";

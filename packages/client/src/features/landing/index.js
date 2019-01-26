@@ -40,7 +40,7 @@ const Row = styled.div`
 const SiteSchema = Yup.object().shape({
   website: Yup.string()
     .test("is-url", "Is not a url", value => {
-      const re = /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/;
+      const re = /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([-.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/;
       return re.test(value);
     })
     .required()
