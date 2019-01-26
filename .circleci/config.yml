@@ -71,10 +71,10 @@ workflows:
     jobs:
       - lerna
       - build:
-        requires:
-          - lerna
-      - deploy-client
-        requires:
-          - build
+          requires:
+            - lerna
+      - deploy-client:
+          requires:
+            - build
   # dev environment
   # prod environment
