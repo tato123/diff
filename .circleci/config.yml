@@ -52,6 +52,8 @@ jobs:
             - client/dist
             - client-bridge/dist
   deploy-client:
+    docker:
+      - image: "circleci/python:2.7"
     steps:
       - checkout
       - restore_cache:
