@@ -12,7 +12,7 @@ defaults: &defaults
 # have some basic set of functionality in order
 # to kick off our jobs
 orbs:
-  aws-s3: circleci/aws-s3@1.0.0
+  aws-s3: circleci/aws-s3@1.0.3
 
 jobs:
   # configure the lerna portion
