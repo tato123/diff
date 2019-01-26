@@ -49,9 +49,10 @@ jobs:
           root: packages
           paths:
             - adobexd-plugin/dist
-            - client/dist
+            - client/build
             - client-bridge/dist
   deploy-client:
+    working_directory: ~/app
     docker:
       - image: "circleci/python:2.7"
     steps:
@@ -59,7 +60,7 @@ jobs:
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}-{{ checksum "lerna.json"}}-{{ .Revision }}
       - aws-s3/sync:
-          from: client/dist
+          from: packages/client/build
           to: "s3://www.stage-getdiff.app"
           arguments: |
             --acl public-read \
