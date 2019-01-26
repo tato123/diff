@@ -1,11 +1,16 @@
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const path = require("path");
 const babel = require("./babel.config");
-const XdpmPlugin = require("./webpack.plugin");
 
 const OUTPUT = path.resolve(__dirname, "../dist");
-const ENV = process.env.NODE_ENV || 'production'
+const ENV = process.env.NODE_ENV || "production";
 
+const plugins = [];
+if (ENV === "developement") {
+  const XdpmPlugin = require("./webpack.plugin");
+  plugins.push(new CopyWebpackPlugin(["src/manifest.json"]));
+  plugins.push(new XdpmPlugin());
+}
 
 module.exports = {
   entry: {
@@ -59,5 +64,5 @@ module.exports = {
     application: "application",
     uxp: "uxp"
   },
-  plugins: ENV === 'development' ?  [new CopyWebpackPlugin(["src/manifest.json"]), new XdpmPlugin()] : []
+  plugins
 };
