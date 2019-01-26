@@ -70,7 +70,11 @@ workflows:
   commit:
     jobs:
       - lerna
-      - build
+      - build:
+        requires:
+          - lerna
       - deploy-client
+        requires:
+          - build
   # dev environment
   # prod environment
