@@ -67,6 +67,7 @@ jobs:
 
 # Our process / workflow
 workflows:
+  version: 2.1
   commit:
     jobs:
       - lerna
