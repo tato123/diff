@@ -52,7 +52,6 @@ jobs:
             - client/dist
             - client-bridge/dist
   deploy-client:
-    <<: *defaults
     steps:
       - checkout
       - restore_cache:
