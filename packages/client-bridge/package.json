@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "prebuild": "rimraf dist",
-    "build": "cross-env NODE_ENV=production webpack --config webpack.config.js --progress",
+    "build": "cross-env NODE_ENV=production webpack --config webpack.config.js",
     "watch": "cross-env NODE_ENV=development webpack-dev-server --config webpack.config.js --progress --watch",
     "start:dev": "npm run watch"
   },

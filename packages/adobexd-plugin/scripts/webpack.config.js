@@ -4,12 +4,14 @@ const babel = require("./babel.config");
 const XdpmPlugin = require("./webpack.plugin");
 
 const OUTPUT = path.resolve(__dirname, "../dist");
+const ENV = process.env.NODE_ENV || 'production'
+
 
 module.exports = {
   entry: {
     main: "./src/main.js"
   },
-  mode: process.env.NODE_ENV || "production",
+  mode: ENV,
   output: {
     path: OUTPUT,
     filename: "[name].js",
@@ -57,5 +59,5 @@ module.exports = {
     application: "application",
     uxp: "uxp"
   },
-  plugins: [new CopyWebpackPlugin(["src/manifest.json"]), new XdpmPlugin()]
+  plugins: ENV === 'development' ?  [new CopyWebpackPlugin(["src/manifest.json"]), new XdpmPlugin()] : []
 };
