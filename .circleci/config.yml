@@ -1,0 +1,75 @@
+version: 2.1
+
+# Set a standard set of default
+# because we are using a monorepo
+defaults: &defaults
+  working_directory: ~/app
+  docker:
+    - image: circleci/node:10.5.0
+
+# Configure the orbs we want to use which
+# have some basic set of functionality in order
+# to kick off our jobs
+orbs:
+  aws-s3: circleci/aws-s3@1.0.0
+
+jobs:
+  # configure the lerna portion
+  lerna:
+    <<: *defaults
+    steps:
+      - checkout
+      - run:
+          name: Install NPX
+          command: yarn global add npx
+      - run:
+          name: Install dependencies with yarn workspaces
+          command: npx lerna bootstrap
+      - save_cache:
+          key: dependency-cache-{{ checksum "package.json" }}-{{ checksum "lerna.json"}}
+          paths:
+            - node_modules
+            - packages/adobexd-plugin/node_modules
+            - packages/client/node_modules
+            - packages/client-bridge/ode_modules
+            - packages/functions-lambda@edge/node_modules
+            - packages/graphql-api/node_modules
+  build:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}-{{ checksum "lerna.json"}}
+      - run:
+          name: Build Packages in parallel
+          command: |
+            yarn build
+      - persist_to_workspace:
+          root: packages
+          paths:
+            - adobexd-plugin/dist
+            - client/dist
+            - client-bridge/dist
+  deploy-client:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}-{{ checksum "lerna.json"}}
+      - aws-s3/sync:
+          from: client/dist
+          to: "s3://www.stage-getdiff.app"
+          arguments: |
+            --acl public-read \
+            --cache-control "max-age=300"
+          overwrite: true
+
+# Our process / workflow
+workflows:
+  commit:
+    jobs:
+      - lerna
+      - build
+      - deploy-client
+  # dev environment
+  # prod environment
