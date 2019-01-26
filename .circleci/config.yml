@@ -32,7 +32,7 @@ jobs:
             - node_modules
             - packages/adobexd-plugin/node_modules
             - packages/client/node_modules
-            - packages/client-bridge/ode_modules
+            - packages/client-bridge/node_modules
             - packages/functions-lambda@edge/node_modules
             - packages/graphql-api/node_modules
   build:
