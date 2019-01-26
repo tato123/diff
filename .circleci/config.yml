@@ -57,13 +57,14 @@ jobs:
       - image: "circleci/python:2.7"
     steps:
       - checkout
-      - restore_cache:
-          key: dependency-cache-{{ checksum "package.json" }}-{{ checksum "lerna.json"}}-{{ .Revision }}
+      - attach_workspace:
+          at: packages
       - aws-s3/sync:
-          from: packages/client/build
+          from: packages/client/build/
           to: "s3://www.stage-getdiff.app"
           arguments: |
             --acl public-read \
+            --recursive \
             --cache-control "max-age=300"
           overwrite: true
 
