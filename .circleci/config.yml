@@ -1,76 +1,37 @@
-# use the latest version
-version: 2.1
-
-# Set a standard set of default
-# because we are using a monorepo
-defaults: &defaults
-  working_directory: ~/app
-  docker:
-    - image: circleci/node:10.5.0
-
-# Configure the orbs we want to use which
-# have some basic set of functionality in order
-# to kick off our jobs
-orbs:
-  aws-s3: circleci/aws-s3@1.0.0
-
+# Javascript Node CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-javascript/ for more details
+#
+version: 2
 jobs:
-  # configure the lerna portion
-  lerna:
-    <<: *defaults
+  build:
+    docker:
+      # specify the version you desire here
+      - image: circleci/node:7.10
+
+      # Specify service dependencies here if necessary
+      # CircleCI maintains a library of pre-built images
+      # documented at https://circleci.com/docs/2.0/circleci-images/
+      # - image: circleci/mongo:3.4.4
+
+    working_directory: ~/repo
+
     steps:
       - checkout
-      - run:
-          name: Install NPX
-          command: yarn global add npx
-      - run:
-          name: Install dependencies with yarn workspaces
-          command: npx lerna bootstrap
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+
+      - run: yarn install
+
       - save_cache:
-          key: dependency-cache-{{ checksum "package.json" }}-{{ checksum "lerna.json"}}
           paths:
             - node_modules
-            - packages/adobexd-plugin/node_modules
-            - packages/client/node_modules
-            - packages/client-bridge/ode_modules
-            - packages/functions-lambda@edge/node_modules
-            - packages/graphql-api/node_modules
-  build:
-    <<: *defaults
-    steps:
-      - checkout
-      - restore_cache:
-          key: dependency-cache-{{ checksum "package.json" }}-{{ checksum "lerna.json"}}
-      - run:
-          name: Build Packages in parallel
-          command: |
-            yarn build
-      - persist_to_workspace:
-          root: packages
-          paths:
-            - adobexd-plugin/dist
-            - client/dist
-            - client-bridge/dist
-  deploy-client:
-    <<: *defaults
-    steps:
-      - checkout
-      - restore_cache:
-          key: dependency-cache-{{ checksum "package.json" }}-{{ checksum "lerna.json"}}
-      - aws-s3/sync:
-          from: client/dist
-          to: "s3://www.stage-getdiff.app"
-          arguments: |
-            --acl public-read \
-            --cache-control "max-age=300"
-          overwrite: true
+          key: v1-dependencies-{{ checksum "package.json" }}
 
-# Our process / workflow
-workflows:
-  commit:
-    jobs:
-      - lerna
-      - build
-      - deploy-client
-  # dev environment
-  # prod environment
+      # run tests!
+      - run: yarn test
