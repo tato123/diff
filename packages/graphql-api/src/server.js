@@ -3,7 +3,7 @@ const path = require("path");
 const resolvers = require("./resolvers");
 const context = require("./context");
 
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 8081;
 
 const options = {
   port,

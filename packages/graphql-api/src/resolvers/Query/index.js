@@ -5,6 +5,8 @@ const dynamo = new AWS.DynamoDB({
   region: "us-east-1"
 });
 
+const ORIGINS = process.env.ORIGINS;
+
 const noop = () => {
   return [{}];
 };
@@ -13,7 +15,7 @@ const originQuery = async (parent, args, { user }) => {
   const account = await user;
 
   var params = {
-    TableName: "Origins",
+    TableName: ORIGINS,
     Key: {
       Host: { S: args.Host }
     }
@@ -37,7 +39,7 @@ const originQuery = async (parent, args, { user }) => {
 
 const allOrigins = async () => {
   const params = {
-    TableName: "Origins"
+    TableName: ORIGINS
   };
 
   // Call DynamoDB to read the item from the table

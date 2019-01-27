@@ -12,6 +12,9 @@ const normalizeUrl = require("normalize-url");
 const str = require("string-to-stream");
 const sslChecker = require("ssl-checker");
 
+const DELTAS = process.env.DELTAS;
+const ORIGINS = process.env.ORIGINS;
+
 const processUpload = async (upload, metaData) => {
   console.log("received upload design request", metaData);
 
@@ -88,7 +91,7 @@ const createSiteOrigin = async (parent, args, context) => {
   console.log("protocol", protocol);
 
   const params = {
-    TableName: "Origins",
+    TableName: ORIGINS,
     Item: {
       Host: { S: host },
       Origin: { S: originUrl },
@@ -119,7 +122,7 @@ const saveSiteDeltas = async (parent, args, context) => {
   console.log("saving site deltas", host, css);
 
   const params = {
-    TableName: "Deltas",
+    TableName: DELTAS,
     Item: {
       Host: { S: host },
       Changes: { S: deltas },

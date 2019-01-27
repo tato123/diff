@@ -35,3 +35,5 @@ Outputs:
   getdiffcertificate:
     Value:
       Ref: getdiffcertificate
+    Export:
+      Name: !Sub "${AWS::StackName}-getdiffcertificate"
