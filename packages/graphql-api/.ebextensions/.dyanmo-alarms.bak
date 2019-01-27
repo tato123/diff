@@ -1,0 +1,76 @@
+
+  SessionWriteCapacityUnitsLimit:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: { "Fn::Join" : ["", [{ "Ref" : "AWSEBEnvironmentName" }, " write capacity limit on the session table." ]]}
+      Namespace: "AWS/DynamoDB"
+      MetricName: ConsumedWriteCapacityUnits
+      Dimensions:
+        - Name: TableName
+          Value: { "Ref" : "SessionTable" }
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 12
+      Threshold:
+          Fn::GetOptionSetting:
+            OptionName : SessionWriteCapacityUnitsAlarmThreshold
+            DefaultValue: 240
+      ComparisonOperator: GreaterThanThreshold
+      AlarmActions:
+        - Ref: SessionAlarmTopic
+      InsufficientDataActions:
+        - Ref: SessionAlarmTopic
+
+  SessionReadCapacityUnitsLimit:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: { "Fn::Join" : ["", [{ "Ref" : "AWSEBEnvironmentName" }, " read capacity limit on the session table." ]]}
+      Namespace: "AWS/DynamoDB"
+      MetricName: ConsumedReadCapacityUnits
+      Dimensions:
+        - Name: TableName
+          Value: { "Ref" : "SessionTable" }
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 12
+      Threshold:
+          Fn::GetOptionSetting:
+            OptionName : SessionReadCapacityUnitsAlarmThreshold
+            DefaultValue: 240
+      ComparisonOperator: GreaterThanThreshold
+      AlarmActions:
+        - Ref: SessionAlarmTopic
+      InsufficientDataActions:
+        - Ref: SessionAlarmTopic
+
+  SessionThrottledRequestsAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: { "Fn::Join" : ["", [{ "Ref" : "AWSEBEnvironmentName" }, ": requests are being throttled." ]]}
+      Namespace: AWS/DynamoDB
+      MetricName: ThrottledRequests
+      Dimensions:
+        - Name: TableName
+          Value: { "Ref" : "SessionTable" }
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 
+        Fn::GetOptionSetting:
+          OptionName: SessionThrottledRequestsThreshold
+          DefaultValue: 1
+      ComparisonOperator: GreaterThanThreshold
+      AlarmActions:
+        - Ref: SessionAlarmTopic
+      InsufficientDataActions:
+        - Ref: SessionAlarmTopic
+
+  SessionAlarmTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      Subscription:
+        - Endpoint:
+            Fn::GetOptionSetting:
+              OptionName: SessionAlarmEmail
+              DefaultValue: "nobody@amazon.com"
+          Protocol: email
