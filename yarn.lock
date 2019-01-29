@@ -2461,6 +2461,11 @@
     "@webassemblyjs/wast-parser" "1.7.6"
     "@xtuc/long" "4.2.1"
 
+"@webcomponents/webcomponentsjs@^2.2.4":
+  version "2.2.4"
+  resolved "https://registry.yarnpkg.com/@webcomponents/webcomponentsjs/-/webcomponentsjs-2.2.4.tgz#b520d586e46517914d9708c2220b263116d5f86a"
+  integrity sha512-YkLxK9Mbw6QK5bNZ67Rarb/yj0gN+Ziy5+2sLjM0lDb3XafM36gXKZXaIBz4zvLA/cYYTdg+l1LlqXeHEcmeiA==
+
 "@xtuc/ieee754@^1.2.0":
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@xtuc/ieee754/-/ieee754-1.2.0.tgz#eef014a3145ae477a1cbc00cd1e552336dceb790"
@@ -4750,6 +4755,11 @@ css-tree@1.0.0-alpha.29:
   dependencies:
     mdn-data "~1.1.0"
     source-map "^0.5.3"
+
+css-typed-om@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/css-typed-om/-/css-typed-om-0.4.0.tgz#c9bb93feab7400b4ff43d1227e59d39bbba439e9"
+  integrity sha512-wa2sUHPTAol+SmOoeaKv20PZ+6wiJIvLG+z5NFnV1trOIcSN0LLxdrMriXKo9wkdABshcfMToT4CmQ/z3CPlcg==
 
 css-unit-converter@^1.1.1:
   version "1.1.1"
@@ -12161,6 +12171,11 @@ react-focus-lock@^1.11.3:
     focus-lock "^0.5.2"
     prop-types "^15.6.2"
     react-clientside-effect "^1.2.0"
+
+react-ga@^2.5.6:
+  version "2.5.6"
+  resolved "https://registry.yarnpkg.com/react-ga/-/react-ga-2.5.6.tgz#5a2e2fa78ae298e5b0a4498210eeec631ef1b562"
+  integrity sha512-g04dz6zrbdHRxVaURPWT3RUbjLflh74sS6dCuhGeZupj7ii+UEt9lwTjALb2ST2w+7wAmzG1YqYlNX4yvRXe1g==
 
 react-icons-kit@^1.2.1:
   version "1.2.1"

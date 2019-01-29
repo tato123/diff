@@ -8,6 +8,13 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { injectGlobal, ThemeProvider } from "styled-components";
 import "react-toastify/dist/ReactToastify.css";
 
+import ReactGA from "react-ga";
+
+if (process.env.NODE_ENV === "production") {
+  ReactGA.initialize("UA-124426207-2");
+  ReactGA.pageview(window.location.pathname + window.location.search);
+}
+
 injectGlobal`
   html, body, #root {
     width: 100%;

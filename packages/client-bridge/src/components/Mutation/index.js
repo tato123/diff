@@ -42,15 +42,20 @@ export default class MutationListener extends React.Component {
     if (selector == null || selector === undefined) {
       return;
     }
-    
-    const styles = []
-    mutation.target.attributeStyleMap.forEach((val,prop)=> {      
-      styles.push(`${prop}:${val.toString()}`)
-    })
-    
-   
+
+    // let styleOutput = "";
+
+    // if (window.CSS && CSS.number) {
+    //   const styles = [];
+    //   mutation.target.attributeStyleMap.forEach((val, prop) => {
+    //     styles.push(`${prop}:${val.toString()}`);
+    //   });
+    //   styleOutput = styles.join(";");
+    // }
+    const styleOutput = mutation.target.getAttribute("style");
+
     this.deltas[selector] = Object.assign({}, this.deltas[selector], {
-      style: styles.join(';')
+      style: styleOutput
     });
   };
 

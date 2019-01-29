@@ -20,8 +20,11 @@ Resources:
           ValidationDomain: getdiff.app
         - DomainName: "*.site.getdiff.app"
           ValidationDomain: getdiff.app
+        - DomainName: "getdiff.app"
+          ValidationDomain: getdiff.app
       SubjectAlternativeNames:
         - "*.site.getdiff.app"
+        - "getdiff.app"
       Tags:
         - Key: STAGE
           Value: prod
