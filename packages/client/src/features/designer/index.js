@@ -99,8 +99,11 @@ class Designer extends React.Component {
 
   handleWorkerMessage = m => {
     console.log("worker message", m.data);
+    const styles = m.data;
     this.setState({
-      styles: m.data
+      styles,
+      changed: true,
+      count: Object.keys(styles).length
     });
   };
 
@@ -110,10 +113,7 @@ class Designer extends React.Component {
       const deltas = data.payload;
       this.stringWorker.postMessage(deltas);
 
-      this.setState({
-        changed: true,
-        count: Object.keys(deltas).length
-      });
+
     }
   };
 
@@ -131,47 +131,55 @@ class Designer extends React.Component {
     this.setState(state => ({ isEditing: !state.isEditing }));
   };
 
-  onSave = () => {
+  onSave = (evt) => {
     const input = {
       host: this.state.versionId,
       deltas: JSON.stringify(this.state.styles)
     };
+    const host = `https://${this.state.versionId}`;
+
+    const copyText = document.querySelector('#clipboardText');
+    copyText.value = host;
+    copyText.select();
+    const successful = document.execCommand('copy');
+
     this.props
       .saveSiteVersion({ variables: { input } })
-      .then(response => {
-        navigator.clipboard.writeText(`https://${this.state.versionId}`).then(
-          function() {
-            toast.info("Prototype URL copied to clipboard", {
-              position: "bottom-right",
-              autoClose: 2000,
-              hideProgressBar: true,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: false
-            });
-          },
-          function() {
-            toast.error("Unable to save url to clipboard", {
-              position: "bottom-right",
-              autoClose: 2000,
-              hideProgressBar: true,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: false
-            });
-          }
-        );
-        console.log(response);
+      .then(() => {
+
+
+        if (!successful) {
+          throw new Error('Unable to copy content')
+        }
+
+
       })
-      .catch(error => {
-        console.error(error);
-      });
+      .then(() => {
+        toast.info("Prototype URL copied to clipboard", {
+          position: "bottom-right",
+          autoClose: 2000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: false
+        })
+      })
+
+      .catch((error) => {
+        console.error(' Unable to copy to clipboard', error);
+        window.open(host);
+      })
+
+
   };
 
   render() {
     const {
       state: { isEditing, version, count, isOpen }
     } = this;
+
+    const versionHost = `https://${this.state.versionId}`;
+
 
     return (
       <Page>
@@ -185,7 +193,7 @@ class Designer extends React.Component {
           count={count}
           onClickChanges={() => this.setState({ isOpen: true })}
         />
-
+        <input type="text" id="clipboardText" value={versionHost} style={{ position: "absolute", opacity: 0 }} />
         <ModalTransition>
           {isOpen && (
             <ModalDialog onClose={() => this.setState({ isOpen: false })}>
