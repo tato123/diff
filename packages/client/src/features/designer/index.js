@@ -4,13 +4,13 @@ import Toolbar from "./toolbar";
 import { compose, graphql } from "react-apollo";
 import { SAVE_VERSION } from "../../graphql/mutations";
 import ModalDialog, { ModalTransition } from "@atlaskit/modal-dialog";
-import StringWorker from "./stringworker";
+import StringWorker from "./string.worker.js"
 import _ from "lodash";
 import { ToastContainer, toast } from "react-toastify";
 import EditCss from "./edit-css.gif";
 
 const Page = styled.div`
-  display: grid;
+  display: grid; 
   grid-template-areas:
     "sharedView"
     "footer";
@@ -81,7 +81,7 @@ class Designer extends React.Component {
     });
 
     window.addEventListener("message", this.eventHandler);
-    this.stringWorker = new Worker(StringWorker);
+    this.stringWorker = new StringWorker();
 
     this.stringWorker.onmessage = _.debounce(this.handleWorkerMessage, 10);
 
@@ -109,10 +109,10 @@ class Designer extends React.Component {
 
   eventHandler = evt => {
     const data = evt.data;
+    const stringworker = this.stringWorker;
     if (data.source === "getDiff-client" && data.type === "SITE_CHANGE") {
       const deltas = data.payload;
-      this.stringWorker.postMessage(deltas);
-
+      stringworker.postMessage(deltas);
 
     }
   };
