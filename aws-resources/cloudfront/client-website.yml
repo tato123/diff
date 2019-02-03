@@ -1,42 +1,22 @@
 ---
 AWSTemplateFormatVersion: "2010-09-09"
-Description: The AWS CloudFormation template for Route53 resources
+Description: The AWS CloudFormation template for Client website resources
 Resources:
-  getdiffzone:
-    Type: AWS::Route53::HostedZone
+  getdiffClientWebsite:
+    Type: AWS::CloudFront::Distribution
     Properties:
-      Name: getdiff.app
+      DistributionConfig:
+        Origins:
+
       HostedZoneTags:
         - Key: STAGE
           Value: prod
         - Key: APP
           Value: getdiff
-  getdiffcertificate:
-    Type: AWS::CertificateManager::Certificate
-    Properties:
-      DomainName: "*.getdiff.app"
-      DomainValidationOptions:
-        - DomainName: "*.getdiff.app"
-          ValidationDomain: getdiff.app
-        - DomainName: "*.site.getdiff.app"
-          ValidationDomain: getdiff.app
-        - DomainName: "getdiff.app"
-          ValidationDomain: getdiff.app
-      SubjectAlternativeNames:
-        - "*.site.getdiff.app"
-        - "getdiff.app"
-      Tags:
-        - Key: STAGE
-          Value: prod
-        - Key: APP
-          Value: getdiff
-      ValidationMethod: DNS
+
 Outputs:
-  getdiffzone:
+  getdiffClientWebsite:
     Value:
-      Ref: getdiffzone
-  getdiffcertificate:
-    Value:
-      Ref: getdiffcertificate
+      Ref: getdiffClientWebsite
     Export:
-      Name: !Sub "${AWS::StackName}-getdiffcertificate"
+      Name: !Sub "${AWS::StackName}-getdiffClientWebsite"

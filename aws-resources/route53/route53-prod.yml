@@ -11,6 +11,25 @@ Resources:
           Value: prod
         - Key: APP
           Value: getdiff
+  getdiffmxRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId:
+        Ref: getdiffzone
+      TTL: "3600"
+      Type: MX
+      Commment: MX records for handling getdiff mail
+      ResourceRecords:
+        - "1 ASPMX.L.GOOGLE.COM."
+        - "5 ALT1.ASPMX.L.GOOGLE.COM."
+        - "5 ALT2.ASPMX.L.GOOGLE.COM."
+        - "10 ALT3.ASPMX.L.GOOGLE.COM."
+        - "10 ALT4.ASPMX.L.GOOGLE.COM."
+      Tags:
+        - Key: STAGE
+          Value: prod
+        - Key: APP
+          Value: getdiff
   getdiffcertificate:
     Type: AWS::CertificateManager::Certificate
     Properties:
