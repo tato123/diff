@@ -6,7 +6,7 @@ const OUTPUT = path.resolve(__dirname, "./dist");
 const ENV = process.env.NODE_ENV || "production";
 
 module.exports = {
-  devtool: ENV === "development" ? "cheap-eval-source-map" : "none",
+  devtool: ENV !== "production" ? "cheap-eval-source-map" : "none",
   mode: ENV,
   entry: {
     clientBridge: "./src/index.js"

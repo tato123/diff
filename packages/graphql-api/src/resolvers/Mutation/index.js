@@ -72,7 +72,7 @@ const checkProtocol = async origin => {
 
 const createSiteOrigin = async (parent, args, context) => {
   const randomSlug = uniqueSlug(args.url);
-  const host = `${randomSlug}.site.stage-getdiff.app`;
+  const host = `${randomSlug}.${process.env.PROTOTYPE_URL}`;
 
   // cleanup url
   const { host: inputHost } = new URL(

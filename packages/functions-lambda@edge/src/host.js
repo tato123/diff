@@ -3,7 +3,7 @@
 const zlib = require("zlib");
 const dynamoDb = require('./dynamo')
 
-const DYNAMODB_TABLE = "Origins";
+const DYNAMODB_TABLE = "awseb-e-s5sngijqpx-stack-Origins-P42SHEFEOOLJ";
 
 // Performs a lookup in dynamodb to match our account
 module.exports.getHost = (host, scheme, uri, querystring) => {

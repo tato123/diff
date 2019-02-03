@@ -1,9 +1,11 @@
 const utils = require("./proxy-utils");
 const dynamoDb = require("./dynamo");
 
+const devBridge = 'https://s3.amazonaws.com/getdiff-static-client/clientBridge.js';
+const prodBridge = 'https://s3.amazonaws.com/clientbridge-site.getdiff.app/clientBridge.js';
+
 // environment values not supported in lambda@edge
-const SCRIPT_URL =
-  "https://s3.amazonaws.com/getdiff-static-client/clientBridge.js";
+const SCRIPT_URL = process.env.CLIENT_BRIDGE === 'production' ? prodBridge : devBridge;
 
 const compose = (...functions) => input =>
   functions.reduceRight(

@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "start": "node src/proxy.js"
+    "start": "node src/proxy.js",
+    "deploy:dev": "npx serverless deploy --stage development -aws-profile dev",
+    "deploy:prod": "npx serverless deploy --stage production -aws-profile prod"
   },
   "author": "Jonathan Fontanez <jfontanez@getdiff.app>",
   "license": "ISC",
@@ -14,8 +16,10 @@
     "zlib": "^1.0.5"
   },
   "devDependencies": {
+    "@silvermine/serverless-plugin-cloudfront-lambda-edge": "^2.1.1",
     "aws-sdk": "^2.382.0",
-    "jest": "^23.6.0"
+    "jest": "^23.6.0",
+    "serverless-dotenv-plugin": "^2.0.1"
   },
   "testPathIgnorePatterns ": [
     "/node_modules/",

@@ -54,6 +54,8 @@ Outputs:
   getdiffzone:
     Value:
       Ref: getdiffzone
+    Export:
+      Name: !Sub "${AWS::StackName}-getdiffzone"
   getdiffcertificate:
     Value:
       Ref: getdiffcertificate
