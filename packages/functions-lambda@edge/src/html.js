@@ -1,11 +1,15 @@
 const utils = require("./proxy-utils");
 const dynamoDb = require("./dynamo");
 
-const devBridge = 'https://s3.amazonaws.com/getdiff-static-client/clientBridge.js';
-const prodBridge = 'https://s3.amazonaws.com/clientbridge-site.getdiff.app/clientBridge.js';
+const devBridge =
+  "https://s3.amazonaws.com/getdiff-static-client/clientBridge.js";
+const prodBridge =
+  "https://s3.amazonaws.com/clientbridge-site.getdiff.app/clientBridge.js";
+const DELTA_TABLE = "awseb-e-s5sngijqpx-stack-Deltas-YNEZTJF4FVSL";
 
 // environment values not supported in lambda@edge
-const SCRIPT_URL = process.env.CLIENT_BRIDGE === 'production' ? prodBridge : devBridge;
+const SCRIPT_URL =
+  process.env.CLIENT_BRIDGE === "production" ? prodBridge : devBridge;
 
 const compose = (...functions) => input =>
   functions.reduceRight(
@@ -59,10 +63,15 @@ const injectStyles = (versionId, isEditMode) => html => {
     return html;
   }
 
-  console.log("Attempting to inject styles for", versionId);
+  console.log(
+    "Attempting to inject styles for",
+    versionId,
+    "using resource",
+    DELTA_TABLE
+  );
 
   const params = {
-    TableName: "Deltas",
+    TableName: DELTA_TABLE,
     Key: {
       Host: {
         S: versionId

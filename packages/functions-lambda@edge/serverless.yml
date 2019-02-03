@@ -14,7 +14,7 @@ provider:
   runtime: nodejs8.10
   stage: prod
   profile: prod
-  region: us-east-1  
+  region: us-east-1
   memorySize: 512 # optional, in MB, default is 1024
   timeout: 10 # optional, in seconds, default is 6
 
@@ -30,28 +30,27 @@ resources:
         RoleName: edgeProxyRole
         AssumeRolePolicyDocument:
           Version: "2012-10-17"
-          Statement: 
+          Statement:
             - Effect: "Allow"
-              Principal: 
-                Service: 
+              Principal:
+                Service:
                   - "edgelambda.amazonaws.com"
                   - "lambda.amazonaws.com"
-              Action: 
+              Action:
                 - "sts:AssumeRole"
         ManagedPolicyArns:
           - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
         Policies:
-        - PolicyName: customLambdaPolicy
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:               
-              - Effect: Allow
-                Action:
-                - dynamodb:Query
-                - dynamodb:Scan
-                - dynamodb:GetItem
-                - dynamodb:PutItem
-                - dynamodb:UpdateItem
-                - dynamodb:DeleteItem
-                Resource: "*"
-        
+          - PolicyName: customLambdaPolicy
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - dynamodb:Query
+                    - dynamodb:Scan
+                    - dynamodb:GetItem
+                    - dynamodb:PutItem
+                    - dynamodb:UpdateItem
+                    - dynamodb:DeleteItem
+                  Resource: "*"
