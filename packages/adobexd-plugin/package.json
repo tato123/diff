@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "prebuild": "rimraf dist",
-    "build": "cross-env NODE_ENV=development webpack --config scripts/webpack.config.js --progress",
+    "build": "cross-env NODE_ENV=production webpack --config scripts/webpack.config.js",
     "watch": "cross-env NODE_ENV=development webpack --config scripts/webpack.config.js --progress --watch",
     "start:dev": "npm run watch"
   },
@@ -53,6 +53,6 @@
     "react-dom": "^16.6.3",
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
-    "styled-components": "^4.1.2"
+    "styled-components": "^3.5.0-0"
   }
 }

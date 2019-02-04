@@ -5,8 +5,9 @@
   "main": "src/index.js",
   "scripts": {
     "prebuild": "rimraf dist",
-    "build": "cross-env NODE_ENV=production webpack --config webpack.config.js --progress",
-    "watch": "cross-env NODE_ENV=development webpack --config webpack.config.js --progress --watch",
+    "build:prod": "cross-env NODE_ENV=production webpack --config webpack.config.js",
+    "build:stage": "cross-env NODE_ENV=stage webpack --config webpack.config.js",
+    "watch": "cross-env NODE_ENV=development webpack-dev-server --config webpack.config.js --progress --watch",
     "start:dev": "npm run watch"
   },
   "repository": {
@@ -23,6 +24,41 @@
   },
   "homepage": "https://github.com/tato123/diff#readme",
   "devDependencies": {
-    "babel-loader": "^8.0.4"
+    "@babel/cli": "^7.1.5",
+    "@babel/core": "^7.1.6",
+    "@babel/plugin-proposal-class-properties": "^7.2.1",
+    "@babel/plugin-transform-modules-commonjs": "^7.1.0",
+    "@babel/plugin-transform-runtime": "^7.1.0",
+    "@babel/preset-env": "^7.1.6",
+    "@babel/preset-react": "^7.0.0",
+    "@babel/preset-typescript": "^7.1.0",
+    "babel-loader": "^8.0.4",
+    "copy-webpack-plugin": "^4.6.0",
+    "cross-env": "^5.2.0",
+    "dotenv-webpack": "^1.6.0",
+    "file-loader": "^2.0.0",
+    "html-loader": "^0.5.5",
+    "prettier": "^1.15.2",
+    "rimraf": "^2.6.2",
+    "text-loader": "^0.0.1",
+    "url-loader": "^1.1.2",
+    "webpack": "^4.25.1",
+    "webpack-cli": "^3.1.2",
+    "webpack-dev-server": "^3.1.14"
+  },
+  "dependencies": {
+    "@medv/finder": "^1.1.1",
+    "@webcomponents/webcomponentsjs": "^2.2.4",
+    "apollo-boost": "^0.1.23",
+    "css-typed-om": "^0.4.0",
+    "graphql": "^14.0.2",
+    "graphql-tag": "^2.10.0",
+    "lodash-es": "^4.17.11",
+    "prop-types": "^15.6.2",
+    "react": "^16.7.0",
+    "react-apollo": "^2.3.3",
+    "react-dom": "^16.7.0",
+    "rxjs": "^6.3.3",
+    "to-css": "^1.2.1"
   }
 }

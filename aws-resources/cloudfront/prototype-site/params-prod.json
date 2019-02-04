@@ -1,0 +1,14 @@
+[
+  {
+    "ParameterKey": "AliasName",
+    "ParameterValue": "*.site.getdiff.app"
+  },
+  {
+    "ParameterKey": "OriginName",
+    "ParameterValue": "www.getdiff.app"
+  },
+  {
+    "ParameterKey": "Stage",
+    "ParameterValue": "prod"
+  }
+]

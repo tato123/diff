@@ -1,0 +1,10 @@
+[
+  {
+    "ParameterKey": "HostName",
+    "ParameterValue": "stage-getdiff.app"
+  },
+  {
+    "ParameterKey": "Stage",
+    "ParameterValue": "stage"
+  }
+]

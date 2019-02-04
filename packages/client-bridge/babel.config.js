@@ -1,19 +1,15 @@
 const presets = [
   [
-    "@babel/env",
+    "@babel/preset-env",
     {
-      targets: {
-        node: true
-      },
+      targets: "> 0.25%, not dead",
       useBuiltIns: "usage"
     }
   ],
+  "@babel/preset-typescript",
   "@babel/preset-react"
 ];
 
-const plugins = [
-  "@babel/plugin-transform-modules-commonjs",
-  "@babel/plugin-proposal-class-properties"
-];
+const plugins = ["@babel/plugin-proposal-class-properties"];
 
 module.exports = { presets, plugins };

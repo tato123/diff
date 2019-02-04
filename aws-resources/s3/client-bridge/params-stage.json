@@ -1,0 +1,10 @@
+[
+  {
+    "ParameterKey": "Stage",
+    "ParameterValue": "stage"
+  },
+  {
+    "ParameterKey": "BucketName",
+    "ParameterValue": "clientbridge-stage.getdiff.app"
+  }
+]

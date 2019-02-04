@@ -1,43 +1,30 @@
-window.addEventListener("load", function(event) {
-  window.addEventListener("message", evt => {
-    console.log("[Child] received a message", evt.data);
-    const data = evt.data;
-    const id = data.id;
+import React from "react";
+import ReactDOM from "react-dom";
 
-    if (data.type === "apply") {
-      const domElements = document.querySelectorAll(data.css);
-      domElements.forEach(element => {
-        const html = data.html.replace("{{value}}", element.innerText);
-        element.insertAdjacentHTML("afterend", html);
+import App from "./components/App";
 
-        element.setAttribute(
-          "data-df-di",
-          window.getComputedStyle(element).display || "initial"
-        );
-        element.style.display = "none";
-        element.setAttribute("data-df-og", id);
-      });
-    } else if (data.type === "remove") {
-      // remove old ids
-      document
-        .querySelectorAll(`[data-df="${id}"]`)
-        .forEach(e => e.parentNode.removeChild(e));
+import { ApolloProvider } from "react-apollo";
+import ApolloClient from "apollo-boost";
 
-      // re-enable
-      document
-        .querySelectorAll(`[data-df-og="${id}"]`)
-        .forEach(e => (e.style.display = e.getAttribute("data-df-di")));
-    }
-  });
-
-  const button = document.createElement("input");
-  button.type = "button";
-  button.value = "im a button";
-  button.onclick = () => {
-    window.parent.postMessage("hi im sending something", "*");
-  };
-  document.body.appendChild(button);
-
-  console.log("I loaded a script!!!");
-  console.log("All resources finished loading!");
+const client = new ApolloClient({
+  uri: process.env.GRAPHQL_HTTP_SERVER
 });
+
+function render(element) {
+  ReactDOM.render(
+    <ApolloProvider client={client}>
+      <App />
+    </ApolloProvider>,
+    element
+  );
+}
+
+// create our application
+function bootstrap() {
+  const element = document.createElement("div");
+  element.id = "df_root_00001";
+  document.body.appendChild(element);
+  return Promise.resolve(element);
+}
+
+bootstrap().then(render);

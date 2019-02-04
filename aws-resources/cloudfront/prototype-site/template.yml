@@ -1,0 +1,85 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: The AWS CloudFormation template for Website prototyping
+Parameters:
+  OriginName:
+    Type: String
+    Description: Name of the prototyping url you want to use (e.g. *.site.getdiff.app)
+  AliasName:
+    Type: String
+    Description: Name of the prototyping url you want to use (e.g. *.site.getdiff.app)
+  Stage:
+    Type: String
+    Description: What stage we are deploying to
+Resources:
+  getDiffRecordSet:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId:
+        Ref: getdiff-route53-getdiffzone
+      Type: A
+      TTL: "300"
+      AliasTarget:
+        HostedZoneId:
+          Ref: getdiff-route53-getdiffzone
+        DNSName:
+          Ref: getDiffSiteDistribution
+  getDiffSiteDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Aliases:
+          - !Ref AliasName
+        ViewerCertificate:
+          AcmCertificateArn: !ImportValue "getdiff-route53-getdiffcertificate"
+          SslSupportMethod: sni-only
+        HttpVersion: http2
+        Enabled: "true"
+        Comment: "Lambda@edge distriubtion for protocol sites"
+        Origins:
+          - DomainName:
+              Ref: OriginName
+            Id: "ProtocolSiteDistribution"
+            CustomOriginConfig:
+              OriginSSLProtocols:
+                - TLSv1.2
+                - TLSv1.1
+              OriginProtocolPolicy: https-only
+            OriginCustomHeaders:
+              - HeaderName: "x-proxy"
+                HeaderValue: "getdiff"
+        DefaultCacheBehavior:
+          TargetOriginId: "ProtocolSiteDistribution"
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+            - PUT
+            - POST
+            - PATCH
+            - DELETE
+          ForwardedValues:
+            QueryString: "true"
+            Headers:
+              - CloudFront-Forwarded-Proto
+              - Host
+              - Origin
+              - x-forwarded-host
+            Cookies:
+              Forward: all
+          MinTTL: 0
+          MaxTTL: 30
+          DefaultTTL: 0
+          Compress: true
+      Tags:
+        - Key: STAGE
+          Value: !Ref Stage
+        - Key: APP
+          Value: getdiff
+Outputs:
+  getDiffSiteDistribution:
+    Value:
+      Ref: getDiffSiteDistribution
+    Export:
+      Name: !Sub "${AWS::StackName}-getDiffSiteDistribution"

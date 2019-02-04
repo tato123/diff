@@ -1,83 +1,52 @@
 "use strict";
 
 const axios = require("axios");
-const zlib = require("zlib");
-const AWS = require("aws-sdk");
 
-const dynamoDb = new AWS.DynamoDB({
-  region: "us-east-1"
-});
+const hostUtils = require("./host");
+const responseMiddleware = require("./responseMiddleware");
 
-// environment values not supported in lambda@edge
-const SCRIPT_URL =
-  "https://s3.amazonaws.com/getdiff-static-client/clientBridge.js";
-const DYNAMODB_TABLE = "Origins";
-
-// handles javascript injection to our bridge
-function handleCustomHtml(data, headers) {
-  console.log("Lambda modifying html content");
-  const jsUrl = SCRIPT_URL;
-  const script = `<script src="${jsUrl}"></script>`;
-  const re = /<\/body>(?![\s\S]*<\/body>[\s\S]*$)/i;
-  const subst = `${script}</body>`;
-  return data.replace(re, subst);
-}
-
-// Performs a lookup in dynamodb to match our account
-function getHost(host, scheme, uri, querystring) {
-  const params = {
-    TableName: DYNAMODB_TABLE,
-    Key: {
-      Host: {
-        S: host
-      }
-    }
-  };
-
-  return new Promise((resolve, reject) => {
-    // fetch todo from the database
-    dynamoDb.getItem(params, function(err, data) {
-      if (err) {
-        console.log(err, err.stack); // an error occurred
-        return resolve(null);
-      } else if (!data.Item) {
-        console.log("No mapping origin found");
-        return resolve(null);
-      }
-      const origin = data.Item.Origin.S;
-      return resolve(origin);
-    });
+const fetchContent = async ({ url, method }) => {
+  // perform a head event to determine type
+  const { headers } = await axios({
+    url,
+    method: "HEAD"
   });
-}
 
-function defaultPage() {
-  const html = `
-    <html>
-      <head></head>
-      <body><h1>Sorry, I cant route there dave</h1></body>
-    </html>
-  `;
+  // get the responseType this time
+  const isByteArray = headers["accept-ranges"] === "bytes";
+  const isBinary = !headers["content-type"].startsWith("text");
+  console.log("[Fetch] is byteArray?", isByteArray);
+  console.log("[Fetch] is isBinary?", isBinary);
 
-  const buffer = zlib.gzipSync(html);
-  const base64EncodedBody = buffer.toString("base64");
+  // fetch the data
+  const axiosResponse = await axios({
+    url: url,
+    method,
+    ...(isByteArray ? { responseType: "arraybuffer" } : {})
+  });
 
-  const response = {
-    headers: {
-      "content-type": [
-        { key: "Content-Type", value: "text/html; charset=utf-8" }
-      ],
-      "content-encoding": [{ key: "Content-Encoding", value: "gzip" }]
-    },
-    body: base64EncodedBody,
-    bodyEncoding: "base64",
-    status: "200",
-    statusDescription: "OK"
+  // if its a byte array and not a binary format
+  // we need to convert it back to a string before working with it
+  const data =
+    !isBinary && isByteArray
+      ? Buffer.from(axiosResponse.data, "binary").toString("utf-8")
+      : axiosResponse.data;
+
+  return {
+    ...axiosResponse,
+    data,
+    isByteArray,
+    isBinary
   };
+};
 
-  return response;
-}
-
-module.exports.edgeProxy = async (event, context) => {
+/**
+ * Our edge proxy that is responsible for reading the requests and
+ * returning a modified version of the site if there is one.
+ */
+module.exports.edgeProxy = async (event, context, callback) => {
+  // parse out our data
+  const start = new Date();
   const request = event.Records[0].cf.request;
   const headers = request.headers;
   const method = request.method;
@@ -88,8 +57,8 @@ module.exports.edgeProxy = async (event, context) => {
   const uri = request.uri;
   const querystring = request.querystring;
 
-  //
-  const viewHost = headers["host"][0].value;
+  // get the origin view host
+  const versionHost = headers["host"][0].value;
 
   // debugging for our event
   console.log("--[Event Record]--");
@@ -97,56 +66,53 @@ module.exports.edgeProxy = async (event, context) => {
   console.log("------------------");
 
   try {
-    const originHost = await getHost(viewHost, scheme, uri, querystring);
+    // attempt to proxied origin host
+    const {
+      origin: originHost,
+      protocol: originProtocol
+    } = await hostUtils.getHost(versionHost, scheme, uri, querystring);
+
+    console.log("Mapped", versionHost, "to", originHost);
+
+    // we dont have an origin host
     if (originHost == null) {
       console.log("No origin available, sending default page");
-      return defaultPage();
+      return hostUtils.defaultPage();
     }
 
-    const url = `${scheme}://${originHost}${uri}${
+    // Build our content origin url
+    const url = `${originProtocol}://${originHost}${uri}${
       querystring.trim().length > 0 ? "?" + querystring : ""
     }`;
+    const xFrameOrigin = `${originProtocol}://${originHost}`;
 
-    console.log("contacting url", url);
-    const response = await axios({
-      url: url,
+    // fetch our content
+    const { data, headers: axiosResHeaders, isBinary } = await fetchContent({
+      url,
       method
     });
 
-    const { data, headers: responseHeaders } = response;
-    // check what sort of data was returned
-    if (responseHeaders["content-type"].indexOf("text/html") !== -1) {
-      const output = handleCustomHtml(data, responseHeaders);
-      const buffer = zlib.gzipSync(output);
-      const base64EncodedBody = buffer.toString("base64");
+    // generate a new response
+    const editMode = querystring.indexOf("diffEditMode=true") !== -1;
+    console.log("is active edit mode?", editMode);
+    const response = await responseMiddleware.generateResponse(request, {
+      data,
+      headers: axiosResHeaders,
+      isBinary,
+      originHost,
+      versionHost,
+      xFrameOrigin,
+      editMode
+    });
 
-      const response = {
-        headers: {
-          "content-type": [
-            { key: "Content-Type", value: responseHeaders["content-type"] }
-          ],
-          "content-encoding": [{ key: "Content-Encoding", value: "gzip" }]
-        },
-        body: base64EncodedBody,
-        bodyEncoding: "base64",
-        status: "200",
-        statusDescription: "OK"
-      };
+    console.log("--[Event Response]--");
+    console.log(response);
+    console.log("------------------");
 
-      return response;
-    }
-
-    // in the case that its not an html file
-    // go ahead and only modify to pass through and allow
-    // cloudfront to manage this request
-    console.log("passing through as a custom origin for cloudfront");
-
-    request.origin.custom.domainName = originHost;
-    request.headers["host"] = [{ key: "host", value: originHost }];
-
-    return request;
+    callback(null, response);
   } catch (error) {
     console.error("Failed to perform mapping", error);
+    /// todo: return an s3 failed bucket
     throw error;
   }
 };

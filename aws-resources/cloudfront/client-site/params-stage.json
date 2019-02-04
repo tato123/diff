@@ -1,0 +1,14 @@
+[
+  {
+    "ParameterKey": "AliasNames",
+    "ParameterValue": ["www.stage-getdiff.app", "stage-getdiff.app"]
+  },
+  {
+    "ParameterKey": "OriginName",
+    "ParameterValue": "www.stage-getdiff.app"
+  },
+  {
+    "ParameterKey": "Stage",
+    "ParameterValue": "stage"
+  }
+]
