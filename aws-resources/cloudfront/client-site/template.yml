@@ -1,0 +1,114 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: The AWS CloudFormation template for Website prototyping
+Parameters:
+  OriginName:
+    Type: String
+    Description: Name of the prototyping url you want to use (e.g. *.site.getdiff.app)
+  AliasNames:
+    Type: CommaDelimitedList
+    Description: Name of the prototyping url you want to use (e.g. *.site.getdiff.app)
+  Stage:
+    Type: String
+    Description: What stage we are deploying to
+
+Resources:
+  # Record on Route53 that handles routing to our distribution
+  Route53RecordSet:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId:
+        Ref: getdiff-route53-getdiffzone
+      Type: A
+      TTL: "300"
+      AliasTarget:
+        HostedZoneId:
+          Ref: getdiff-route53-getdiffzone
+        DNSName:
+          Ref: CloudFrontDistribution
+
+  # Bucket
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketName
+      AccessControl: PublicRead
+    DeletionPolicy: Retain
+    Tags:
+      - Key: STAGE
+        Value: !ref Stage
+      - Key: APP
+        Value: getdiff
+
+  # Bucket Policy
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      PolicyDocument:
+        Id: S3BucketPolify
+        Version: 2012-10-17
+        Statement:
+          - Sid: PublicReadForGetBucketObjects
+            Effect: Allow
+            Principal: "*"
+            Action: "s3:GetObject"
+            Resource: !Join ["", "arn:aws:s3:::", !Ref S3Bucket, "/*"]
+    Bucket: !Ref S3Bucket
+
+  # access identify for cloudfront
+  cloudfrontoriginaccessidentity:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: string-value
+
+  # Cloudfront distribution
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Aliases: !Ref AliasName
+        ViewerCertificate:
+          AcmCertificateArn: !ImportValue "getdiff-route53-getdiffcertificate"
+          SslSupportMethod: sni-only
+        HttpVersion: http2
+        Enabled: "true"
+        Comment: "S3 Origin for the website"
+        Origins:
+          - DomainName:
+              Ref: OriginName
+            Id: ClientS3Origin
+            S3OriginConfig:
+              OriginAccessIdentity:
+                !Join [
+                  "",
+                  [
+                    "origin-access-identity/cloudfront/",
+                    !Ref cloudfrontoriginaccessidentity,
+                  ],
+                ]
+        DefaultCacheBehavior:
+          TargetOriginId: WebsiteOrigin
+          ViewerProtocolPolicy: redirect-to-https
+          ForwardedValues:
+            QueryString: "true"
+            Cookies:
+              Forward: all
+          MinTTL: 300
+          MaxTTL: 600
+          DefaultTTL: 300
+          Compress: true
+        CustomErrorResponses:
+          - ErrorCode: "404"
+            ResponsePagePath: "/index.html"
+            ResponseCode: "200"
+            ErrorCachingMinTTL: "0"
+          - ErrorCode: "403"
+            ResponsePagePath: "/index.html"
+            ResponseCode: "200"
+            ErrorCachingMinTTL: "0"
+      Tags:
+        - Key: STAGE
+          Value: !ref Stage
+        - Key: APP
+          Value: getdiff

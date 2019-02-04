@@ -1,0 +1,55 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: The AWS CloudFormation template for Route53 resources
+Parameters:
+  HostName:
+    Type: String
+    Description: Host name for the zone that will be created
+  Stage:
+    Type: String
+    Description: What stage we are deploying to
+Resources:
+  # Create our top level zone
+  Route53Zone:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      Name: !Ref HostName
+      HostedZoneTags:
+        - Key: STAGE
+          Value: !Ref Stage
+        - Key: APP
+          Value: getdiff
+
+  # Create our Domain Certificate
+  ACMCertificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !Join [".", ["*", !Ref HostName]]
+      DomainValidationOptions:
+        - DomainName: !Join [".", ["*", !Ref HostName]]
+          ValidationDomain: !Ref HostName
+        - DomainName: !Join [".", ["*", "site", !Ref HostName]]
+          ValidationDomain: !Ref HostName
+        - DomainName: !Ref HostName
+          ValidationDomain: !Ref HostName
+      SubjectAlternativeNames:
+        - !Join [".", ["*", "site", !Ref HostName]]
+        - !Ref HostName
+      Tags:
+        - Key: STAGE
+          Value: !Ref Stage
+        - Key: APP
+          Value: getdiff
+      ValidationMethod: DNS
+
+Outputs:
+  getdiffzone:
+    Value:
+      Ref: getdiffzone
+    Export:
+      Name: !Sub "${AWS::StackName}-getdiffzone"
+  getdiffcertificate:
+    Value:
+      Ref: getdiffcertificate
+    Export:
+      Name: !Sub "${AWS::StackName}-getdiffcertificate"

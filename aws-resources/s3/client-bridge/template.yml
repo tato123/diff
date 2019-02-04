@@ -1,0 +1,39 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: The AWS CloudFormation template for Website prototyping
+Parameters:
+  BucketName:
+    Type: String
+    Description: Name of the prototyping url you want to use (e.g. *.site.getdiff.app)
+  Stage:
+    Type: String
+    Description: What stage we are deploying to
+
+Resources:
+  # Bucket
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketName
+      AccessControl: PublicRead
+    DeletionPolicy: Retain
+    Tags:
+      - Key: STAGE
+        Value: !ref Stage
+      - Key: APP
+        Value: getdiff
+
+  # Bucket Policy
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      PolicyDocument:
+        Id: S3BucketPolify
+        Version: 2012-10-17
+        Statement:
+          - Sid: PublicReadForGetBucketObjects
+            Effect: Allow
+            Principal: "*"
+            Action: "s3:GetObject"
+            Resource: !Join ["", ["arn:aws:s3:::", !Ref S3Bucket, "/*"]]
+    Bucket: !Ref S3Bucket

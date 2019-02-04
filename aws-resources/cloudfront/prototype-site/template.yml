@@ -1,7 +1,7 @@
 ---
 AWSTemplateFormatVersion: "2010-09-09"
 Description: The AWS CloudFormation template for Website prototyping
-Parameters: 
+Parameters:
   OriginName:
     Type: String
     Description: Name of the prototyping url you want to use (e.g. *.site.getdiff.app)
@@ -23,31 +23,31 @@ Resources:
         HostedZoneId:
           Ref: getdiff-route53-getdiffzone
         DNSName:
-          Ref: getDiffSiteDistribution      
+          Ref: getDiffSiteDistribution
   getDiffSiteDistribution:
     Type: AWS::CloudFront::Distribution
     Properties:
-      DistributionConfig: 
+      DistributionConfig:
         Aliases:
           - !Ref AliasName
-        ViewerCertificate: 
+        ViewerCertificate:
           AcmCertificateArn: !ImportValue "getdiff-route53-getdiffcertificate"
           SslSupportMethod: sni-only
         HttpVersion: http2
-        Enabled: 'true'
+        Enabled: "true"
         Comment: "Lambda@edge distriubtion for protocol sites"
         Origins:
-          - DomainName: 
+          - DomainName:
               Ref: OriginName
             Id: "ProtocolSiteDistribution"
             CustomOriginConfig:
               OriginSSLProtocols:
                 - TLSv1.2
                 - TLSv1.1
-              OriginProtocolPolicy: https-only        
-            OriginCustomHeaders: 
+              OriginProtocolPolicy: https-only
+            OriginCustomHeaders:
               - HeaderName: "x-proxy"
-                HeaderValue: "getdiff"                               
+                HeaderValue: "getdiff"
         DefaultCacheBehavior:
           TargetOriginId: "ProtocolSiteDistribution"
           ViewerProtocolPolicy: redirect-to-https
@@ -60,21 +60,21 @@ Resources:
             - PATCH
             - DELETE
           ForwardedValues:
-            QueryString: 'true'
+            QueryString: "true"
             Headers:
               - CloudFront-Forwarded-Proto
               - Host
               - Origin
               - x-forwarded-host
             Cookies:
-              Forward: all          
+              Forward: all
           MinTTL: 0
-          MaxTTL: 30 
+          MaxTTL: 30
           DefaultTTL: 0
           Compress: true
       Tags:
         - Key: STAGE
-          Value: prod
+          Value: !Ref Stage
         - Key: APP
           Value: getdiff
 Outputs:

@@ -1,0 +1,38 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Adds gsuite mail records to a hosted zone 
+Parameters:
+  HostedZone:
+    Type: String
+    Description: Host name for the zone that will be created
+  Stage:
+    Type: String
+    Description: What stage we are deploying to
+Resources:
+  # Email MX Records
+  MXRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZone
+        Ref: Route53Zone
+      TTL: "3600"
+      Type: MX
+      Commment: MX records for handling getdiff mail
+      ResourceRecords:
+        - "1 ASPMX.L.GOOGLE.COM."
+        - "5 ALT1.ASPMX.L.GOOGLE.COM."
+        - "5 ALT2.ASPMX.L.GOOGLE.COM."
+        - "10 ALT3.ASPMX.L.GOOGLE.COM."
+        - "10 ALT4.ASPMX.L.GOOGLE.COM."
+      Tags:
+        - Key: STAGE
+          Value: !Ref Stage
+        - Key: APP
+          Value: getdiff
+
+Outputs:
+  mxrecord:
+    Value:
+      Ref: MXRecord
+    Export:
+      Name: !Sub "${AWS::StackName}-MXRecord"
