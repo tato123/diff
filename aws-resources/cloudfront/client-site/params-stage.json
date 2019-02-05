@@ -10,9 +10,5 @@
   {
     "ParameterKey": "Stage",
     "ParameterValue": "stage"
-  },
-  {
-    "ParameterKey": "BucketName",
-    "ParameterValue": "client-stage.getdiff.app"
   }
 ]

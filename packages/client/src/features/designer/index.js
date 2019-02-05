@@ -4,13 +4,12 @@ import Toolbar from "./toolbar";
 import { compose, graphql } from "react-apollo";
 import { SAVE_VERSION } from "../../graphql/mutations";
 import ModalDialog, { ModalTransition } from "@atlaskit/modal-dialog";
-import StringWorker from "./string.worker.js"
+import StringWorker from "./string.worker.js";
 import _ from "lodash";
 import { ToastContainer, toast } from "react-toastify";
-import EditCss from "./edit-css.gif";
 
 const Page = styled.div`
-  display: grid; 
+  display: grid;
   grid-template-areas:
     "sharedView"
     "footer";
@@ -113,7 +112,6 @@ class Designer extends React.Component {
     if (data.source === "getDiff-client" && data.type === "SITE_CHANGE") {
       const deltas = data.payload;
       stringworker.postMessage(deltas);
-
     }
   };
 
@@ -131,28 +129,24 @@ class Designer extends React.Component {
     this.setState(state => ({ isEditing: !state.isEditing }));
   };
 
-  onSave = (evt) => {
+  onSave = evt => {
     const input = {
       host: this.state.versionId,
       deltas: JSON.stringify(this.state.styles)
     };
     const host = `https://${this.state.versionId}`;
 
-    const copyText = document.querySelector('#clipboardText');
+    const copyText = document.querySelector("#clipboardText");
     copyText.value = host;
     copyText.select();
-    const successful = document.execCommand('copy');
+    const successful = document.execCommand("copy");
 
     this.props
       .saveSiteVersion({ variables: { input } })
       .then(() => {
-
-
         if (!successful) {
-          throw new Error('Unable to copy content')
+          throw new Error("Unable to copy content");
         }
-
-
       })
       .then(() => {
         toast.info("Prototype URL copied to clipboard", {
@@ -162,15 +156,13 @@ class Designer extends React.Component {
           closeOnClick: true,
           pauseOnHover: true,
           draggable: false
-        })
+        });
       })
 
-      .catch((error) => {
-        console.error(' Unable to copy to clipboard', error);
+      .catch(error => {
+        console.error(" Unable to copy to clipboard", error);
         window.open(host);
-      })
-
-
+      });
   };
 
   render() {
@@ -179,7 +171,6 @@ class Designer extends React.Component {
     } = this;
 
     const versionHost = `https://${this.state.versionId}`;
-
 
     return (
       <Page>
@@ -193,7 +184,12 @@ class Designer extends React.Component {
           count={count}
           onClickChanges={() => this.setState({ isOpen: true })}
         />
-        <input type="text" id="clipboardText" value={versionHost} style={{ position: "absolute", opacity: 0 }} />
+        <input
+          type="text"
+          id="clipboardText"
+          value={versionHost}
+          style={{ position: "absolute", opacity: 0 }}
+        />
         <ModalTransition>
           {isOpen && (
             <ModalDialog onClose={() => this.setState({ isOpen: false })}>
@@ -207,7 +203,7 @@ class Designer extends React.Component {
                 <h2>Step 1</h2>
                 <p>First open devtools and make your changes</p>
                 <img
-                  src={EditCss}
+                  src="https://developers.google.com/web/tools/chrome-devtools/images/edit-css.gif"
                   style={{ objectFit: "contain", width: "100%" }}
                   alt="Devtool instructions"
                 />

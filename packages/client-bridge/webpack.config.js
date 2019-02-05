@@ -7,7 +7,7 @@ const ENV = process.env.NODE_ENV || "production";
 
 module.exports = {
   devtool: ENV !== "production" ? "cheap-eval-source-map" : "none",
-  mode: ENV,
+  mode: ENV !== "production" ? "development" : "production",
   entry: {
     clientBridge: "./src/index.js"
   },

@@ -4,7 +4,10 @@ Description: The AWS CloudFormation template for Website prototyping
 Parameters:
   BucketName:
     Type: String
-    Description: Name of the prototyping url you want to use (e.g. *.site.getdiff.app)
+    Description: Name of our bucket cname
+  ExportName:
+    Type: String
+    Description: Export variable name`
   Stage:
     Type: String
     Description: What stage we are deploying to
@@ -21,7 +24,6 @@ Resources:
           Value: !Ref Stage
         - Key: APP
           Value: getdiff
-    DeletionPolicy: Retain
 
   # Bucket Policy
   BucketPolicy:
@@ -39,8 +41,8 @@ Resources:
             Resource: !Join ["", ["arn:aws:s3:::", !Ref S3Bucket, "/*"]]
 
 Outputs:
-  getdiffClientS3bucket:
+  getdiffClientBridgeS3bucket:
     Value:
       Ref: S3Bucket
     Export:
-      Name: "getdiff-s3-clientbridge"
+      Name: !Ref ExportName

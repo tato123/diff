@@ -5,10 +5,10 @@
   },
   {
     "ParameterKey": "BucketName",
-    "ParameterValue": "clientbridge-www.stage-getdiff.app"
+    "ParameterValue": "client-www.getdiff.app"
   },
   {
     "ParameterKey": "ExportName",
-    "ParameterValue": "getdiff-s3-clientbridge"
+    "ParameterValue": "getdiff-s3-client"
   }
 ]

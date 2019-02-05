@@ -5,9 +5,6 @@ Parameters:
   OriginName:
     Type: String
     Description: Name of the prototyping url you want to use (e.g. *.site.getdiff.app)
-  BucketName:
-    Type: String
-    Description: Name of the prototyping url you want to use (e.g. *.site.getdiff.app)
   AliasNames:
     Type: CommaDelimitedList
     Description: Name of the prototyping url you want to use (e.g. *.site.getdiff.app)
@@ -27,33 +24,6 @@ Resources:
         HostedZoneId: !ImportValue getdiff-hostedzone
         DNSName:
           Ref: CloudFrontDistribution
-
-  # Bucket
-  S3Bucket:
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: !Ref BucketName
-      AccessControl: PublicRead
-      Tags:
-        - Key: STAGE
-          Value: !Ref Stage
-        - Key: APP
-          Value: getdiff
-
-  # Bucket Policy
-  BucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket: !Ref S3Bucket
-      PolicyDocument:
-        Id: S3BucketPolicyGetDiff
-        Version: 2012-10-17
-        Statement:
-          - Sid: PublicReadForGetBucketObjects
-            Effect: Allow
-            Principal: "*"
-            Action: "s3:GetObject"
-            Resource: !Join ["", ["arn:aws:s3:::", !Ref S3Bucket, "/*"]]
 
   # access identify for cloudfront
   cloudfrontoriginaccessidentity:
@@ -76,7 +46,7 @@ Resources:
         Enabled: "true"
         Comment: "S3 Origin for the website"
         Origins:
-          - DomainName: !Ref S3Bucket
+          - DomainName: !ImportValue "getdiff-s3-client"
             Id: ClientS3Origin
             S3OriginConfig:
               OriginAccessIdentity:
