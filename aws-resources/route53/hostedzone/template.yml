@@ -45,11 +45,11 @@ Resources:
 Outputs:
   getdiffzone:
     Value:
-      Ref: getdiffzone
+      Ref: Route53Zone
     Export:
-      Name: !Sub "${AWS::StackName}-getdiffzone"
+      Name: "getdiff-hostedzone"
   getdiffcertificate:
     Value:
-      Ref: getdiffcertificate
+      Ref: ACMCertificate
     Export:
-      Name: !Sub "${AWS::StackName}-getdiffcertificate"
+      Name: "getdiff-acmcertificate"

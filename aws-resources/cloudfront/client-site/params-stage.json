@@ -1,7 +1,7 @@
 [
   {
     "ParameterKey": "AliasNames",
-    "ParameterValue": ["www.stage-getdiff.app", "stage-getdiff.app"]
+    "ParameterValue": "www.stage-getdiff.app,stage-getdiff.app"
   },
   {
     "ParameterKey": "OriginName",
@@ -10,5 +10,9 @@
   {
     "ParameterKey": "Stage",
     "ParameterValue": "stage"
+  },
+  {
+    "ParameterKey": "BucketName",
+    "ParameterValue": "client-stage.getdiff.app"
   }
 ]

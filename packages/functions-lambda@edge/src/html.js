@@ -8,8 +8,7 @@ const prodBridge =
 const DELTA_TABLE = "awseb-e-s5sngijqpx-stack-Deltas-YNEZTJF4FVSL";
 
 // environment values not supported in lambda@edge
-const SCRIPT_URL =
-  process.env.CLIENT_BRIDGE === "production" ? prodBridge : devBridge;
+const SCRIPT_URL = prodBridge
 
 const compose = (...functions) => input =>
   functions.reduceRight(

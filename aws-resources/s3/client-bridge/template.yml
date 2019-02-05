@@ -16,19 +16,20 @@ Resources:
     Properties:
       BucketName: !Ref BucketName
       AccessControl: PublicRead
+      Tags:
+        - Key: STAGE
+          Value: !Ref Stage
+        - Key: APP
+          Value: getdiff
     DeletionPolicy: Retain
-    Tags:
-      - Key: STAGE
-        Value: !ref Stage
-      - Key: APP
-        Value: getdiff
 
   # Bucket Policy
   BucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
+      Bucket: !Ref S3Bucket
       PolicyDocument:
-        Id: S3BucketPolify
+        Id: S3BucketPolicy
         Version: 2012-10-17
         Statement:
           - Sid: PublicReadForGetBucketObjects
@@ -36,4 +37,10 @@ Resources:
             Principal: "*"
             Action: "s3:GetObject"
             Resource: !Join ["", ["arn:aws:s3:::", !Ref S3Bucket, "/*"]]
-    Bucket: !Ref S3Bucket
+
+Outputs:
+  getdiffClientS3bucket:
+    Value:
+      Ref: S3Bucket
+    Export:
+      Name: "getdiff-s3-clientbridge"

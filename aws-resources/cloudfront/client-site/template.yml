@@ -1,8 +1,11 @@
 ---
 AWSTemplateFormatVersion: "2010-09-09"
-Description: The AWS CloudFormation template for Website prototyping
+Description: The AWS CloudFormation template for getdiff main site
 Parameters:
   OriginName:
+    Type: String
+    Description: Name of the prototyping url you want to use (e.g. *.site.getdiff.app)
+  BucketName:
     Type: String
     Description: Name of the prototyping url you want to use (e.g. *.site.getdiff.app)
   AliasNames:
@@ -17,13 +20,11 @@ Resources:
   Route53RecordSet:
     Type: AWS::Route53::RecordSet
     Properties:
-      HostedZoneId:
-        Ref: getdiff-route53-getdiffzone
+      HostedZoneId: !ImportValue getdiff-hostedzone
       Type: A
       TTL: "300"
       AliasTarget:
-        HostedZoneId:
-          Ref: getdiff-route53-getdiffzone
+        HostedZoneId: !ImportValue getdiff-hostedzone
         DNSName:
           Ref: CloudFrontDistribution
 
@@ -33,50 +34,49 @@ Resources:
     Properties:
       BucketName: !Ref BucketName
       AccessControl: PublicRead
-    DeletionPolicy: Retain
-    Tags:
-      - Key: STAGE
-        Value: !ref Stage
-      - Key: APP
-        Value: getdiff
+      Tags:
+        - Key: STAGE
+          Value: !Ref Stage
+        - Key: APP
+          Value: getdiff
 
   # Bucket Policy
   BucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
+      Bucket: !Ref S3Bucket
       PolicyDocument:
-        Id: S3BucketPolify
+        Id: S3BucketPolicyGetDiff
         Version: 2012-10-17
         Statement:
           - Sid: PublicReadForGetBucketObjects
             Effect: Allow
             Principal: "*"
             Action: "s3:GetObject"
-            Resource: !Join ["", "arn:aws:s3:::", !Ref S3Bucket, "/*"]
-    Bucket: !Ref S3Bucket
+            Resource: !Join ["", ["arn:aws:s3:::", !Ref S3Bucket, "/*"]]
 
   # access identify for cloudfront
   cloudfrontoriginaccessidentity:
     Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
     Properties:
       CloudFrontOriginAccessIdentityConfig:
-        Comment: string-value
+        Comment: CloudFront OAI for getdiff s3
 
   # Cloudfront distribution
   CloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
+    DependsOn: S3Bucket
     Properties:
       DistributionConfig:
-        Aliases: !Ref AliasName
+        Aliases: !Ref AliasNames
         ViewerCertificate:
-          AcmCertificateArn: !ImportValue "getdiff-route53-getdiffcertificate"
+          AcmCertificateArn: !ImportValue "getdiff-acmcertificate"
           SslSupportMethod: sni-only
         HttpVersion: http2
         Enabled: "true"
         Comment: "S3 Origin for the website"
         Origins:
-          - DomainName:
-              Ref: OriginName
+          - DomainName: !Ref S3Bucket
             Id: ClientS3Origin
             S3OriginConfig:
               OriginAccessIdentity:
@@ -109,6 +109,6 @@ Resources:
             ErrorCachingMinTTL: "0"
       Tags:
         - Key: STAGE
-          Value: !ref Stage
+          Value: !Ref Stage
         - Key: APP
           Value: getdiff

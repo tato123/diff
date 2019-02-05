@@ -79,8 +79,7 @@ const Designer = ({
       </Row>
       <Row>
         <div style={{ textAlign: "center", width: "100%" }}>
-          With Diff you can share changes you make with your browsers devtools.
-          Enter a URL above to get started
+          Diff shares the changes you make using your browser's devtools...with no coding. Enter a URL above to get started.
         </div>
       </Row>
     </form>
