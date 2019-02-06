@@ -12,26 +12,29 @@ Parameters:
     Type: String
     Description: What stage we are deploying to
 Resources:
-  getDiffRecordSet:
+  # Route53 Record
+  Route53RecordSet:
     Type: AWS::Route53::RecordSet
+    DependsOn: CloudFrontDistribution
     Properties:
-      HostedZoneId:
-        Ref: getdiff-route53-getdiffzone
+      Name: !Ref AliasName
+      HostedZoneId: !ImportValue getdiff-hostedzone
       Type: A
       TTL: "300"
       AliasTarget:
-        HostedZoneId:
-          Ref: getdiff-route53-getdiffzone
-        DNSName:
-          Ref: getDiffSiteDistribution
-  getDiffSiteDistribution:
+        HostedZoneId: !ImportValue getdiff-hostedzone
+        DNSName: !Ref CloudFrontDistribution
+
+  # Cloudfront Distribution
+  CloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
+        PriceClass: PriceClass_100
         Aliases:
           - !Ref AliasName
         ViewerCertificate:
-          AcmCertificateArn: !ImportValue "getdiff-route53-getdiffcertificate"
+          AcmCertificateArn: !ImportValue getdiff-acmcertificate
           SslSupportMethod: sni-only
         HttpVersion: http2
         Enabled: "true"
@@ -78,8 +81,13 @@ Resources:
         - Key: APP
           Value: getdiff
 Outputs:
-  getDiffSiteDistribution:
+  CloudFrontDistribution:
     Value:
-      Ref: getDiffSiteDistribution
+      Ref: CloudFrontDistribution
     Export:
-      Name: !Sub "${AWS::StackName}-getDiffSiteDistribution"
+      Name: getdiff-cloudfront-clientbridge
+  Route53RecordSet:
+    Value:
+      Ref: Route53RecordSet
+    Export:
+      Name: getdiff-route53-clientbridge-record
