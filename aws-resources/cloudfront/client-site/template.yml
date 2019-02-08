@@ -15,16 +15,17 @@ Parameters:
 Resources:
   # Record on Route53 that handles routing to our distribution
   Route53RecordSet:
-    Type: AWS::Route53::RecordSet
-    DependsOn: CloudFrontDistribution
+    Type: AWS::Route53::RecordSetGroup
     Properties:
-      Name: !Ref OriginName
-      HostedZoneId: !ImportValue getdiff-hostedzone
-      Type: A
-      TTL: "300"
-      AliasTarget:
-        HostedZoneId: !ImportValue getdiff-hostedzone
-        DNSName: !Ref CloudFrontDistribution
+      HostedZoneId: !Ref OriginName
+      Comment: Record set for the client site
+      RecordSets:
+        - Name: !Ref OriginName
+          Type: A
+          TTL: "300"
+          AliasTarget:
+            HostedZoneId: !ImportValue getdiff-hostedzone
+            DNSName: !GetAtt [CloudFrontDistribution, DomainName]
 
   # access identify for cloudfront
   cloudfrontoriginaccessidentity:
