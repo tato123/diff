@@ -37,6 +37,13 @@ const Row = styled.div`
   }
 `;
 
+const Footer = styled.div`
+width: 75%;
+    text-align: center;
+    bottom: 10px;
+    position: fixed;
+`
+
 const SiteSchema = Yup.object().shape({
   website: Yup.string()
     .test("is-url", "Is not a url", value => {
@@ -83,6 +90,9 @@ const Designer = ({
         </div>
       </Row>
     </form>
+    <Footer>
+      &copy; 2018 getDiff, Inc. 
+    </Footer>
   </Page>
 );
 

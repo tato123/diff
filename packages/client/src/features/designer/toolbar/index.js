@@ -28,7 +28,11 @@ const Toolbar = ({ count, onSave, onEdit, onShare, onClickChanges }) => (
       <Button onClick={onSave} isDisabled={count === 0} appearance="primary">
         Save Changes
       </Button>
+      
     </div>
+    <div>
+      &copy; 2018 getDiff, Inc. 
+      </div>
   </View>
 );
 
