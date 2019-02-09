@@ -14,7 +14,6 @@ import { ApolloProvider } from "react-apollo";
 
 import "normalize.css";
 
-import "./index.css";
 
 // const authLink = setContext((_, { headers }) => {
 //   // return the headers to the context so httpLink can read them

@@ -23,6 +23,10 @@ injectGlobal`
     padding: 0;
   }
 
+  body {
+    margin-top: -16px;
+  }
+
   #root {
     position: relative;
   }
@@ -30,7 +34,6 @@ injectGlobal`
 `;
 
 export default () => (
-
   <ThemeProvider theme={{}}>
     <React.Fragment>
       <Router>
@@ -41,6 +44,4 @@ export default () => (
       </Router>
     </React.Fragment>
   </ThemeProvider>
-  
-  
 );
