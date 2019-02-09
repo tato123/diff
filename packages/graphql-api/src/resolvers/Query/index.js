@@ -13,11 +13,12 @@ const noop = () => {
 
 const originQuery = async (parent, args, { user }) => {
   const account = await user;
+  const host = args.Host;
 
   var params = {
     TableName: ORIGINS,
     Key: {
-      Host: { S: args.Host }
+      Host: { S: host }
     }
   };
 
@@ -30,7 +31,8 @@ const originQuery = async (parent, args, { user }) => {
       } else {
         return resolve({
           host: data.Item.Host.S,
-          origin: data.Item.Origin.S
+          origin: data.Item.Origin.S,
+          protocol: data.Item.Proto.S
         });
       }
     });
@@ -60,9 +62,6 @@ const allOrigins = async () => {
 };
 
 module.exports = {
-  allInvites: noop,
-  allUsers: noop,
-  allComponents: noop,
   origin: originQuery,
   allOrigins
 };

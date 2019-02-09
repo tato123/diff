@@ -6,6 +6,7 @@ const httpProxy = require("http-proxy");
 const proxyTarget = require("./middleware/proxyTarget");
 const proxyMiddleware = require("./middleware/proxy");
 
+const PORT = process.env.PORT || 9001;
 const fs = require("fs");
 const path = require("path");
 const certPath = path.join(__dirname, "..", "certs");
@@ -93,7 +94,7 @@ const main = () => {
 
   // get our server implementation
   const app = getBaseApp([proxyTarget, responseModifier, proxyMiddleware], {
-    port: 9000,
+    port: PORT,
     proxy
   });
 };

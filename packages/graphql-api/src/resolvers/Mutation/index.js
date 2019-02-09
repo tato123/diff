@@ -70,6 +70,12 @@ const checkProtocol = async origin => {
   }
 };
 
+/**
+ * Saves a website as an origin that can be used for proxying
+ * @param {*} parent
+ * @param {*} args
+ * @param {*} context
+ */
 const createSiteOrigin = async (parent, args, context) => {
   const randomSlug = uniqueSlug(args.url);
   const host = `${randomSlug}.${process.env.PROTOTYPE_URL}`;
@@ -114,6 +120,12 @@ const createSiteOrigin = async (parent, args, context) => {
   });
 };
 
+/**
+ * Saves all of the CSS changes associated with an origin
+ * @param {*} parent
+ * @param {*} args
+ * @param {*} context
+ */
 const saveSiteDeltas = async (parent, args, context) => {
   const host = args.input.host;
   const deltas = args.input.deltas;
