@@ -15,15 +15,17 @@ Parameters:
 Resources:
   # Record on Route53 that handles routing to our distribution
   Route53RecordSet:
-    Type: AWS::Route53::RecordSet
+    Type: AWS::Route53::RecordSetGroup
     Properties:
-      HostedZoneId: !ImportValue getdiff-hostedzone
-      Type: A
-      TTL: "300"
-      AliasTarget:
-        HostedZoneId: !ImportValue getdiff-hostedzone
-        DNSName:
-          Ref: CloudFrontDistribution
+      HostedZoneId: !Ref OriginName
+      Comment: Record set for the client site
+      RecordSets:
+        - Name: !Ref OriginName
+          Type: A
+          TTL: "300"
+          AliasTarget:
+            HostedZoneId: !ImportValue getdiff-hostedzone
+            DNSName: !GetAtt [CloudFrontDistribution, DomainName]
 
   # access identify for cloudfront
   cloudfrontoriginaccessidentity:
@@ -35,18 +37,15 @@ Resources:
   # Cloudfront distribution
   CloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
-    DependsOn: S3Bucket
     Properties:
       DistributionConfig:
-        Aliases: !Ref AliasNames
-        ViewerCertificate:
-          AcmCertificateArn: !ImportValue "getdiff-acmcertificate"
-          SslSupportMethod: sni-only
-        HttpVersion: http2
-        Enabled: "true"
-        Comment: "S3 Origin for the website"
+        PriceClass: PriceClass_100
         Origins:
-          - DomainName: !ImportValue "getdiff-s3-client"
+          - DomainName:
+              !Join [
+                ".",
+                [!ImportValue "getdiff-s3-client", "s3.amazonaws.com"],
+              ]
             Id: ClientS3Origin
             S3OriginConfig:
               OriginAccessIdentity:
@@ -57,8 +56,24 @@ Resources:
                     !Ref cloudfrontoriginaccessidentity,
                   ],
                 ]
+        ViewerCertificate:
+          AcmCertificateArn: !ImportValue "getdiff-acmcertificate"
+          SslSupportMethod: sni-only
+        HttpVersion: http2
+        Enabled: "true"
+        Comment: "S3 Origin for the website"
+        DefaultRootObject: index.html
+        Aliases: !Ref AliasNames
         DefaultCacheBehavior:
-          TargetOriginId: WebsiteOrigin
+          AllowedMethods:
+            - DELETE
+            - GET
+            - HEAD
+            - OPTIONS
+            - PATCH
+            - POST
+            - PUT
+          TargetOriginId: ClientS3Origin
           ViewerProtocolPolicy: redirect-to-https
           ForwardedValues:
             QueryString: "true"
@@ -82,3 +97,14 @@ Resources:
           Value: !Ref Stage
         - Key: APP
           Value: getdiff
+Outputs:
+  CloudFrontDistribution:
+    Value:
+      Ref: CloudFrontDistribution
+    Export:
+      Name: getdiff-cloudfront-client
+  Route53RecordSet:
+    Value:
+      Ref: Route53RecordSet
+    Export:
+      Name: getdiff-route53-client-record
