@@ -5,6 +5,7 @@ const httpProxy = require("http-proxy");
 
 const proxyTarget = require("./middleware/proxyTarget");
 const proxyMiddleware = require("./middleware/proxy");
+const healthMiddleware = require("./middleware/health");
 
 const PORT = process.env.PORT || 9001;
 const fs = require("fs");
@@ -30,29 +31,33 @@ const defaultHttpProxyOptions = {
 
 // provide a server implementation
 const getBaseApp = (mw = [], opts) => {
-  const https = require("https");
-
   const fastify = Fastify({
     logger: true,
-    trustProxy: true,
-    https: {
-      key: fs.readFileSync(path.join(certPath, "server.key")),
-      cert: fs.readFileSync(path.join(certPath, "server.crt")),
-      ca: fs.readFileSync(path.join(certPath, "server.csr")),
-      passphrase: ""
-    }
-  });
+    trustProxy: true
 
-  fastify.setErrorHandler(function(error, request, reply) {
-    reply.send("ok");
+    // ,
+    // https: {
+    //   key: fs.readFileSync(path.join(certPath, "server.key")),
+    //   cert: fs.readFileSync(path.join(certPath, "server.crt")),
+    //   ca: fs.readFileSync(path.join(certPath, "server.csr")),
+    //   passphrase: ""
+    // }
   });
 
   mw.forEach(mw => {
     fastify.use(mw.handle(opts));
   });
 
-  fastify.listen(opts.port, (err, address) => {
-    if (err) throw err;
+  fastify.setErrorHandler((error, request, reply) => {
+    // Send error response
+    console.log("an error occured");
+    reply.send("error occured" + error);
+  });
+
+  fastify.listen(opts.port, "127.0.0.1", (err, address) => {
+    if (err) {
+      fastify.log.error(err);
+    }
     fastify.log.info(`server listening on ${address}`);
   });
 
@@ -97,10 +102,13 @@ const main = () => {
   applyToProxy("error", [proxyError]);
 
   // get our server implementation
-  const app = getBaseApp([proxyTarget, responseModifier, proxyMiddleware], {
-    port: PORT,
-    proxy
-  });
+  const app = getBaseApp(
+    [healthMiddleware, proxyTarget, responseModifier, proxyMiddleware],
+    {
+      port: PORT,
+      proxy
+    }
+  );
 };
 
 main();

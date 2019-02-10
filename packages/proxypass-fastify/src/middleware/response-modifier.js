@@ -1,7 +1,6 @@
 "use strict";
 
 const lrSnippet = require("resp-modifier");
-const validator = require("./validate");
 
 const middleware = opts => (req, res, next) => {
   const rules = [];

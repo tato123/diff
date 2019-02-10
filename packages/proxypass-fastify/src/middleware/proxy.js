@@ -1,15 +1,15 @@
 "use strict";
 
-const validator = require("./validate");
-
 const middleware = opts => (req, res, next) => {
   if (!opts.proxy) {
-    return next("No proxy server set");
+    next("Proxy was not set");
   }
 
   opts.proxy.web(req, res, {
     target: req.proxyTarget
   });
+
+  next();
 };
 
 module.exports = {
