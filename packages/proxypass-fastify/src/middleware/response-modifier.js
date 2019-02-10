@@ -10,7 +10,31 @@ const middleware = opts => (req, res, next) => {
 
   const hostname = req.proxyHostname;
 
+  const url =
+    "https://s3.amazonaws.com/clientbridge-www.stage-getdiff.app/clientBridge.js";
+  const snippet = `<script async src="${url}"></script>`;
+
+  const snippetOptions = {
+    async: true,
+    whitelist: [],
+    blacklist: [],
+    rule: {
+      match: /<body[^>]*>/i,
+      fn: function(snippet, match) {
+        return match + snippet;
+      }
+    }
+  };
+
   // inject our snipppet
+  rules.push({
+    once: true,
+    id: "diff-snippet",
+    match: snippetOptions.rule.match,
+    fn: function(req, res, match) {
+      return snippetOptions.rule.fn.apply(null, [snippet, match]);
+    }
+  });
 
   // inject any additional rules
 

@@ -43,7 +43,6 @@ type Origin {
 
 type Query {
   origin(Host: String): Origin
-  allOrigins: [Origin]
 }
 
 type Counter {

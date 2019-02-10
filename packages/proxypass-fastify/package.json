@@ -11,9 +11,9 @@
   "author": "Jonathan Fontanez <jfontanez@getdiff.app>",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^6.2.0",
     "fastify": "^1.14.1",
     "graphql-request": "^1.8.2",
-    "graphql-tag": "^2.10.1",
     "http-proxy": "^1.17.0",
     "resp-modifier": "^6.0.2"
   },
