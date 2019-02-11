@@ -6,6 +6,7 @@ const httpProxy = require("http-proxy");
 const proxyTarget = require("./middleware/proxyTarget");
 const proxyMiddleware = require("./middleware/proxy");
 const healthMiddleware = require("./middleware/health");
+const responseModifier = require("./middleware/response-modifier");
 
 const PORT = process.env.PORT || 9001;
 const fs = require("fs");
@@ -26,35 +27,35 @@ const defaultHttpProxyOptions = {
    * This allows our self-signed certs to be used for development
    */
   secure: false,
-  ws: true
+  ws: true,
+
 };
 
 // provide a server implementation
 const getBaseApp = (mw = [], opts) => {
   const fastify = Fastify({
     logger: true,
-    trustProxy: true
-
-    // ,
-    // https: {
-    //   key: fs.readFileSync(path.join(certPath, "server.key")),
-    //   cert: fs.readFileSync(path.join(certPath, "server.crt")),
-    //   ca: fs.readFileSync(path.join(certPath, "server.csr")),
-    //   passphrase: ""
-    // }
+    trustProxy: true,
+    https: {
+      key: fs.readFileSync(path.join(certPath, "server.key")),
+      cert: fs.readFileSync(path.join(certPath, "server.crt")),
+      ca: fs.readFileSync(path.join(certPath, "server.csr")),
+      passphrase: ""
+    }
   });
+
 
   mw.forEach(mw => {
     fastify.use(mw.handle(opts));
   });
 
-  fastify.setErrorHandler((error, request, reply) => {
-    // Send error response
-    console.log("an error occured");
-    reply.send("error occured" + error);
-  });
+  // fastify.setErrorHandler((error, request, reply) => {
+  //   // Send error response
+  //   console.log("an error occured");
+  //   reply.send("error occured" + error);
+  // });
 
-  fastify.listen(opts.port, "127.0.0.1", (err, address) => {
+  fastify.listen(opts.port,  (err, address) => {
     if (err) {
       fastify.log.error(err);
     }
@@ -91,7 +92,6 @@ const main = () => {
   // allows us to bind to the proxy
   const applyToProxy = applyFns(proxy);
 
-  const responseModifier = require("./middleware/response-modifier");
 
   /**
    * Add any user provided functions for proxyReq, proxyReqWs and proxyRes

@@ -3,6 +3,8 @@
 const lrSnippet = require("resp-modifier");
 
 const middleware = opts => (req, res, next) => {
+  console.log('[response-modifier] executing middleware');
+
   const rules = [];
   const blacklist = [];
   const whitelist = [];

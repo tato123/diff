@@ -1,9 +1,10 @@
 "use strict";
-
-const client = require("../apollo");
+const { request } = require('graphql-request')
 const url = require("url");
 
 const middleware = opts => (req, res, next) => {
+  console.log('[proxyTarget] executing middleware');
+
   const query = `
     query getOrigin($host: String!) {
       origin(Host: $host) {
@@ -14,15 +15,18 @@ const middleware = opts => (req, res, next) => {
     }
   `;
 
-  console.log("my url is ", req.hostname);
-
   const variables = {
-    host: "localhost"
+    host: req.hostname
   };
 
-  client
-    .request(query, variables)
+  console.log("Querying with variables", variables);
+
+  request(process.env.GRAPHQL_ENDPOINT, query, variables)
     .then(data => {
+      if (data.origin == null ) {
+        return next('no data found');
+      }
+
       req.proxyTarget = `${data.origin.protocol}://${data.origin.origin}`;
       req.proxyHostname = data.origin.origin;
       next();
