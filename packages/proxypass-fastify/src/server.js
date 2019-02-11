@@ -35,13 +35,13 @@ const defaultHttpProxyOptions = {
 const getBaseApp = (mw = [], opts) => {
   const fastify = Fastify({
     logger: true,
-    trustProxy: true,
-    https: {
-      key: fs.readFileSync(path.join(certPath, "server.key")),
-      cert: fs.readFileSync(path.join(certPath, "server.crt")),
-      ca: fs.readFileSync(path.join(certPath, "server.csr")),
-      passphrase: ""
-    }
+    trustProxy:true
+    // https: {
+    //   key: fs.readFileSync(path.join(certPath, "server.key")),
+    //   cert: fs.readFileSync(path.join(certPath, "server.crt")),
+    //   ca: fs.readFileSync(path.join(certPath, "server.csr")),
+    //   passphrase: ""
+    // }
   });
 
 
@@ -86,6 +86,15 @@ const proxyError = (err, req, res) => {
   console.error("An error occured proxying", err);
 };
 
+const onProxyReq = (proxyReq, req, res, options) =>{
+  // proxyReq.setHeader('cookie', '');
+  console.log("on proxy req", req.headers)
+}
+
+const onProxyRes =  (proxyRes, req, res)  =>{
+  console.log("on proxy res", req.headers)
+}
+
 const main = () => {
   // proxy implementation
   const proxy = httpProxy.createProxyServer(defaultHttpProxyOptions);
@@ -100,6 +109,9 @@ const main = () => {
   // applyFns("proxyRes", proxyRes);
   // applyFns("proxyReqWs", proxyResWs);
   applyToProxy("error", [proxyError]);
+
+  proxy.on('proxyReq', onProxyReq)
+  proxy.on('proxyRes', onProxyRes)
 
   // get our server implementation
   const app = getBaseApp(
