@@ -11,13 +11,46 @@ Parameters:
   Stage:
     Type: String
     Description: What stage we are deploying to
+  BucketName:
+    Type: String
+    Description: Name of our bucket cname
 
 Resources:
+  # Bucket
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketName
+      AccessControl: PublicRead
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: 404.html
+      Tags:
+        - Key: STAGE
+          Value: !Ref Stage
+        - Key: APP
+          Value: getdiff
+
+  # Bucket Policy
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref S3Bucket
+      PolicyDocument:
+        Id: S3BucketPolicy
+        Version: 2012-10-17
+        Statement:
+          - Sid: PublicReadForGetBucketObjects
+            Effect: Allow
+            Principal: "*"
+            Action: "s3:GetObject"
+            Resource: !Join ["", ["arn:aws:s3:::", !Ref S3Bucket, "/*"]]
+
   # Record on Route53 that handles routing to our distribution
   Route53RecordSet:
     Type: AWS::Route53::RecordSetGroup
     Properties:
-      HostedZoneId: !Ref OriginName
+      HostedZoneId: !ImportValue getdiff-hostedzone
       Comment: Record set for the client site
       RecordSets:
         - Name: !Ref OriginName
@@ -37,15 +70,13 @@ Resources:
   # Cloudfront distribution
   CloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
+    DependsOn:
+      - S3Bucket
     Properties:
       DistributionConfig:
         PriceClass: PriceClass_100
         Origins:
-          - DomainName:
-              !Join [
-                ".",
-                [!ImportValue "getdiff-s3-client", "s3.amazonaws.com"],
-              ]
+          - DomainName: !GetAtt S3Bucket.DomainName
             Id: ClientS3Origin
             S3OriginConfig:
               OriginAccessIdentity:
@@ -108,3 +139,8 @@ Outputs:
       Ref: Route53RecordSet
     Export:
       Name: getdiff-route53-client-record
+  S3Bucket:
+    Value:
+      Ref: S3Bucket
+    Export:
+      Name: getdiff-s3-client

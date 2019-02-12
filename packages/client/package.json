@@ -41,7 +41,7 @@
   },
   "scripts": {
     "start": "react-app-rewired start",
-    "start:dev": "react-app-rewired start",
+    "start:dev": "set PORT=9010 && react-app-rewired start",
     "build:prod": "react-app-rewired build --env=production",
     "build:stage": "react-app-rewired build --env=stage",
     "test": "react-app-rewired test --env=jsdom",
