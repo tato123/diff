@@ -1,52 +1,48 @@
 type Origin {
   host: String
   origin: String
-  accountId: String
+  protocol: String
 }
 
-type Invite {
-  email: String
-  firstName: String
-  invitedBy: String
-  lastName: String
-  status: String
-  workspaceId: String
-  id: String
-}
+# type Invite {
+#   email: String
+#   firstName: String
+#   invitedBy: String
+#   lastName: String
+#   status: String
+#   workspaceId: String
+#   id: String
+# }
 
-type User {
-  aud: String
-  email: String
-  email_verified: Boolean
-  exp: Int
-  family_name: String
-  gender: String
-  given_name: String
-  iat: Int
-  iss: String
-  locale: String
-  name: String
-  nickname: String
-  picture: String
-  plan: String
-  sub: String
-  updated_at: String
-}
+# type User {
+#   aud: String
+#   email: String
+#   email_verified: Boolean
+#   exp: Int
+#   family_name: String
+#   gender: String
+#   given_name: String
+#   iat: Int
+#   iss: String
+#   locale: String
+#   name: String
+#   nickname: String
+#   picture: String
+#   plan: String
+#   sub: String
+#   updated_at: String
+# }
 
-type Component {
-  created: String
-  metageneration: String
-  name: String
-  updated: String
-  url: String
-}
+# type Component {
+#   created: String
+#   metageneration: String
+#   name: String
+#   updated: String
+#   url: String
+# }
 
 type Query {
-  allInvites: [Invite]
-  allUsers: [User]
-  allComponents: [Component]
   origin(Host: String): Origin
-  allOrigins: [Origin]
 }
 
 type Counter {

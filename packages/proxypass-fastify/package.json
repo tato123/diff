@@ -1,0 +1,24 @@
+{
+  "name": "@diff/proxypass-fastify",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/index.js",
+    "start:dev": "cross-env NODE_ENV=development nodemon src/index.js"
+  },
+  "author": "Jonathan Fontanez <jfontanez@getdiff.app>",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^6.2.0",
+    "fastify": "^1.14.1",
+    "graphql-request": "^1.8.2",
+    "http-proxy": "^1.17.0",
+    "resp-modifier": "^6.0.2"
+  },
+  "devDependencies": {
+    "cross-env": "^5.2.0",
+    "nodemon": "^1.18.10"
+  }
+}

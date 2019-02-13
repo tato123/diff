@@ -2,6 +2,11 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: The AWS CloudFormation template for getdiff main site
 Parameters:
+  DomainName:
+    Type: String
+    Description: The DNS name of an existing Amazon Route 53 hosted zone e.g. jevsejev.io
+    AllowedPattern: (?!-)[a-zA-Z0-9-.]{1,63}(?<!-)
+    ConstraintDescription: must be a valid DNS zone name.
   OriginName:
     Type: String
     Description: Name of the prototyping url you want to use (e.g. *.site.getdiff.app)
@@ -11,20 +16,57 @@ Parameters:
   Stage:
     Type: String
     Description: What stage we are deploying to
+  BucketName:
+    Type: String
+    Description: Name of our bucket cname
 
 Resources:
+  # Bucket
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketName
+      AccessControl: PublicRead
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: 404.html
+      Tags:
+        - Key: STAGE
+          Value: !Ref Stage
+        - Key: APP
+          Value: getdiff
+
+  # Bucket Policy
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref S3Bucket
+      PolicyDocument:
+        Id: S3BucketPolicy
+        Version: 2012-10-17
+        Statement:
+          - Sid: PublicReadForGetBucketObjects
+            Effect: Allow
+            Principal: "*"
+            Action: "s3:GetObject"
+            Resource: !Join ["", ["arn:aws:s3:::", !Ref S3Bucket, "/*"]]
+
   # Record on Route53 that handles routing to our distribution
   Route53RecordSet:
     Type: AWS::Route53::RecordSetGroup
     Properties:
-      HostedZoneId: !Ref OriginName
+      HostedZoneName: !Join ['', [!Ref 'DomainName', .]]
       Comment: Record set for the client site
       RecordSets:
         - Name: !Ref OriginName
           Type: A
-          TTL: "300"
           AliasTarget:
-            HostedZoneId: !ImportValue getdiff-hostedzone
+            HostedZoneId: Z2FDTNDATAQYW2 
+            DNSName: !GetAtt [CloudFrontDistribution, DomainName]
+        - Name: !Ref 'DomainName'
+          Type: A
+          AliasTarget:
+            HostedZoneId: Z2FDTNDATAQYW2 
             DNSName: !GetAtt [CloudFrontDistribution, DomainName]
 
   # access identify for cloudfront
@@ -37,15 +79,13 @@ Resources:
   # Cloudfront distribution
   CloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
+    DependsOn:
+      - S3Bucket
     Properties:
       DistributionConfig:
         PriceClass: PriceClass_100
         Origins:
-          - DomainName:
-              !Join [
-                ".",
-                [!ImportValue "getdiff-s3-client", "s3.amazonaws.com"],
-              ]
+          - DomainName: !GetAtt S3Bucket.DomainName
             Id: ClientS3Origin
             S3OriginConfig:
               OriginAccessIdentity:
@@ -108,3 +148,8 @@ Outputs:
       Ref: Route53RecordSet
     Export:
       Name: getdiff-route53-client-record
+  S3Bucket:
+    Value:
+      Ref: S3Bucket
+    Export:
+      Name: getdiff-s3-client
