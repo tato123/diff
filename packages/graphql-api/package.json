@@ -13,8 +13,8 @@
   "dependencies": {
     "cross-env": "^5.2.0",
     "dotenv": "^6.2.0",
+    "express": "^4.16.4",
     "fast-crc32c": "^1.0.4",
-    "firebase-admin": "^6.3.0",
     "graphql-redis-subscriptions": "^2.0.0",
     "graphql-yoga": "^1.16.7",
     "ioredis": "^4.3.0",

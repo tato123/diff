@@ -1,8 +1,7 @@
 "use strict";
 
-
 const middleware = opts => (req, res, next) => {
-  console.log('[proxy] executing middleware');
+  console.log("[proxy] executing middleware");
 
   if (!opts.proxy) {
     next("Proxy was not set");

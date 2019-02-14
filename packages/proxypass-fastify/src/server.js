@@ -7,6 +7,7 @@ const proxyTarget = require("./middleware/proxyTarget");
 const proxyMiddleware = require("./middleware/proxy");
 const healthMiddleware = require("./middleware/health");
 const responseModifier = require("./middleware/response-modifier");
+const proxyUtils = require("./proxy/utils");
 
 const PORT = process.env.PORT || 9001;
 const fs = require("fs");
@@ -27,42 +28,50 @@ const defaultHttpProxyOptions = {
    * This allows our self-signed certs to be used for development
    */
   secure: false,
-  ws: true,
+  ws: true
+};
 
+function test(proxyRes, req, res) {
+  console.log(
+    "RAW Response from the target",
+    JSON.stringify(proxyRes.headers, true, 2)
+  );
+}
+
+const ProxyOption = {
+  route: "",
+  target: "",
+  rewriteRules: true,
+  proxyReq: [],
+  proxyRes: [test],
+  cookies: {
+    stripDomain: true
+  },
+
+  proxyReqWs: [],
+  errHandler: undefined,
+  url: "",
+  ws: false,
+  middleware: [],
+  reqHeaders: undefined
 };
 
 // provide a server implementation
 const getBaseApp = (mw = [], opts) => {
-  const fastify = Fastify({
-    logger: true,
-    trustProxy:true
-    // https: {
-    //   key: fs.readFileSync(path.join(certPath, "server.key")),
-    //   cert: fs.readFileSync(path.join(certPath, "server.crt")),
-    //   ca: fs.readFileSync(path.join(certPath, "server.csr")),
-    //   passphrase: ""
-    // }
-  });
+  const express = require("express");
+  const app = express();
 
+  app.set("trust proxy", true);
 
   mw.forEach(mw => {
-    fastify.use(mw.handle(opts));
+    app.use(mw.handle(opts));
   });
 
-  // fastify.setErrorHandler((error, request, reply) => {
-  //   // Send error response
-  //   console.log("an error occured");
-  //   reply.send("error occured" + error);
-  // });
-
-  fastify.listen(opts.port,  (err, address) => {
-    if (err) {
-      fastify.log.error(err);
-    }
-    fastify.log.info(`server listening on ${address}`);
+  app.listen(opts.port, () => {
+    console.info(`server listening on ${opts.port}`);
   });
 
-  return fastify;
+  return app;
 };
 
 /**
@@ -86,32 +95,33 @@ const proxyError = (err, req, res) => {
   console.error("An error occured proxying", err);
 };
 
-const onProxyReq = (proxyReq, req, res, options) =>{
-  // proxyReq.setHeader('cookie', '');
-  console.log("on proxy req", req.headers)
-}
-
-const onProxyRes =  (proxyRes, req, res)  =>{
-  console.log("on proxy res", req.headers)
-}
-
 const main = () => {
   // proxy implementation
   const proxy = httpProxy.createProxyServer(defaultHttpProxyOptions);
   // allows us to bind to the proxy
   const applyToProxy = applyFns(proxy);
+  const opts = ProxyOption;
 
+  const proxyRes = getProxyResFunctions(opts.proxyRes, opts);
+  const proxyReq = getProxyReqFunctions(opts.proxyReq, opts);
+  const proxyResWs = opts.proxyReqWs;
 
   /**
    * Add any user provided functions for proxyReq, proxyReqWs and proxyRes
    */
-  // applyFns("proxyReq", proxyReq);
-  // applyFns("proxyRes", proxyRes);
-  // applyFns("proxyReqWs", proxyResWs);
+  applyToProxy("proxyReq", proxyReq);
+  applyToProxy("proxyRes", proxyRes);
+  applyToProxy("proxyReqWs", proxyResWs);
   applyToProxy("error", [proxyError]);
 
-  proxy.on('proxyReq', onProxyReq)
-  proxy.on('proxyRes', onProxyRes)
+  proxy.on("proxyRes", function(proxyRes, req, res) {
+    proxyRes.headers["x-frame-options"] =
+      "allow-from " +
+      `${req.secure ? "https" : "http"}://${req.headers.host} ${
+        req.proxyTarget
+      }`;
+    proxyRes.headers["access-control-allow-origin"] = "*";
+  });
 
   // get our server implementation
   const app = getBaseApp(
@@ -124,3 +134,32 @@ const main = () => {
 };
 
 main();
+
+function getProxyResFunctions(resFns = [], opts) {
+  if (opts.cookies.stripDomain) {
+    return resFns.push(proxyUtils.checkCookies);
+  }
+  return resFns;
+}
+
+/**
+ * @param reqFns
+ * @returns {*}
+ */
+function getProxyReqFunctions(reqFns, opt, bs) {
+  var reqHeaders = opt.reqHeaders;
+
+  if (!reqHeaders) {
+    return reqFns;
+  }
+
+  if (Map.isMap(reqHeaders)) {
+    return reqFns.concat(function(proxyReq) {
+      reqHeaders.forEach(function(value, key) {
+        proxyReq.setHeader(key, value);
+      });
+    });
+  }
+
+  return reqFns;
+}

@@ -1,9 +1,9 @@
 "use strict";
-const { request } = require('graphql-request')
+const { request } = require("graphql-request");
 const url = require("url");
 
 const middleware = opts => (req, res, next) => {
-  console.log('[proxyTarget] executing middleware');
+  console.log("[proxyTarget] executing middleware");
 
   const query = `
     query getOrigin($host: String!) {
@@ -16,15 +16,15 @@ const middleware = opts => (req, res, next) => {
   `;
 
   const variables = {
-    host: req.hostname
+    host: req.headers.host
   };
 
   console.log("Querying with variables", variables);
 
   request(process.env.GRAPHQL_ENDPOINT, query, variables)
     .then(data => {
-      if (data.origin == null ) {
-        return next('no data found');
+      if (data.origin == null) {
+        return next("no data found");
       }
 
       req.proxyTarget = `${data.origin.protocol}://${data.origin.origin}`;
