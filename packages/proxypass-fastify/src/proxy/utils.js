@@ -99,7 +99,9 @@ module.exports.rewriteLinks = function(userServer) {
  * @param {Object} res
  */
 module.exports.checkCookies = function checkCookies(res) {
-  if (typeof res.headers["set-cookie"] !== "undefined") {
+  if (res && res.headers && typeof res.headers["set-cookie"] !== "undefined") {
+    console.log("Response", res);
+
     res.headers["set-cookie"] = res.headers["set-cookie"].map(function(item) {
       return rewriteCookies(item);
     });

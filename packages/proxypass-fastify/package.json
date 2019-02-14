@@ -5,15 +5,17 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/index.js",
-    "start:dev": "cross-env NODE_ENV=development nodemon src/index.js"
+    "start": "node src/index.js -- --max-http-header-size=80000",
+    "start:dev": "cross-env NODE_ENV=development nodemon src/index.js -- --max-http-header-size=80000"
   },
   "author": "Jonathan Fontanez <jfontanez@getdiff.app>",
   "license": "ISC",
   "dependencies": {
     "dotenv": "^6.2.0",
+    "express": "^4.16.4",
     "fastify": "^1.14.1",
     "graphql-request": "^1.8.2",
+    "http-parser-js": "^0.5.0",
     "http-proxy": "^1.17.0",
     "resp-modifier": "^6.0.2"
   },
