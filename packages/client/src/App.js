@@ -1,8 +1,9 @@
 import React from "react";
 import "@atlaskit/css-reset/dist/bundle.css";
 
-import Landing from "./features/landing";
+import Search from "./features/search";
 import Designer from "./features/designer";
+import Home from "./features/home";
 
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { injectGlobal, ThemeProvider } from "styled-components";
@@ -39,7 +40,8 @@ export default () => (
       <Router>
         <Switch>
           <Route exact path="/edit" component={Designer} />
-          <Route exact path="/" component={Landing} />
+          <Route exact path="/search" component={Search} />
+          <Route exact path="/" component={Home} />
         </Switch>
       </Router>
     </React.Fragment>
