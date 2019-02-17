@@ -10,6 +10,8 @@ import { HttpLink } from "apollo-link-http";
 import { WebSocketLink } from "apollo-link-ws";
 import { getMainDefinition } from "apollo-utilities";
 import { ApolloProvider } from "react-apollo";
+import { ApolloProvider as ApolloHooksProvider } from 'react-apollo-hooks';
+
 // import { setContext } from "apollo-link-context";
 
 import "normalize.css";
@@ -62,7 +64,9 @@ const client = new ApolloClient({
 
 ReactDOM.render(
   <ApolloProvider client={client}>
+  <ApolloHooksProvider client={client}>
     <App />
+    </ApolloHooksProvider>
   </ApolloProvider>,
   document.getElementById("root")
 );

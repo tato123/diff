@@ -1,8 +1,12 @@
-import React from "react";
+import React, {useRef} from "react";
 
 import Logo from "../../components/Logo";
 import Icon from "../../components/Icon";
 import styled from "styled-components";
+
+import { useMutation } from 'react-apollo-hooks';
+import { CREATE_SITE } from "../../graphql/mutations";
+
 
 const SpecialText = styled.span`
   color: #4949b1;
@@ -43,6 +47,15 @@ const Main = styled(Section)`
       margin-right: 16px;
     }
   }
+
+  h1 {
+    text-transform: uppercase;
+  }
+
+  p {
+    margin-top: 32px;
+    font-size: 1.2rem;
+  }
 `;
 
 const Explain = styled(Section)`
@@ -58,7 +71,7 @@ const Button = styled.button`
   outline: none;
   border-radius: 32px;
   border: none;
-  padding: 10px 16px;
+  padding: 10px 32px;
   box-sizing: border-box;
   cursor: pointer;
 `;
@@ -67,6 +80,12 @@ const FancyPrimaryButton = styled(Button)`
   background-color: #4949b1 !important;
   color: #fff !important;
 `;
+
+const FancySecondaryButton = styled(Button)`
+  background-color: #151837;
+  color: #fff;
+`
+
 
 const Footer = styled(Section)``;
 
@@ -92,18 +111,20 @@ const Column = styled.div`
 `;
 
 const Input = styled.input`
-  border-radius: 16px;
-  padding: 16px;
-  outline: none;
-  border: 1px solid #000;
-  width: 90%;
+border-radius: 24px;
+outline: none;
+border: 1px solid #000;
+width: 90%;
+max-height: 32px;
+padding: 8px 16px;
 `;
 
 const InputField = styled(Section)`
   width: 100%;
   display: grid;
   grid-template-areas: ". .";
-  grid-template-columns: 1fr 200px;
+  grid-template-columns: 70% 30%;
+  column-gap: 24px;
 `;
 
 const Copy = styled.div``;
@@ -122,10 +143,16 @@ const Step = styled.div`
   text-align: center;
   font-weight: bold;
   
-`
+`;
 
+const Sentence = styled.span`
+  display:block;
+`;
 
-export default () => {
+function HomePage({history}) {
+  const inputEl = useRef('');
+  const createSite = useMutation(CREATE_SITE)
+
   return (
     <Page>
       <div>
@@ -134,16 +161,21 @@ export default () => {
       <Main>
         <div className="description">
           <div>
-            <h1>Prototype and share changes to your site...with no coding</h1>
+            <h1 >
+              <Sentence>Prototype and share</Sentence>
+              <Sentence>changes to your</Sentence>
+              <Sentence>site...with no coding</Sentence>
+
+            </h1>
             <p>
-              Make CSS changes with devtools and get a{" "}
-              <SpecialText>unique URL</SpecialText> to share for review or user
-              testing
+              <Sentence>Make CSS changes with devtools and</Sentence>
+              <Sentence>get a <SpecialText>unique URL</SpecialText> to share for review</Sentence>
+              <Sentence> or user testing</Sentence>
             </p>
           </div>
           <div>
             <FancyPrimaryButton>See how it works</FancyPrimaryButton>
-            <Button>Try it out</Button>
+            <FancySecondaryButton>Try it out</FancySecondaryButton>
           </div>
         </div>
         <div>
@@ -153,23 +185,23 @@ export default () => {
       <Explain>
         <Column medium={3}>
           <Step>1</Step>
-          <h1 style={{color: "#7172b9"}}>Enter your url</h1>
+          <h1 style={{ color: "#7172b9", textTransform: "uppercase" }}>Enter your url</h1>
           <p>
             Go to getdiff.app and enter the URL of the website or application
             you would like to make changes to.
           </p>
         </Column>
         <Column medium={3}>
-        <Step>2</Step>
-          <h1 style={{color:"#5aced5"}}>Make css changes using devtools</h1>
+          <Step>2</Step>
+          <h1 style={{ color: "#5aced5", textTransform: "uppercase" }}>Make css changes using devtools</h1>
           <p>
             Open devtools and make CSS changes. We will keep up with them until
             you are done.
           </p>
         </Column>
         <Column medium={3}>
-        <Step>3</Step>
-          <h1 style={{color:"#dd51b1"}}>Get a unique url</h1>
+          <Step>3</Step>
+          <h1 style={{ color: "#dd51b1", textTransform: "uppercase" }}>Get a unique url</h1>
           <p>
             Click "Save changes" and a unique URL will be automatically copied
             to your clipboard
@@ -182,12 +214,35 @@ export default () => {
           application
         </Banner>
 
+        <form onSubmit={(evt) => {
+          evt.preventDefault();
+          
+          const siteResponse = createSite({variables:{input:{url:evt.target.site.value}}});
+          
+          siteResponse
+            .then(response => {
+              
+              history.push({
+                pathname: "/edit",
+                search: "?version=" + response.data.createSiteOrigin.prototypeUrl
+              });
+              console.log(response)
+            }).catch(err => {
+              
+              console.error(err)
+            });
+            return false;
+        }}>
         <InputField>
-          <Input type="text" placeholder="Enter a website" />
-          <Button>Prototype Changes</Button>
+          <Input name="site" type="text" placeholder="Enter a website" innerRef={inputEl}/>
+          <FancySecondaryButton type="submit">Prototype Changes</FancySecondaryButton>
         </InputField>
+        </form>
       </Footer>
       <Copy>&copy; 2019 getDiff, Inc.</Copy>
     </Page>
   );
 };
+
+
+export default HomePage;
