@@ -80,7 +80,16 @@ const Banner = styled.div`
   font-weight: 500;
 `;
 
-const Column = styled.div``;
+const Column = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 30%;
+  align-items: center;
+
+  * {
+    text-align: center;
+  }
+`;
 
 const Input = styled.input`
   border-radius: 16px;
@@ -98,6 +107,23 @@ const InputField = styled(Section)`
 `;
 
 const Copy = styled.div``;
+
+const Step = styled.div`
+  background-color: #ccc;
+  width: 64px;
+  height: 64px;
+  max-height: 64px;
+  max-width: 64px;
+  border-radius: 100%;
+  display: flex;
+  align-items: center;
+  flex: 1 auto;
+  justify-content: center;
+  text-align: center;
+  font-weight: bold;
+  
+`
+
 
 export default () => {
   return (
@@ -126,21 +152,24 @@ export default () => {
       </Main>
       <Explain>
         <Column medium={3}>
-          <h1>Enter your url</h1>
+          <Step>1</Step>
+          <h1 style={{color: "#7172b9"}}>Enter your url</h1>
           <p>
             Go to getdiff.app and enter the URL of the website or application
             you would like to make changes to.
           </p>
         </Column>
         <Column medium={3}>
-          <h1>Make css changes using devtools</h1>
+        <Step>2</Step>
+          <h1 style={{color:"#5aced5"}}>Make css changes using devtools</h1>
           <p>
             Open devtools and make CSS changes. We will keep up with them until
             you are done.
           </p>
         </Column>
         <Column medium={3}>
-          <h1>Get a unique url</h1>
+        <Step>3</Step>
+          <h1 style={{color:"#dd51b1"}}>Get a unique url</h1>
           <p>
             Click "Save changes" and a unique URL will be automatically copied
             to your clipboard
