@@ -2,6 +2,39 @@
 
 const lrSnippet = require("resp-modifier");
 const proxyUtils = require("../proxy/utils");
+const { request } = require("graphql-request");
+
+
+
+
+const getDeltas =  (host) => {
+  const GET_DELTAS = `
+  query getDeltas($host: String!) {
+    deltas(Host: $host) {
+      host
+      changes
+      css
+    }
+  }
+`;
+
+  const variables = {
+    host
+  };
+
+  console.log("Querying with variables", variables);
+
+  return request(process.env.GRAPHQL_ENDPOINT, GET_DELTAS, variables)
+    .then(data => {
+      if ( data && data.deltas && data.deltas.css) {
+        return data.deltas.css;
+      }
+      return '';
+    })
+    .catch (err => {
+      return '';
+    })
+}
 
 
 const injectSnippet = (req, res, next) => {
@@ -38,16 +71,12 @@ const injectSnippet = (req, res, next) => {
   }
 }
 
-const injectCSS = (req, res, next) => {
+const injectCSS = (changes) =>  (req, res, next) => {
 
-  const snippet = `
-    <style>
-      * {
-        color: green !important;
-        font-size: 32px;
-      }      
-    </style>
-  `
+  const snippet = changes.length > 0 ? `<style>${changes}</style>` : '';
+  console.log('-----------------------------------\n')
+  console.log(snippet)
+  console.log('-----------------------------------\n\n\n')
 
   const snippetOptions = {
     async: true,
@@ -75,7 +104,7 @@ const injectCSS = (req, res, next) => {
 
 
 
-const middleware = opts => (req, res, next) => {
+const middleware = opts =>  async (req, res, next) => {
   console.log('[response-modifier] executing middleware');
 
   const rules = [];
@@ -83,13 +112,14 @@ const middleware = opts => (req, res, next) => {
   const whitelist = [];
 
   const hostname = req.proxyHostname;
+  const changes = await getDeltas(req.headers.host);
   
 
   // inject snippet rules
   rules.push(injectSnippet(req, res, next));
 
   // inject CSS rules
-  rules.push(injectCSS(req, res, next));
+  rules.push(injectCSS(changes)(req, res, next));
   
   // inject the proxy rules
   rules.push(proxyUtils.rewriteLinks({ hostname }));

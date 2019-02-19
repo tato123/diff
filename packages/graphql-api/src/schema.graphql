@@ -4,6 +4,13 @@ type Origin {
   protocol: String
 }
 
+type Delta {
+  host: String
+  css: String
+  changes: String
+
+}
+
 # type Invite {
 #   email: String
 #   firstName: String
@@ -42,7 +49,8 @@ type Origin {
 # }
 
 type Query {
-  origin(Host: String): Origin
+  origin(Host: String!): Origin
+  deltas(Host: String!) : Delta
 }
 
 type Counter {
