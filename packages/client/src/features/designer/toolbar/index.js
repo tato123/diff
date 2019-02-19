@@ -21,18 +21,12 @@ const Toolbar = ({ count, onSave, onEdit, onShare, onClickChanges }) => (
         display: "flex",
         marginLeft: "-10%"
       }}
-    >
-      {/* <Button onClick={onShare} appearence="link">
-        Save to workspace
-      </Button> */}
+    >      
       <Button onClick={onSave} isDisabled={count === 0} appearance="primary">
         Save Changes
       </Button>
       
-    </div>
-    <div>
-      &copy; 2018 getDiff, Inc. 
-      </div>
+    </div>   
   </View>
 );
 

@@ -1,157 +1,49 @@
-import React, {useRef} from "react";
-
-import Logo from "../../components/Logo";
-import Icon from "../../components/Icon";
-import styled from "styled-components";
-
+import React, { useRef, useState } from "react";
 import { useMutation } from 'react-apollo-hooks';
+import Button from '../../components/Button';
+import Icon from "../../components/Icon";
+import Logo from "../../components/Logo";
 import { CREATE_SITE } from "../../graphql/mutations";
+import Banner from './styles/Banner';
+import Column from './styles/Column';
+import Copy from './styles/Copy';
+import Explain from './styles/Explain';
+import Footer from './styles/Footer';
+import Input from './styles/Input';
+import InputField from './styles/InputField';
+import Main from './styles/Main';
+import Page from './styles/Page';
+import Sentence from './styles/Sentence';
+import SpecialText from './styles/SpecialText';
+import Step from './styles/Step';
 
 
-const SpecialText = styled.span`
-  color: #4949b1;
-`;
 
-const Page = styled.div`
-  display: grid;
-  grid-template-areas: "." "." "." "." ".";
-  grid-template-columns: 1fr;
-  grid-auto-rows: auto;
-  grid-template-rows: 64px 2fr 1fr 1fr 200px;
-  margin: 32px 64px 32px 64px;
-  font-size: 1rem;
-  line-height: 1.6;
-`;
-
-const Section = styled.div`
-  margin-top: 32px;
-`;
-
-const Main = styled(Section)`
-  display: flex;
-  flex: 1 auto;
-  justify-content: space-between;
-
-  > div:first-child {
-    margin-right: 16px;
-    display: flex;
-    flex: 1 auto;
-    flex-direction: column;
-    width: 50%;
-
-    > div:first-child {
-      margin-bottom: 64px;
-    }
-
-    > div:last-child * {
-      margin-right: 16px;
-    }
-  }
-
-  h1 {
-    text-transform: uppercase;
-  }
-
-  p {
-    margin-top: 32px;
-    font-size: 1.2rem;
-  }
-`;
-
-const Explain = styled(Section)`
-  display: flex;
-  flex: 1 auto;
-  justify-content: space-between;
-`;
-
-const Button = styled.button`
-  padding: 20px;
-  text-transform: uppercase;
-  font-size: 20px;
-  outline: none;
-  border-radius: 32px;
-  border: none;
-  padding: 10px 32px;
-  box-sizing: border-box;
-  cursor: pointer;
-`;
-
-const FancyPrimaryButton = styled(Button)`
-  background-color: #4949b1 !important;
-  color: #fff !important;
-`;
-
-const FancySecondaryButton = styled(Button)`
-  background-color: #151837;
-  color: #fff;
-`
-
-
-const Footer = styled(Section)``;
-
-const Banner = styled.div`
-  display: block;
-  width: 100%;
-  border: 3px dotted #e8e8e8;
-  border-radius: 8px;
-  padding: 4px 16px;
-  text-align: center;
-  font-weight: 500;
-`;
-
-const Column = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 30%;
-  align-items: center;
-
-  * {
-    text-align: center;
-  }
-`;
-
-const Input = styled.input`
-border-radius: 24px;
-outline: none;
-border: 1px solid #000;
-width: 90%;
-max-height: 32px;
-padding: 8px 16px;
-`;
-
-const InputField = styled(Section)`
-  width: 100%;
-  display: grid;
-  grid-template-areas: ". .";
-  grid-template-columns: 70% 30%;
-  column-gap: 24px;
-`;
-
-const Copy = styled.div``;
-
-const Step = styled.div`
-  background-color: #ccc;
-  width: 64px;
-  height: 64px;
-  max-height: 64px;
-  max-width: 64px;
-  border-radius: 100%;
-  display: flex;
-  align-items: center;
-  flex: 1 auto;
-  justify-content: center;
-  text-align: center;
-  font-weight: bold;
-  
-`;
-
-const Sentence = styled.span`
-  display:block;
-`;
-
-function HomePage({history}) {
+const HomePage = ({ history }) => {
+  const [loading, setLoading] = useState(false);
   const inputEl = useRef('');
   const createSite = useMutation(CREATE_SITE)
+
+  const onSubmit = (evt) => {
+    evt.preventDefault();
+    
+
+    const siteResponse = createSite({ variables: { input: { url: inputEl.current.value } } });
+    setLoading(true);
+    siteResponse
+      .then(response => {
+        setLoading(false);
+        history.push({
+          pathname: "/edit",
+          search: "?version=" + response.data.createSiteOrigin.prototypeUrl
+        });
+        console.log(response)
+      }).catch(err => {
+        setLoading(false);
+        console.error(err)
+      });
+    return false;
+  }
 
   return (
     <Page>
@@ -174,8 +66,8 @@ function HomePage({history}) {
             </p>
           </div>
           <div>
-            <FancyPrimaryButton>See how it works</FancyPrimaryButton>
-            <FancySecondaryButton>Try it out</FancySecondaryButton>
+            <Button appearence="FancyPrimaryButton">See how it works</Button>
+            <Button appearence="FancySecondaryButton">Try it out</Button>
           </div>
         </div>
         <div>
@@ -185,7 +77,7 @@ function HomePage({history}) {
       <Explain>
         <Column medium={3}>
           <Step>1</Step>
-          <h1 style={{ color: "#7172b9", textTransform: "uppercase" }}>Enter your url</h1>
+          <h1 style={{ color: "#4949b1", textTransform: "uppercase" }}>Enter your url</h1>
           <p>
             Go to getdiff.app and enter the URL of the website or application
             you would like to make changes to.
@@ -214,29 +106,11 @@ function HomePage({history}) {
           application
         </Banner>
 
-        <form onSubmit={(evt) => {
-          evt.preventDefault();
-          
-          const siteResponse = createSite({variables:{input:{url:evt.target.site.value}}});
-          
-          siteResponse
-            .then(response => {
-              
-              history.push({
-                pathname: "/edit",
-                search: "?version=" + response.data.createSiteOrigin.prototypeUrl
-              });
-              console.log(response)
-            }).catch(err => {
-              
-              console.error(err)
-            });
-            return false;
-        }}>
-        <InputField>
-          <Input name="site" type="text" placeholder="Enter a website" innerRef={inputEl}/>
-          <FancySecondaryButton type="submit">Prototype Changes</FancySecondaryButton>
-        </InputField>
+        <form onSubmit={onSubmit}>
+          <InputField>
+            <Input autoComplete="false" name="site" type="text" placeholder="Enter a website" innerRef={inputEl} />
+            <Button onClick={onSubmit} loading={loading} disabled={loading} appearence="FancySecondaryButton" type="submit">Prototype Changes</Button>
+          </InputField>
         </form>
       </Footer>
       <Copy>&copy; 2019 getDiff, Inc.</Copy>
