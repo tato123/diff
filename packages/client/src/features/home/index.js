@@ -16,6 +16,7 @@ import Page from './styles/Page';
 import Sentence from './styles/Sentence';
 import SpecialText from './styles/SpecialText';
 import Step from './styles/Step';
+import {scroller, Element} from 'react-scroll';
 
 
 
@@ -66,7 +67,7 @@ const HomePage = ({ history }) => {
             </p>
           </div>
           <div>
-            <Button appearence="FancyPrimaryButton">See how it works</Button>
+            <Button appearence="FancyPrimaryButton" onClick={() => scroller.scrollTo('myScrollToElement', {duration: 650,delay:0,smooth: "easeIn"})}>See how it works</Button>
             <Button appearence="FancySecondaryButton">Try it out</Button>
           </div>
         </div>
@@ -101,17 +102,19 @@ const HomePage = ({ history }) => {
         </Column>
       </Explain>
       <Footer>
+        <Element  name="myScrollToElement"></Element>
         <Banner>
           Don't worry! This is secure and we don't make changes to your site or
           application
         </Banner>
 
-        <form onSubmit={onSubmit}>
+        <form autoComplete="off" onSubmit={onSubmit}>
           <InputField>
-            <Input autoComplete="false" name="site" type="text" placeholder="Enter a website" innerRef={inputEl} />
+            <Input autoComplete="off"  name="site" type="text" placeholder="Enter a website" innerRef={inputEl} />
             <Button onClick={onSubmit} loading={loading} disabled={loading} appearence="FancySecondaryButton" type="submit">Prototype Changes</Button>
           </InputField>
         </form>
+        
       </Footer>
       <Copy>&copy; 2019 getDiff, Inc.</Copy>
     </Page>
