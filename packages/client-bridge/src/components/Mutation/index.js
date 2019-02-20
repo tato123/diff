@@ -1,5 +1,8 @@
 import React from "react";
-import finder from "@medv/finder";
+import nodeSelector from '../../utils/selector';
+
+
+
 
 export default class MutationListener extends React.Component {
   componentDidMount() {
@@ -23,21 +26,8 @@ export default class MutationListener extends React.Component {
     this.observer.observe(targetNode, observerConfig);
   }
 
-  getSelector = node => {
-    try {
-      const selector = finder(node, {
-        seedMinLength: 4,
-        optimizedMinLength: 2,
-        threshold: 1000
-      });
-      return selector;
-    } catch (error) {
-      // do nothing
-    }
-  };
-
   styleMutator = mutation => {
-    const selector = this.getSelector(mutation.target);
+    const selector = nodeSelector(mutation.target);
 
     if (selector == null || selector === undefined) {
       return;

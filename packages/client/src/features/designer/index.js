@@ -51,7 +51,10 @@ class Designer extends React.Component {
   }
 
   handleWorkerMessage = m => {
-    console.log("worker message", m.data);
+    if (process.env.NODE_ENV === 'development') {
+      console.log("[development] worker message", m.data);
+    }
+    
     const styles = m.data;
     this.setState({
       styles,
