@@ -2,33 +2,57 @@ import React from 'react';
 import styled from 'styled-components';
 
 const Main = styled.div`
-    display: flex;
-    flex: 1 auto;
-    justify-content: space-between;
+    
+    display: grid;
+    grid-template-areas: "d l";
+    grid-template-rows: minmax(0, 1fr);
+    grid-template-columns: 1fr 1fr;
 
-    > div:first-child {
-    margin-right: 16px;
-    display: flex;
-    flex: 1 auto;
-    flex-direction: column;
-    width: 50%;
+    .description {
+        grid-area: d;
 
-    > div:first-child {
-        margin-bottom: 64px;
+        .button-group{
+            margin-top: 64px;
+        }
+
+        .button-group > button:first-child {
+            margin-right: 16px;
+        }
     }
 
-    > div:last-child * {
-        margin-right: 16px;
+    .logo {
+        grid-area: l;
     }
+
+    @media only screen and (max-width:1024px) {
+        grid-template-areas: "l" "d";
+        grid-template-rows: 220px 1fr;
+        grid-template-columns: 1fr;
+
+        .description {
+            text-align: center;
+        }
+
+        .logo > img {
+            max-height: 200px;
+            width: 100%;
+            object-fit: contain;
+        }
     }
+
+   
 
     h1 {
-    text-transform: uppercase;
+        text-transform: uppercase;
+    }
+
+    .description h1{
+        font-weight:900;
     }
 
     p {
-    margin-top: 32px;
-    font-size: 1.2rem;
+        margin-top: 32px;
+        font-size: 1.2rem;
     }
 `;
 

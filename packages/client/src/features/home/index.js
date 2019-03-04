@@ -66,17 +66,17 @@ const HomePage = ({ history }) => {
               <Sentence> or user testing</Sentence>
             </p>
           </div>
-          <div>
+          <div className="button-group">
             <Button appearence="FancyPrimaryButton" onClick={() => scroller.scrollTo('myScrollToElement', {duration: 650,delay:0,smooth: "easeIn"})}>See how it works</Button>
-            <Button appearence="FancySecondaryButton">Try it out</Button>
+            <Button appearence="FancySecondaryButton"> Try it out</Button>
           </div>
         </div>
-        <div>
+        <div className="logo">
           <Icon icon="computer" style={{ maxWidth: "100%" }} />
         </div>
       </Main>
       <Explain>
-        <Column medium={3}>
+        <Column id="step1">
           <Step>1</Step>
           <h1 style={{ color: "#4949b1", textTransform: "uppercase" }}>Enter your url</h1>
           <p>
@@ -84,7 +84,7 @@ const HomePage = ({ history }) => {
             you would like to make changes to.
           </p>
         </Column>
-        <Column medium={3}>
+        <Column id="step2">
           <Step>2</Step>
           <h1 style={{ color: "#5aced5", textTransform: "uppercase" }}>Make css changes using devtools</h1>
           <p>
@@ -92,7 +92,7 @@ const HomePage = ({ history }) => {
             you are done.
           </p>
         </Column>
-        <Column medium={3}>
+        <Column id="step3">
           <Step>3</Step>
           <h1 style={{ color: "#dd51b1", textTransform: "uppercase" }}>Get a unique url</h1>
           <p>

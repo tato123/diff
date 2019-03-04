@@ -11,7 +11,7 @@ const DARK_BLUE = '#151837';
 const ButtonStyle = styled.button`
   padding: 20px;
   text-transform: uppercase;
-  font-size: 20px;
+  font-size: 1.1rem;
   outline: none;
   border-radius: 32px;
   border: none;
@@ -19,6 +19,14 @@ const ButtonStyle = styled.button`
   box-sizing: border-box;
   cursor: pointer;
   animation: all 350ms ease-in;
+  height:60px;
+  text-align: center;
+
+
+  @media (max-width: 600px) {
+    font-size: 0.9rem;
+  }
+  
 
   &:disabled {
     background-color: ${grayscale(PURPLE)}
@@ -46,7 +54,7 @@ const ButtonStyle = styled.button`
 
 const Button = ({children, loading, ...rest}) => (
   <ButtonStyle {...rest}>
-    <div className="text loading" >{children}</div>
+    <div className={`text ${loading ? 'loading': ''}` } >{children}</div>
   </ButtonStyle>
 )
 
