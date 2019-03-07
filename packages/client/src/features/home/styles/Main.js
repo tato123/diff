@@ -28,9 +28,21 @@ const Main = styled.div`
         grid-template-areas: "l" "d";
         grid-template-rows: 220px 1fr;
         grid-template-columns: 1fr;
+        grid-row-gap: 24px;
 
         .description {
             text-align: center;
+
+            .button-group {
+                margin-top: 16px;
+            }
+
+            .button-group button {
+                width: 100%;
+                margin-top: 24px;
+                height: 50px;
+                max-height: 50px;
+            }
         }
 
         .logo > img {

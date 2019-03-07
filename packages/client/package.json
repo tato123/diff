@@ -27,6 +27,7 @@
     "react-apollo": "^2.3.2",
     "react-apollo-hooks": "^0.4.0",
     "react-app-rewire-yarn-workspaces": "^1.0.3",
+    "react-device-detect": "^1.6.2",
     "react-dom": "^16.8.2",
     "react-dropzone": "^8.1.0",
     "react-ga": "^2.5.7",

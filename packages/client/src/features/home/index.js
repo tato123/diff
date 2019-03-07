@@ -16,7 +16,8 @@ import Page from './styles/Page';
 import Sentence from './styles/Sentence';
 import SpecialText from './styles/SpecialText';
 import Step from './styles/Step';
-import {scroller, Element} from 'react-scroll';
+import { scroller, Element } from 'react-scroll';
+import { isMobile } from 'react-device-detect';
 
 
 
@@ -27,7 +28,7 @@ const HomePage = ({ history }) => {
 
   const onSubmit = (evt) => {
     evt.preventDefault();
-    
+
 
     const siteResponse = createSite({ variables: { input: { url: inputEl.current.value } } });
     setLoading(true);
@@ -67,8 +68,8 @@ const HomePage = ({ history }) => {
             </p>
           </div>
           <div className="button-group">
-            <Button appearence="FancyPrimaryButton" onClick={() => scroller.scrollTo('myScrollToElement', {duration: 650,delay:0,smooth: "easeIn"})}>See how it works</Button>
-            <Button appearence="FancySecondaryButton"> Try it out</Button>
+            {/* <Button appearence="FancyPrimaryButton" >See how it works</Button> */}
+            <Button appearence="FancySecondaryButton" onClick={() => scroller.scrollTo('myScrollToElement', { duration: 650, delay: 0, smooth: "easeIn" })}> Try it out</Button>
           </div>
         </div>
         <div className="logo">
@@ -102,19 +103,30 @@ const HomePage = ({ history }) => {
         </Column>
       </Explain>
       <Footer>
-        <Element  name="myScrollToElement"></Element>
-        <Banner>
-          Don't worry! This is secure and we don't make changes to your site or
-          application
-        </Banner>
+        <Element name="myScrollToElement"></Element>
 
-        <form autoComplete="off" onSubmit={onSubmit}>
-          <InputField>
-            <Input autoComplete="off"  name="site" type="text" placeholder="Enter a website" innerRef={inputEl} />
-            <Button onClick={onSubmit} loading={loading} disabled={loading} appearence="FancySecondaryButton" type="submit">Prototype Changes</Button>
-          </InputField>
-        </form>
-        
+
+        {!isMobile && (
+          <React.Fragment>
+            <Banner>
+              Don't worry! This is secure and we don't make changes to your site or
+              application
+         </Banner>
+            <form autoComplete="off" onSubmit={onSubmit}>
+              <InputField>
+                <Input autoComplete="off" name="site" type="text" placeholder="Enter a website" innerRef={inputEl} />
+                <Button onClick={onSubmit} loading={loading} disabled={loading} appearence="FancySecondaryButton" type="submit">Prototype Changes</Button>
+              </InputField>
+            </form>
+          </React.Fragment>
+        )}
+        {isMobile && (
+          <div style={{fontSize: "2rem", fontWeight: "200",  textAlign: "center", color: "red"}}>
+            Oh no, it looks like you're on mobile. You can however try Diff on a non-mobile browser.
+          </div>
+        )}
+
+
       </Footer>
       <Copy>&copy; 2019 getDiff, Inc.</Copy>
     </Page>
