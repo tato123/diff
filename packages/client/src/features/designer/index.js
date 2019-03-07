@@ -1,66 +1,16 @@
-import React from "react";
-import styled from "styled-components";
-import Toolbar from "./toolbar";
-import { compose, graphql } from "react-apollo";
-import { SAVE_VERSION } from "../../graphql/mutations";
-import ModalDialog, { ModalTransition } from "@atlaskit/modal-dialog";
-import StringWorker from "./string.worker.js";
 import _ from "lodash";
-import { ToastContainer, toast } from "react-toastify";
+import React from "react";
+import { compose, graphql } from "react-apollo";
+import { toast, ToastContainer } from "react-toastify";
+import { SAVE_VERSION } from "../../graphql/mutations";
+import StringWorker from "./string.worker.js";
+import Page from './styles/Page';
+import SharedView from './styles/SharedView';
+import Iframe from './styles/Iframe'
+import Toolbar from "./toolbar";
 
-const Page = styled.div`
-  display: grid;
-  grid-template-areas:
-    "sharedView"
-    "footer";
-  grid-template-rows: 1fr 64px;
-  grid-template-columns: 1fr;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
 
-  .toolbar {
-    border-top: 3px solid #0052cc;
-    grid-area: footer;
-  }
-`;
 
-const SharedView = styled.div`
-  position: relative;
-  width: 100%;
-  height: 100%;
-  grid-area: sharedView;
-
-  iframe {
-    width: ${props => (props.isEditing ? "calc(100% - 400px)" : "calc(100%)")};
-
-    height: 100%;
-  }
-
-  .Toastify__toast {
-    bottom: 32px;
-  }
-
-  > div:last-child {
-    width: 400px;
-    height: 100%;
-    position: absolute;
-    top: 0px;
-    right: 0px;
-    transform: translateX(${props => (props.isEditing ? "0px" : "400px")});
-  }
-`;
-
-const Walkthrough = styled.div`
-  height: 650px;
-  width: 100%;
-`;
-
-const Iframe = styled.iframe`
-  outline: none;
-  box-sizing: border-box;
-  border: none;
-`;
 
 class Designer extends React.Component {
   state = {
@@ -73,10 +23,14 @@ class Designer extends React.Component {
   };
 
   componentDidMount() {
+    
     const params = new URLSearchParams(this.props.location.search);
+    const version = params.get("version")
+    const proto = version.indexOf('localhost') !== -1 ? 'http' : 'https';
     this.setState({
-      versionId: params.get("version"),
-      version: `https://${params.get("version")}?diffEditMode=true`
+      versionId: version,
+      version: `${proto}://${version}`
+
     });
 
     window.addEventListener("message", this.eventHandler);
@@ -97,7 +51,10 @@ class Designer extends React.Component {
   }
 
   handleWorkerMessage = m => {
-    console.log("worker message", m.data);
+    if (process.env.NODE_ENV === 'development') {
+      console.log("[development] worker message", m.data);
+    }
+    
     const styles = m.data;
     this.setState({
       styles,
@@ -170,13 +127,12 @@ class Designer extends React.Component {
       state: { isEditing, version, count, isOpen }
     } = this;
 
-    const versionHost = `https://${this.state.versionId}`;
 
     return (
       <Page>
         <SharedView isEditing={isEditing}>
           <ToastContainer />
-          <Iframe id="frame" src={version} title="prototype" />
+          <Iframe id="frame" src={`${version}?edit=true`} title="prototype" />
         </SharedView>
         <Toolbar
           onEdit={this.onEdit}
@@ -187,37 +143,9 @@ class Designer extends React.Component {
         <input
           type="text"
           id="clipboardText"
-          value={versionHost}
+          value={version}
           style={{ position: "absolute", opacity: 0 }}
         />
-        <ModalTransition>
-          {isOpen && (
-            <ModalDialog onClose={() => this.setState({ isOpen: false })}>
-              <Walkthrough>
-                <h1>Getting Started with Diff</h1>
-                <p>
-                  With diff you can modify sites using browser devtools, save
-                  those changes, and share them as a unique url
-                </p>
-
-                <h2>Step 1</h2>
-                <p>First open devtools and make your changes</p>
-                <img
-                  src="https://developers.google.com/web/tools/chrome-devtools/images/edit-css.gif"
-                  style={{ objectFit: "contain", width: "100%" }}
-                  alt="Devtool instructions"
-                />
-
-                <h2>Step 2</h2>
-                <p>
-                  When you're satisified with your changes click save changes at
-                  the bottom, this will save all your changes to a unique url
-                  that you can share
-                </p>
-              </Walkthrough>
-            </ModalDialog>
-          )}
-        </ModalTransition>
       </Page>
     );
   }
