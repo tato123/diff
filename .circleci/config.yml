@@ -8,6 +8,22 @@ defaults: &defaults
   docker:
     - image: circleci/node:10.5.0
 
+stageFilter: &stageFilter
+  context: stage
+  filters:
+    branches:
+      ignore: /.*/
+    tags:
+      only: /^stage.*/
+
+prodFilter: &prodFilter
+  context: prod
+  filters:
+    branches:
+      ignore: /.*/
+    tags:
+      only: /^v.*/
+
 # Configure the orbs we want to use which
 # have some basic set of functionality in order
 # to kick off our jobs
@@ -61,7 +77,7 @@ jobs:
           at: packages
       - aws-s3/sync:
           from: packages/client/build/
-          to: "s3://www.stage-getdiff.app"
+          to: $S3_CLIENT_BUCKET
           arguments: |
             --acl public-read \
             --cache-control "max-age=300" \
@@ -76,25 +92,43 @@ jobs:
           at: packages
       - aws-s3/sync:
           from: packages/client-bridge/dist/
-          to: "s3://getdiff-static-client"
+          to: $S3_CLIENT_BRIDGE_BUCKET
           arguments: |
             --acl public-read \
             --cache-control "max-age=300" \
             --delete
 
+
 # Our process / workflow
 workflows:
-  commit:
-    jobs:
-      - lerna
+  version: 2
+  
+  deploy_stage:
+    jobs: 
+      - lerna:  
+          <<: *stageFilter
       - build:
-          requires:
-            - lerna
+          <<: *stageFilter
       - deploy-client:
+          <<: *stageFilter
           requires:
             - build
-      - deploy-client:
+      - deploy-client-bridge:
+          <<: *stageFilter
           requires:
             - build
-  # dev environment
-  # prod environment
+  deploy_prod:
+    jobs: 
+      - lerna:  
+          <<: *prodFilter
+      - build:
+          <<: *prodFilter
+      - deploy-client:
+          <<: *prodFilter
+          requires:
+            - build
+      - deploy-client-bridge:
+          <<: *prodFilter
+          requires:
+            - build
+          
