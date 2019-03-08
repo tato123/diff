@@ -109,6 +109,8 @@ workflows:
           <<: *stageFilter
       - build:
           <<: *stageFilter
+          requires:
+            - lerna
       - deploy-client:
           <<: *stageFilter
           requires:
@@ -123,6 +125,8 @@ workflows:
           <<: *prodFilter
       - build:
           <<: *prodFilter
+          requires:
+            - lerna
       - deploy-client:
           <<: *prodFilter
           requires:
