@@ -29,6 +29,7 @@ prodFilter: &prodFilter
 # to kick off our jobs
 orbs:
   aws-s3: circleci/aws-s3@1.0.3
+  awsebcli: sbc-orbs/awsebcli@0.0.3
 
 jobs:
   # configure the lerna portion
@@ -97,7 +98,25 @@ jobs:
             --acl public-read \
             --cache-control "max-age=300" \
             --delete
-
+  deploy-graphql-api:
+    working_directory: ~/app
+    docker:
+      - image: "circleci/python:2.7"
+    steps:
+      - checkout
+      - attach_workspace:
+          at: packages
+      - awsebcli/install
+      - awsebcli/configure:
+          profile-name: $env
+          aws-region: $AWS_REGION
+          aws-access-key-id: AWS_ACCESS_KEY
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
+      - deploy:
+          name: Deploy to elastic beanstalk 
+          command: |
+            cd packages/graphql-api
+            eb deploy --profile $env
 
 # Our process / workflow
 workflows:
