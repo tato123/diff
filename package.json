@@ -12,6 +12,7 @@
   "scripts": {
     "start": "lerna run --parallel start:dev",
     "build": "lerna run --parallel build",
+    "build:stage": "lerna run --parallel build:stage",
     "test": "lerna run --parallel test"
   }
 }

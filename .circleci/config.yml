@@ -60,7 +60,7 @@ jobs:
       - run:
           name: Build Packages in parallel
           command: |
-            yarn build
+            yarn build:$env
       - persist_to_workspace:
           root: packages
           paths:
