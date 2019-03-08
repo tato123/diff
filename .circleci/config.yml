@@ -101,7 +101,7 @@ jobs:
   deploy-graphql-api:
     working_directory: ~/app
     docker:
-      - image: "circleci/python:2.7"
+      - image: "circleci/python:3.7.2"
     steps:
       - checkout
       - attach_workspace:
@@ -135,6 +135,10 @@ workflows:
           requires:
             - build
       - deploy-client-bridge:
+          <<: *stageFilter
+          requires:
+            - build
+      - deploy-graphql-api:
           <<: *stageFilter
           requires:
             - build
