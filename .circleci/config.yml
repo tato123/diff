@@ -116,7 +116,7 @@ jobs:
           name: Deploy to elastic beanstalk 
           command: |
             cd packages/graphql-api
-            eb deploy --profile $env
+            eb deploy --profile ${env}
 
 # Our process / workflow
 workflows:
