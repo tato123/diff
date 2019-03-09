@@ -112,7 +112,7 @@ jobs:
           aws-region: AWS_REGION
           aws-access-key-id: AWS_ACCESS_KEY_ID
           aws-secret-access-key: AWS_SECRET_ACCESS_KEY
-      - write_config:
+      - run:
           name: Write config 
           command: |
             echo $graphql_eb_config | base64 --decode > packages/graphql-api/.elasticbeanstalk/config.yml
