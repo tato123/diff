@@ -24,19 +24,6 @@ prodFilter: &prodFilter
     tags:
       only: /^v.*/
 
-beforeEbDeploy: &beforeEbDeploy
-  - checkout
-  - attach_workspace:
-      at: packages
-  - awsebcli/install
-  - awsebcli/configure:
-      profile-name: $env
-      aws-region: AWS_REGION
-      aws-access-key-id: AWS_ACCESS_KEY_ID
-      aws-secret-access-key: AWS_SECRET_ACCESS_KEY
-  - run:
-      name: Install Rsync
-      command: sudo apt install rsync
 
 # Configure the orbs we want to use which
 # have some basic set of functionality in order
@@ -117,7 +104,18 @@ jobs:
     docker:
       - image: "circleci/python:3.7.2"
     steps:
-      <<: *beforeEbDeploy
+      - checkout
+      - attach_workspace:
+          at: packages
+      - awsebcli/install
+      - awsebcli/configure:
+          profile-name: $env
+          aws-region: AWS_REGION
+          aws-access-key-id: AWS_ACCESS_KEY_ID
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
+      - run:
+          name: Install Rsync
+          command: sudo apt install rsync
       - run:
           name: Stage Environment
           command: |
@@ -134,7 +132,18 @@ jobs:
     docker:
       - image: "circleci/python:3.7.2"
     steps:
-      <<: *beforeEbDeploy
+      - checkout
+      - attach_workspace:
+          at: packages
+      - awsebcli/install
+      - awsebcli/configure:
+          profile-name: $env
+          aws-region: AWS_REGION
+          aws-access-key-id: AWS_ACCESS_KEY_ID
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
+      - run:
+          name: Install Rsync
+          command: sudo apt install rsync
       - run:
           name: Stage Environment
           command: |
