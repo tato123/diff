@@ -113,10 +113,10 @@ jobs:
           aws-access-key-id: AWS_ACCESS_KEY_ID
           aws-secret-access-key: AWS_SECRET_ACCESS_KEY
       - run:
-          name: Write config 
+          name: Stage Environment
           command: |
-            echo $graphql_eb_config | base64 --decode > packages/graphql-api/.elasticbeanstalk/config.yml
-            cat packages/graphql-api/.elasticbeanstalk/config.yml
+            echo "Copying files necessary for deploy"
+            rsync -a --stats packages/graphql-api/.deploy/${env}/ packages/graphql-api/
       - deploy:
           name: Deploy to elastic beanstalk 
           command: |
