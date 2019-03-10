@@ -124,7 +124,7 @@ class Designer extends React.Component {
 
   render() {
     const {
-      state: { isEditing, version, count, isOpen }
+      state: { isEditing, version, count }
     } = this;
 
 
