@@ -7,9 +7,15 @@ const middleware = opts => (req, res, next) => {
     next("Proxy was not set");
   }
 
-  opts.proxy.web(req, res, {
-    target: req.proxyTarget
-  });
+  try {
+    opts.proxy.web(req, res, {
+      target: req.proxyTarget
+    });
+  } catch (error ){
+    console.error('Uh oh, something broke', error.message)
+    return next(error.message)
+  }
+  
 };
 
 module.exports = {

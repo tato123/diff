@@ -1,6 +1,6 @@
 "use strict";
 
-const Fastify = require("fastify");
+
 const httpProxy = require("http-proxy");
 
 const proxyTarget = require("./middleware/proxyTarget");
@@ -56,6 +56,9 @@ const ProxyOption = {
   reqHeaders: undefined
 };
 
+
+
+
 // provide a server implementation
 const getBaseApp = (mw = [], opts) => {
   const express = require("express");
@@ -64,12 +67,17 @@ const getBaseApp = (mw = [], opts) => {
   app.set("trust proxy", true);
 
   mw.forEach(mw => {
+    console.log(`Loading middleware [${mw.id}]`)
     app.use(mw.handle(opts));
   });
 
   app.listen(opts.port, () => {
     console.info(`server listening on ${opts.port}`);
   });
+
+  app.use( errorHandler)
+
+  
 
   return app;
 };
@@ -91,10 +99,6 @@ const applyFns = proxy => (name, fns) => {
   });
 };
 
-const proxyError = (err, req, res) => {
-  console.error("An error occured proxying", err);
-};
-
 const main = () => {
   // proxy implementation
   const proxy = httpProxy.createProxyServer(defaultHttpProxyOptions);
@@ -112,7 +116,7 @@ const main = () => {
   applyToProxy("proxyReq", proxyReq);
   applyToProxy("proxyRes", proxyRes);
   applyToProxy("proxyReqWs", proxyResWs);
-  applyToProxy("error", [proxyError]);
+  applyToProxy("error", [errorHandler]);
 
   proxy.on("proxyRes", function(proxyRes, req, res) {
     proxyRes.headers["x-frame-options"] =
@@ -134,6 +138,12 @@ const main = () => {
 };
 
 main();
+
+
+function errorHandler(err, req, res, next) {
+  console.error(err.stack)
+  res.status(500).send('Something broke!')
+}
 
 function getProxyResFunctions(resFns = [], opts) {
   if (opts.cookies.stripDomain) {

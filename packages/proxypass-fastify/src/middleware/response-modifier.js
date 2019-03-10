@@ -3,11 +3,12 @@
 const lrSnippet = require("resp-modifier");
 const proxyUtils = require("../proxy/utils");
 const { request } = require("graphql-request");
-
-
-
+const endpoint = process.env.GRAPHQL_ENDPOINT;
 
 const getDeltas =  (host) => {
+  console.log("[response-modifier] executing middleware");
+
+
   const GET_DELTAS = `
   query getDeltas($host: String!) {
     deltas(Host: $host) {
@@ -23,8 +24,9 @@ const getDeltas =  (host) => {
   };
 
   console.log("Querying with variables", variables);
+  console.log("Querying Endpoint",endpoint )
 
-  return request(process.env.GRAPHQL_ENDPOINT, GET_DELTAS, variables)
+  return request(endpoint, GET_DELTAS, variables)
     .then(data => {
       if ( data && data.deltas && data.deltas.css) {
         return data.deltas.css;
