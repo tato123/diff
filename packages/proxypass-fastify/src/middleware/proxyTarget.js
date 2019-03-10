@@ -1,6 +1,9 @@
 "use strict";
 const { request } = require("graphql-request");
 const url = require("url");
+const endpoint = process.env.GRAPHQL_ENDPOINT;
+
+
 
 const middleware = opts => (req, res, next) => {
   console.log("[proxyTarget] executing middleware");
@@ -20,8 +23,9 @@ const middleware = opts => (req, res, next) => {
   };
 
   console.log("Querying with variables", variables);
+  console.log("Querying Endpoint",endpoint )
 
-  request(process.env.GRAPHQL_ENDPOINT, query, variables)
+  request(endpoint, query, variables)
     .then(data => {
       if (data.origin == null) {
         return next("no data found");
