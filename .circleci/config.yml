@@ -24,6 +24,20 @@ prodFilter: &prodFilter
     tags:
       only: /^v.*/
 
+beforeEbDeploy: &beforeEbDeploy
+  - checkout
+  - attach_workspace:
+      at: packages
+  - awsebcli/install
+  - awsebcli/configure:
+      profile-name: $env
+      aws-region: AWS_REGION
+      aws-access-key-id: AWS_ACCESS_KEY_ID
+      aws-secret-access-key: AWS_SECRET_ACCESS_KEY
+  - run:
+      name: Install Rsync
+      command: sudo apt install rsync
+
 # Configure the orbs we want to use which
 # have some basic set of functionality in order
 # to kick off our jobs
@@ -103,18 +117,7 @@ jobs:
     docker:
       - image: "circleci/python:3.7.2"
     steps:
-      - checkout
-      - attach_workspace:
-          at: packages
-      - awsebcli/install
-      - awsebcli/configure:
-          profile-name: $env
-          aws-region: AWS_REGION
-          aws-access-key-id: AWS_ACCESS_KEY_ID
-          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
-      - run:
-          name: Install Rsync
-          command: sudo apt install rsync
+      <<: *beforeEbDeploy
       - run:
           name: Stage Environment
           command: |
@@ -124,6 +127,23 @@ jobs:
           name: Deploy to elastic beanstalk 
           command: |
             cd packages/graphql-api
+            echo 'Using enviroment $env'
+            eb deploy --profile ${env}
+  deploy-proxypass:
+    working_directory: ~/app
+    docker:
+      - image: "circleci/python:3.7.2"
+    steps:
+      <<: *beforeEbDeploy
+      - run:
+          name: Stage Environment
+          command: |
+            echo "Copying files necessary for deploy"
+            rsync -a --stats packages/proxypass-fastify/.deploy/${env}/ packages/proxypass-fastify/
+      - deploy:
+          name: Deploy to elastic beanstalk 
+          command: |
+            cd packages/proxypass-fastify
             echo 'Using enviroment $env'
             eb deploy --profile ${env}
 
@@ -151,6 +171,10 @@ workflows:
           <<: *stageFilter
           requires:
             - build
+      - deploy-proxypass:
+          <<: *stageFilter
+          requires:
+            - build
   deploy_prod:
     jobs: 
       - lerna:  
@@ -164,6 +188,14 @@ workflows:
           requires:
             - build
       - deploy-client-bridge:
+          <<: *prodFilter
+          requires:
+            - build
+      - deploy-graphql-api:
+          <<: *prodFilter
+          requires:
+            - build
+      - deploy-proxypass:
           <<: *prodFilter
           requires:
             - build
