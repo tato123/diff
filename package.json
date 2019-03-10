@@ -14,6 +14,8 @@
     "build": "yarn run build:prod",
     "build:prod": "lerna run --parallel build:prod",
     "build:stage": "lerna run --parallel build:stage",
-    "test": "lerna run --parallel test"
+    "test": "lerna run --parallel test",
+    "switch:stage" : "lerna run --parallel switch:stage",
+    "switch:prod" : "lerna run --parallel switch:prod"
   }
 }
