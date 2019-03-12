@@ -24,6 +24,7 @@ const SharedView = styled.div`
     align-items: center;
     flex: 1 auto;
     height: 100%;
+    flex-direction: column;
   }
 
   .Toastify__toast {

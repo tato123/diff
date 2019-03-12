@@ -190,6 +190,16 @@
     babel-runtime "^6.26.0"
     react-transition-group "^2.2.1"
 
+"@atlaskit/spinner@^10.0.0":
+  version "10.0.0"
+  resolved "https://registry.yarnpkg.com/@atlaskit/spinner/-/spinner-10.0.0.tgz#c79a6b36302599fb5e4a632a40c7e578bcc30f23"
+  integrity sha512-zSCde3FyVzLK1LRg6EAEM5unfGO0MkFTjD2EhpHnRvjMCFIhGLa2KFJL6VT/FxvT/RrEDzZwUmIiSK1nXyGIuA==
+  dependencies:
+    "@atlaskit/theme" "^8.0.0"
+    "@babel/runtime" "^7.0.0"
+    babel-runtime "^6.26.0"
+    react-transition-group "^2.2.1"
+
 "@atlaskit/textfield@^0.1.5", "@atlaskit/textfield@^0.1.6":
   version "0.1.6"
   resolved "https://registry.yarnpkg.com/@atlaskit/textfield/-/textfield-0.1.6.tgz#4d606da205278fa45f75a603ce8da4195acc81b1"
@@ -203,6 +213,15 @@
   version "7.0.4"
   resolved "https://registry.yarnpkg.com/@atlaskit/theme/-/theme-7.0.4.tgz#4f9a7568633a7e18bdcc121627e32916ee9ada66"
   integrity sha512-Pk7x8gwVyeEc7y7hhjeKfu26ykXl1CJfFSoLuxCIrELzNnx4LFxfAFmcoHgr09c8/nsT57vtxmcnmKkZkEJtJA==
+  dependencies:
+    "@babel/runtime" "^7.0.0"
+    exenv "^1.2.2"
+    prop-types "^15.5.10"
+
+"@atlaskit/theme@^8.0.0":
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/@atlaskit/theme/-/theme-8.0.0.tgz#4acfa401e8d034ab6785dd3b6280dea5c0c5ddd6"
+  integrity sha512-hQ/V9owmJ4kzs66p3GRf+sSw1f2BPqvfje4mGnhKeEchLdOkB9iDNMpeUqjqrIc71YPlvyuSHfJbAtY1yQFOrw==
   dependencies:
     "@babel/runtime" "^7.0.0"
     exenv "^1.2.2"

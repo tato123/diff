@@ -8,6 +8,7 @@ import Page from "./styles/Page";
 import SharedView from "./styles/SharedView";
 import Iframe from "./styles/Iframe";
 import Toolbar from "./toolbar";
+import Spinner from "@atlaskit/spinner";
 
 class Designer extends React.Component {
   state = {
@@ -41,6 +42,10 @@ class Designer extends React.Component {
         isOpen: true
       });
     }
+
+    setTimeout(() => {
+      this.checkIfLoaded();
+    }, 10000);
   }
 
   componentWillUnmount() {
@@ -92,6 +97,19 @@ class Designer extends React.Component {
     this.setState({ loaded: true });
   };
 
+  onError = () => {
+    console.error("an error occured");
+  };
+
+  checkIfLoaded() {
+    if (!this.state.loaded && !this.state.loadError) {
+      this.setState({
+        loaded: true,
+        loadError: true
+      });
+    }
+  }
+
   onSave = evt => {
     const input = {
       host: this.state.versionId,
@@ -141,6 +159,9 @@ class Designer extends React.Component {
             {!loadError && !loaded && (
               <div className="message">
                 <label>Loading your prototype</label>
+                <div>
+                  <Spinner />
+                </div>
               </div>
             )}
             {!loadError && (
@@ -155,7 +176,15 @@ class Designer extends React.Component {
             )}
             {loadError && (
               <div className="message">
-                <label>Uh Oh, we had issues trying to proxy your site</label>
+                <label>
+                  Uh Oh, we had issues trying to prototype your site
+                </label>
+                <p style={{ maxWidth: "50%", fontSize: "1rem" }}>
+                  Not every site can be prototyped. We are working hard to get
+                  every site to work with diff. Help us out by requesting
+                  support for you site in the feedback and we will get back to
+                  you.
+                </p>
               </div>
             )}
           </div>
