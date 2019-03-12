@@ -7,7 +7,6 @@ const proxyMiddleware = require("./middleware/proxy");
 const healthMiddleware = require("./middleware/health");
 const errorHandler = require("./middleware/errorHandler");
 const responseModifier = require("./middleware/response-modifier");
-const https = require("https");
 
 const proxyUtils = require("./proxy/utils");
 
@@ -70,17 +69,9 @@ const getBaseApp = (mw = [], opts) => {
     app.use(mw(opts));
   });
 
-  https
-    .createServer(
-      {
-        key: fs.readFileSync(path.resolve(__dirname, "../certs/server.key")),
-        cert: fs.readFileSync(path.resolve(__dirname, "../certs/server.crt"))
-      },
-      app
-    )
-    .listen(opts.port, () => {
-      console.info(`server listening on ${opts.port}`);
-    });
+  app.listen(opts.port, () => {
+    console.info(`server listening on ${opts.port}`);
+  });
 
   app.use(errorHandler);
 
