@@ -1,5 +1,6 @@
 "use strict";
 const ua = require("universal-analytics");
+const visitor = ua("UA-124426207-2", "proxy_server");
 
 const middleware = opts => (req, res, next) => {
   console.log("[proxy] executing middleware");
@@ -9,8 +10,6 @@ const middleware = opts => (req, res, next) => {
   }
 
   try {
-    const visitor = ua("UA-124426207-2");
-
     visitor.event("Prototype", "View", req.headers.host).send();
   } catch (e) {
     // do nothing
