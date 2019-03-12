@@ -1,12 +1,13 @@
 "use strict";
 
-
 const httpProxy = require("http-proxy");
 
 const proxyTarget = require("./middleware/proxyTarget");
 const proxyMiddleware = require("./middleware/proxy");
 const healthMiddleware = require("./middleware/health");
+const errorHandler = require("./middleware/errorHandler");
 const responseModifier = require("./middleware/response-modifier");
+
 const proxyUtils = require("./proxy/utils");
 
 const PORT = process.env.PORT || 9001;
@@ -56,9 +57,6 @@ const ProxyOption = {
   reqHeaders: undefined
 };
 
-
-
-
 // provide a server implementation
 const getBaseApp = (mw = [], opts) => {
   const express = require("express");
@@ -67,17 +65,15 @@ const getBaseApp = (mw = [], opts) => {
   app.set("trust proxy", true);
 
   mw.forEach(mw => {
-    console.log(`Loading middleware [${mw.id}]`)
-    app.use(mw.handle(opts));
+    console.log(`Loading middleware [${mw.id}]`);
+    app.use(mw(opts));
   });
 
   app.listen(opts.port, () => {
     console.info(`server listening on ${opts.port}`);
   });
 
-  app.use( errorHandler)
-
-  
+  app.use(errorHandler);
 
   return app;
 };
@@ -138,12 +134,6 @@ const main = () => {
 };
 
 main();
-
-
-function errorHandler(err, req, res, next) {
-  console.error(err.stack)
-  res.status(500).send('Something broke!')
-}
 
 function getProxyResFunctions(resFns = [], opts) {
   if (opts.cookies.stripDomain) {

@@ -1,4 +1,5 @@
 "use strict";
+const ua = require("universal-analytics");
 
 const middleware = opts => (req, res, next) => {
   console.log("[proxy] executing middleware");
@@ -8,18 +9,22 @@ const middleware = opts => (req, res, next) => {
   }
 
   try {
+    const visitor = ua("UA-124426207-2");
+
+    visitor.event("Prototype", "View", req.headers.host).send();
+  } catch (e) {
+    // do nothing
+    console.log("unable to send event");
+  }
+
+  try {
     opts.proxy.web(req, res, {
       target: req.proxyTarget
     });
-  } catch (error ){
-    console.error('Uh oh, something broke', error.message)
-    return next(error.message)
+  } catch (error) {
+    console.error("Uh oh, something broke", error.message);
+    return next(error.message);
   }
-  
 };
 
-module.exports = {
-  id: "Proxy Middleware",
-  route: "",
-  handle: middleware
-};
+module.exports = middleware;

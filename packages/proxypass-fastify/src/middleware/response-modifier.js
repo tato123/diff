@@ -5,9 +5,8 @@ const proxyUtils = require("../proxy/utils");
 const { request } = require("graphql-request");
 const endpoint = process.env.GRAPHQL_ENDPOINT;
 
-const getDeltas =  (host) => {
+const getDeltas = host => {
   console.log("[response-modifier] executing middleware");
-
 
   const GET_DELTAS = `
   query getDeltas($host: String!) {
@@ -24,20 +23,19 @@ const getDeltas =  (host) => {
   };
 
   console.log("Querying with variables", variables);
-  console.log("Querying Endpoint",endpoint )
+  console.log("Querying Endpoint", endpoint);
 
   return request(endpoint, GET_DELTAS, variables)
     .then(data => {
-      if ( data && data.deltas && data.deltas.css) {
+      if (data && data.deltas && data.deltas.css) {
         return data.deltas.css;
       }
-      return '';
+      return "";
     })
-    .catch (err => {
-      return '';
-    })
-}
-
+    .catch(err => {
+      return "";
+    });
+};
 
 const injectSnippet = (req, res, next) => {
   const url = process.env.SNIPPET_URL;
@@ -50,10 +48,9 @@ const injectSnippet = (req, res, next) => {
     rule: {
       match: /<body[^>]*>/i,
       fn: (snippet, match) => {
-
         if (req.query.edit) {
-          console.log('[response-modifier] is edit mode?', req.query)
-          console.log('[response-modifier] path is ?', req.path)
+          console.log("[response-modifier] is edit mode?", req.query);
+          console.log("[response-modifier] path is ?", req.path);
           return match + snippet;
         }
 
@@ -67,18 +64,17 @@ const injectSnippet = (req, res, next) => {
     once: true,
     id: "diff-snippet",
     match: snippetOptions.rule.match,
-    fn: function (req, res, match) {
+    fn: function(req, res, match) {
       return snippetOptions.rule.fn.apply(null, [snippet, match]);
     }
-  }
-}
+  };
+};
 
-const injectCSS = (changes) =>  (req, res, next) => {
-
-  const snippet = changes.length > 0 ? `<style>${changes}</style>` : '';
-  console.log('-----------------------------------\n')
-  console.log(snippet)
-  console.log('-----------------------------------\n\n\n')
+const injectCSS = changes => (req, res, next) => {
+  const snippet = changes.length > 0 ? `<style>${changes}</style>` : "";
+  console.log("-----------------------------------\n");
+  console.log(snippet);
+  console.log("-----------------------------------\n\n\n");
 
   const snippetOptions = {
     async: true,
@@ -97,17 +93,14 @@ const injectCSS = (changes) =>  (req, res, next) => {
     once: true,
     id: "diff-css",
     match: snippetOptions.rule.match,
-    fn: function (req, res, match) {
+    fn: function(req, res, match) {
       return snippetOptions.rule.fn.apply(null, [snippet, match]);
     }
-  }
-}
+  };
+};
 
-
-
-
-const middleware = opts =>  async (req, res, next) => {
-  console.log('[response-modifier] executing middleware');
+const middleware = opts => async (req, res, next) => {
+  console.log("[response-modifier] executing middleware");
 
   const rules = [];
   const blacklist = [];
@@ -115,14 +108,13 @@ const middleware = opts =>  async (req, res, next) => {
 
   const hostname = req.proxyHostname;
   const changes = await getDeltas(req.headers.host);
-  
 
   // inject snippet rules
   rules.push(injectSnippet(req, res, next));
 
   // inject CSS rules
   rules.push(injectCSS(changes)(req, res, next));
-  
+
   // inject the proxy rules
   rules.push(proxyUtils.rewriteLinks({ hostname }));
 
@@ -135,8 +127,4 @@ const middleware = opts =>  async (req, res, next) => {
   return lr.middleware(req, res, next);
 };
 
-module.exports = {
-  id: "Response Modifier",
-  route: "",
-  handle: middleware
-};
+module.exports = middleware;

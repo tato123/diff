@@ -4,13 +4,10 @@ import { compose, graphql } from "react-apollo";
 import { toast, ToastContainer } from "react-toastify";
 import { SAVE_VERSION } from "../../graphql/mutations";
 import StringWorker from "./string.worker.js";
-import Page from './styles/Page';
-import SharedView from './styles/SharedView';
-import Iframe from './styles/Iframe'
+import Page from "./styles/Page";
+import SharedView from "./styles/SharedView";
+import Iframe from "./styles/Iframe";
 import Toolbar from "./toolbar";
-
-
-
 
 class Designer extends React.Component {
   state = {
@@ -19,18 +16,18 @@ class Designer extends React.Component {
     styles: null,
     isEditing: false,
     count: 0,
-    isOpen: false
+    isOpen: false,
+    loaded: false,
+    loadError: false
   };
 
   componentDidMount() {
-    
     const params = new URLSearchParams(this.props.location.search);
-    const version = params.get("version")
-    const proto = version.indexOf('localhost') !== -1 ? 'http' : 'https';
+    const version = params.get("version");
+    const proto = version.indexOf("localhost") !== -1 ? "http" : "https";
     this.setState({
       versionId: version,
       version: `${proto}://${version}`
-
     });
 
     window.addEventListener("message", this.eventHandler);
@@ -51,10 +48,10 @@ class Designer extends React.Component {
   }
 
   handleWorkerMessage = m => {
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === "development") {
       console.log("[development] worker message", m.data);
     }
-    
+
     const styles = m.data;
     this.setState({
       styles,
@@ -66,6 +63,11 @@ class Designer extends React.Component {
   eventHandler = evt => {
     const data = evt.data;
     const stringworker = this.stringWorker;
+    if (data.source === "getDiff-client" && data.type === "ERROR_LOADING") {
+      console.log("load error occured");
+      this.setState({ loadError: true });
+    }
+
     if (data.source === "getDiff-client" && data.type === "SITE_CHANGE") {
       const deltas = data.payload;
       stringworker.postMessage(deltas);
@@ -84,6 +86,10 @@ class Designer extends React.Component {
 
   onEdit = () => {
     this.setState(state => ({ isEditing: !state.isEditing }));
+  };
+
+  onLoad = evt => {
+    this.setState({ loaded: true });
   };
 
   onSave = evt => {
@@ -124,15 +130,35 @@ class Designer extends React.Component {
 
   render() {
     const {
-      state: { isEditing, version, count }
+      state: { isEditing, version, count, loaded, loadError }
     } = this;
-
 
     return (
       <Page>
         <SharedView isEditing={isEditing}>
           <ToastContainer />
-          <Iframe id="frame" src={`${version}?edit=true`} title="prototype" />
+          <div className="innerView">
+            {!loadError && !loaded && (
+              <div className="message">
+                <label>Loading your prototype</label>
+              </div>
+            )}
+            {!loadError && (
+              <Iframe
+                id="frame"
+                onLoad={this.onLoad}
+                onError={this.onError}
+                src={`${version}?edit=true`}
+                style={{ opacity: !loadError && !loaded ? 0 : 1 }}
+                title="prototype"
+              />
+            )}
+            {loadError && (
+              <div className="message">
+                <label>Uh Oh, we had issues trying to proxy your site</label>
+              </div>
+            )}
+          </div>
         </SharedView>
         <Toolbar
           onEdit={this.onEdit}

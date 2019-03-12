@@ -3,8 +3,6 @@ const { request } = require("graphql-request");
 const url = require("url");
 const endpoint = process.env.GRAPHQL_ENDPOINT;
 
-
-
 const middleware = opts => (req, res, next) => {
   console.log("[proxyTarget] executing middleware");
 
@@ -23,7 +21,7 @@ const middleware = opts => (req, res, next) => {
   };
 
   console.log("Querying with variables", variables);
-  console.log("Querying Endpoint",endpoint )
+  console.log("Querying Endpoint", endpoint);
 
   request(endpoint, query, variables)
     .then(data => {
@@ -40,8 +38,4 @@ const middleware = opts => (req, res, next) => {
     });
 };
 
-module.exports = {
-  id: "Get the middleware target",
-  route: "",
-  handle: middleware
-};
+module.exports = middleware;

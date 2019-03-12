@@ -8,7 +8,7 @@ import Home from "./features/home";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { injectGlobal, ThemeProvider } from "styled-components";
 import "react-toastify/dist/ReactToastify.css";
-import "./index.css"
+import "./index.css";
 
 import ReactGA from "react-ga";
 
