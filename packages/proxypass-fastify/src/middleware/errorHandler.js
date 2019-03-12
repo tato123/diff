@@ -1,4 +1,5 @@
 "use strict";
+const ua = require("universal-analytics");
 
 const template = `
 <html>
@@ -35,15 +36,15 @@ const template = `
 `;
 
 const middleware = (err, req, res, next) => {
-  console.error(err.stack);
+  const visitor = ua("UA-124426207-2");
+  try {
+    visitor.exception('Proxy Error', req.headers.host).send()
+  } catch() {
 
-  res.setHeader(
-    "x-frame-options",
-    "allow-from " +
-      `${req.secure ? "https" : "http"}://${req.headers.host} ${
-        req.proxyTarget
-      }`
-  );
+  }
+  
+
+  console.error(err.stack);
 
   res.status(200).send(template);
 };
