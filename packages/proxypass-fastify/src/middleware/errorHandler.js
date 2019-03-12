@@ -38,11 +38,10 @@ const template = `
 const middleware = (err, req, res, next) => {
   const visitor = ua("UA-124426207-2");
   try {
-    visitor.exception('Proxy Error', req.headers.host).send()
-  } catch() {
-
+    visitor.exception("Proxy Error", req.headers.host).send();
+  } catch (err) {
+    // do nothing
   }
-  
 
   console.error(err.stack);
 
