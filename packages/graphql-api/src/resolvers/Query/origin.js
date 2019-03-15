@@ -1,7 +1,6 @@
 "use strict";
 
 const pubsub = require("../../context/pubsub");
-
 const AWS = require("aws-sdk");
 // Create the DynamoDB service object
 const dynamo = new AWS.DynamoDB({
@@ -53,9 +52,11 @@ const originQuery = (parent, args) => {
         }
 
         const result = {
-          host: data.Item.Host.S,
-          origin: data.Item.Origin.S,
-          protocol: data.Item.Proto.S
+          host: _.get(data, 'Item.Host.S', null),
+          origin: _.get(data, 'Item.Origin.S', null),
+          protocol: _.get(data, 'Item.Proto.S', null),
+          created: _.get(data, 'Item.Created.N', null),
+          uid: _.get(data, 'Item.Created.S', null)
         };
 
         pubsub.client.set(REDIS_KEY, JSON.stringify(result));

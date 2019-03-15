@@ -7,8 +7,8 @@
     "start": "npx forever src/index.js",
     "start:dev": "cross-env NODE_ENV=development nodemon src/index.js",
     "test": "jest",
-    "switch:stage" : "rsync -a --stats .deploy/stage/ ./",
-    "switch:prod" : "rsync -a --stats .deploy/prod/ ./"
+    "switch:stage": "rsync -a --stats .deploy/stage/ ./",
+    "switch:prod": "rsync -a --stats .deploy/prod/ ./"
   },
   "author": "",
   "license": "ISC",

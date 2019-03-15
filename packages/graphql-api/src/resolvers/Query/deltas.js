@@ -43,9 +43,11 @@ const deltasQuery = (parent, args) => {
             }
 
             const result = {
-                host: data.Item.Host.S,
-                css: data.Item.CSS.S,
-                changes: data.Item.Changes.S
+                host: _.get(data, 'Item.Host.S', null),
+                css: _.get(data, 'Item.CSS.S', null),
+                changes: _.get(data, 'Item.Changes.S', null),
+                created: _.get(data, 'Item.Created.N', null),
+                uid: _.get(data, 'Item.Created.S', null)
             };
 
             return resolve(result);

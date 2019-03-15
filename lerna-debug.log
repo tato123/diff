@@ -1,0 +1,6 @@
+0 silly argv { _: [ 'bootstrap' ],
+0 silly argv   lernaVersion: '3.13.1',
+0 silly argv   '$0': 'C:\\Program Files\\nodejs\\node_modules\\lerna\\cli.js' }
+1 notice cli v3.13.1
+2 verbose rootPath C:\Users\fonta\Repositories\diff
+3 error

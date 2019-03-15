@@ -2,13 +2,16 @@ type Origin {
   host: String
   origin: String
   protocol: String
+  uid: String
+  created: String
 }
 
 type Delta {
   host: String
   css: String
   changes: String
-
+  uid: String
+  created: String
 }
 
 # type Invite {

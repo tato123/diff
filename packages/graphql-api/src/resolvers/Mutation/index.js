@@ -91,6 +91,7 @@ const createSiteOrigin = async (parent, args, context) => {
 
   const originUrl = inputUrl;
   const protocol = await checkProtocol(originUrl);
+  const timestamp = Date.now().toString();
 
   console.log("host", host);
   console.log("args", args);
@@ -101,7 +102,9 @@ const createSiteOrigin = async (parent, args, context) => {
     Item: {
       Host: { S: host },
       Origin: { S: originUrl },
-      Proto: { S: protocol }
+      Proto: { S: protocol },
+      Created: {N: timestamp },
+
     }
   };
 
@@ -130,6 +133,7 @@ const saveSiteDeltas = async (parent, args, context) => {
   const host = args.input.host;
   const deltas = args.input.deltas;
   const css = toCss(JSON.parse(deltas));
+  const timestamp = Date.now().toString();
 
   console.log("saving site deltas", host, css);
 
@@ -138,7 +142,8 @@ const saveSiteDeltas = async (parent, args, context) => {
     Item: {
       Host: { S: host },
       Changes: { S: deltas },
-      CSS: { S: css }
+      CSS: { S: css },
+      Created: {N: timestamp}
     }
   };
 

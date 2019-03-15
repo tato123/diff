@@ -14,7 +14,7 @@
     "apollo-cache-inmemory": "^1.4.3",
     "apollo-link-context": "^1.0.14",
     "apollo-link-ws": "^1.0.14",
-    "auth0-js": "^9.8.2",
+    "auth0-js": "^9.10.0",
     "env-cmd": "^8.0.2",
     "formik": "^1.5.0",
     "graphql": "^14.0.2",
