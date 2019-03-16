@@ -1,8 +1,6 @@
-import "@atlaskit/css-reset/dist/bundle.css";
 import React from "react";
 import ReactGA from "react-ga";
 import {  Router, Route, Switch } from "react-router-dom";
-import "react-toastify/dist/ReactToastify.css";
 import { injectGlobal, ThemeProvider } from "styled-components";
 import AuthCallback from './features/auth/callback';
 import Login from './features/auth/login';
@@ -10,9 +8,13 @@ import Designer from "./features/designer";
 import Home from "./features/home";
 import Search from "./features/search";
 import history from './history';
-import "./index.css";
 import Auth from './utils/auth';
 
+
+import "@atlaskit/css-reset/dist/bundle.css";
+import "./index.css";
+import "react-toastify/dist/ReactToastify.css";
+import "./normalize.css";
 
 
 const auth = new Auth();
@@ -35,10 +37,6 @@ injectGlobal`
     height: 100%;
     margin: 0;
     padding: 0;
-  }
-
-  body {
-    margin-top: -16px;
   }
 
   #root {

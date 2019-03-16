@@ -14,6 +14,21 @@ export default class Auth {
     this.auth0.authorize();
   }
 
+  loginWithGoogle = (redirectUri) => {
+    this.auth0.authorize({
+      connection: 'google-oauth2',
+      scope: 'openid profile email'
+    })
+  }
+
+  passwordlessLogin = (email, cb) => {
+    this.auth0.authorize({
+      connection: 'email',
+      send: 'link',
+      email
+    }, cb)
+  }
+
   handleAuthentication = () => {
     this.auth0.parseHash((err, authResult) => {
       if (authResult && authResult.accessToken && authResult.idToken) {
@@ -24,6 +39,10 @@ export default class Auth {
         alert(`Error: ${err.error}. Check the console for further details.`);
       }
     });
+  }
+
+  get webAuth() {
+    return this.auth0;
   }
 
   getAccessToken = () => {
@@ -98,7 +117,7 @@ export default class Auth {
     this.clear();
 
     // navigate to the home route
-    history.replace('/home');
+    history.replace('/');
   }
 
   isAuthenticated = ()  =>{

@@ -120,6 +120,21 @@
     tiny-invariant "^0.0.3"
     uuid "^3.1.0"
 
+"@atlaskit/form@^5.2.2":
+  version "5.2.2"
+  resolved "https://registry.yarnpkg.com/@atlaskit/form/-/form-5.2.2.tgz#1caa94144714850707df8b34fec6910ddbd1230a"
+  integrity sha512-XMyeb9OJhzwiXN427P93iRNZW4KztoplzOaB5ef6gG0A9HUwwzxPs1j9tn177A8+zxIBJGoeMJfRU1uZT6dR2w==
+  dependencies:
+    "@atlaskit/icon" "^16.0.5"
+    "@atlaskit/theme" "^8.0.1"
+    "@babel/runtime" "^7.0.0"
+    final-form "^4.10.0"
+    final-form-focus "^1.1.0"
+    memoize-one "^3.0.1"
+    react-uid "^2.2.0"
+    shallow-equal "^1.0.0"
+    tiny-invariant "^0.0.3"
+
 "@atlaskit/icon@^16.0.0", "@atlaskit/icon@^16.0.5":
   version "16.0.5"
   resolved "https://registry.yarnpkg.com/@atlaskit/icon/-/icon-16.0.5.tgz#21d23dbe9a1bc3d7dd064634375d177679070b3d"
@@ -12427,6 +12442,11 @@ react-transition-group@^2.2.1, react-transition-group@^2.4.0:
     loose-envify "^1.4.0"
     prop-types "^15.6.2"
     react-lifecycles-compat "^3.0.4"
+
+react-uid@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/react-uid/-/react-uid-2.2.0.tgz#0f77e1e0594fbf29fc4fe528cc9aa415c5bf9159"
+  integrity sha512-z+g5+hFOQ08hCfrGcJ1PNs+cmvH8Uq2CVzCmPeWBsUi5A4W4NWXR5jouledzy3oSKGMU9HOzf8zFuGi15TXJoQ==
 
 react@^16.4.0, react@^16.8.2:
   version "16.8.4"

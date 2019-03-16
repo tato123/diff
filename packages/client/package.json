@@ -7,6 +7,7 @@
     "@atlaskit/css-reset": "^3.0.5",
     "@atlaskit/empty-state": "^3.1.4",
     "@atlaskit/field-text": "^7.0.19",
+    "@atlaskit/form": "^5.2.2",
     "@atlaskit/modal-dialog": "^7.2.3",
     "@atlaskit/page": "^8.0.12",
     "@atlaskit/textfield": "^0.1.6",
