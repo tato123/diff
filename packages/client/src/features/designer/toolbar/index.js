@@ -30,26 +30,28 @@ const Toolbar = ({ count, onSave, onEdit, onShare, onClickChanges, isLoggedIn, u
         display: "flex",
         marginLeft: "-10%"
       }}
-    >      
+    >
       <Button onClick={onSave} isDisabled={count === 0} appearance="primary">
         Save Changes
       </Button>
       {isLoggedIn && (
-        <Avatar src={userImage} />
+        <a href="/account">
+          <Avatar src={userImage} />
+        </a>
       )}
       {!isLoggedIn && (
         <a href="/login">login</a>
       )}
-    </div>   
+    </div>
   </View>
 );
 
 Toolbar.defaultProps = {
   count: 0,
-  onSave: () => {},
-  onEdit: () => {},
-  onShare: () => {},
-  onClickChanges: () => {}
+  onSave: () => { },
+  onEdit: () => { },
+  onShare: () => { },
+  onClickChanges: () => { }
 };
 
 export default Toolbar;

@@ -38,15 +38,6 @@ input UploadDesignMeta {
   name: String!
 }
 
-input SiteChangeInput {
-  origin: String!
-  changes: String!
-}
-
-type CreateSiteChangeResult {
-  status: String!
-  versionUrl: String
-}
 
 input CreateSiteOriginInput {
   url: String!
@@ -79,7 +70,6 @@ type CreateCustomerResult {
 # Mutations
 type Mutation {
   uploadDesign(file: Upload!, metaData: UploadDesignMeta): UploadResult
-  createSiteChange(siteChange: SiteChangeInput!): CreateSiteChangeResult
   createSiteOrigin(input: CreateSiteOriginInput!): CreateSiteOriginResult
   createCustomer(input: CreateCustomerInput!) : CreateCustomerResult
   saveSiteDeltas(input: SaveSiteDeltasInput!): SaveSiteDeltasResult

@@ -45,7 +45,7 @@ const App = () => (
             }} />
             <Route exact path="/search" component={Search} />
             <Route exact path="/" component={Home} />
-            <PrivateRoute auth={auth} exact path="/account" component={Account} />
+            <PrivateRoute auth={auth} path="/account" component={Account} />
           </Switch>
         </Router>
       </React.Fragment>

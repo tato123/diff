@@ -1,6 +1,5 @@
 
-import { dynamo, ORIGINS } from '../../aws/dynamodb';
-
+import * as Origins from '../../aws/tables/Origins'
 const uniqueSlug = require("unique-slug");
 const str = require("string-to-stream");
 const sslChecker = require("ssl-checker");
@@ -30,7 +29,7 @@ interface SiteRequest {
     }
 }
 
-const createSiteOrigin = async (_parent: Object, args: SiteRequest) => {
+const createSiteOrigin = async (_parent: Object, args: SiteRequest, context) => {
     const randomSlug = uniqueSlug(args.url);
     const host = `${randomSlug}.${process.env.PROTOTYPE_URL}`;
 
@@ -46,35 +45,17 @@ const createSiteOrigin = async (_parent: Object, args: SiteRequest) => {
     const originUrl = inputUrl;
     const protocol = await checkProtocol(originUrl);
     const timestamp = Date.now().toString();
+    const user = await context.getUser();
 
     console.log("host", host);
     console.log("args", args);
     console.log("protocol", protocol);
 
-    const params = {
-        TableName: ORIGINS,
-        Item: {
-            Host: { S: host },
-            Origin: { S: originUrl },
-            Proto: { S: protocol },
-            Created: { N: timestamp },
+    return Origins.createSiteOrigin(host, originUrl, protocol, timestamp, user)
+        .then(() => ({
+            prototypeUrl: host
+        }))
 
-        }
-    };
-
-    // Call DynamoDB to read the item from the table
-    return new Promise((resolve, reject) => {
-        dynamo.putItem(params, (err: Object) => {
-            if (err) {
-                console.log("Error", err);
-                return reject(err);
-            }
-
-            return resolve({
-                prototypeUrl: host
-            });
-        });
-    });
 };
 
 

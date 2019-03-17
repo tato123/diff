@@ -46,7 +46,6 @@ const Header = () => {
                     <Logo size="200px" />
                 </Brand>
                 <Menu>
-                    test
                 </Menu>
                 <Account>
                     {auth.isAuthenticated() && (

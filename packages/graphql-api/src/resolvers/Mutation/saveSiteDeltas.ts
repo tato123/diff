@@ -1,12 +1,13 @@
 
 
-import { dynamo, DELTAS, ORIGINS } from '../../aws/dynamodb';
+import * as  Deltas from '../../aws/tables/Deltas';
 
 const uniqueSlug = require("unique-slug");
 const normalizeUrl = require("normalize-url");
 const str = require("string-to-stream");
 const sslChecker = require("ssl-checker");
 const toCss = require("to-css");
+import _ from 'lodash';
 
 interface SaveSiteInput {
     input: {
@@ -15,37 +16,25 @@ interface SaveSiteInput {
     }
 }
 
-const saveSiteDeltas = async (_parent: Object, args: SaveSiteInput) => {
-    const host = args.input.host;
-    const deltas = args.input.deltas;
-    const css = toCss(JSON.parse(deltas));
-    const timestamp = Date.now().toString();
+const saveSiteDeltas = async (_parent: Object, args: SaveSiteInput, context) => {
+    const Host = args.input.host;
+    const Changes = args.input.deltas;
+    const CSS = toCss(JSON.parse(Changes));
+    const Created = Date.now().toString();
+    const user = await context.getUser();
 
-    console.log("saving site deltas", host, css);
 
-    const params = {
-        TableName: DELTAS,
-        Item: {
-            Host: { S: host },
-            Changes: { S: deltas },
-            CSS: { S: css },
-            Created: { N: timestamp }
-        }
-    };
-
-    // Call DynamoDB to read the item from the table
-    return new Promise((resolve, reject) => {
-        dynamo.putItem(params, (err, data) => {
-            if (err) {
-                console.log("Error", err);
-                return reject(err);
-            }
-
-            return resolve({
-                prototypeUrl: host
-            });
-        });
-    });
+    return Deltas.createDelta({
+        Host,
+        Changes,
+        CSS,
+        Created,
+        uid: _.get(user, 'sub', null)
+    }).then(() => ({
+        prototypeUrl: Host
+    })).catch(() => {
+        return {};
+    })
 };
 
 export default saveSiteDeltas;
