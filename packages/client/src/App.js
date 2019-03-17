@@ -1,15 +1,16 @@
 import React from "react";
 import ReactGA from "react-ga";
-import {  Router, Route, Switch } from "react-router-dom";
-import { injectGlobal, ThemeProvider } from "styled-components";
+import { Router, Route, Switch } from "react-router-dom";
+import { ThemeProvider } from "styled-components";
 import AuthCallback from './features/auth/callback';
 import Login from './features/auth/login';
 import Designer from "./features/designer";
 import Home from "./features/home";
 import Search from "./features/search";
+import Account from './features/account'
 import history from './history';
-import Auth from './utils/auth';
-
+import PrivateRoute from './components/PrivateRoute';
+import AuthContext, { auth } from './utils/context'
 
 import "@atlaskit/css-reset/dist/bundle.css";
 import "./index.css";
@@ -17,7 +18,6 @@ import "react-toastify/dist/ReactToastify.css";
 import "./normalize.css";
 
 
-const auth = new Auth();
 
 const handleAuthentication = (nextState, replace) => {
   if (/access_token|id_token|error/.test(nextState.location.hash)) {
@@ -31,35 +31,27 @@ if (process.env.NODE_ENV === "production") {
   ReactGA.pageview(window.location.pathname + window.location.search);
 }
 
-injectGlobal`
-  html, body, #root {
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-  }
-
-  #root {
-    position: relative;
-  }
-
-`;
-
-export default () => (
+const App = () => (
   <ThemeProvider theme={{}}>
-    <React.Fragment>
-      <Router history={history}>
-        <Switch>
-          <Route exact path="/edit" render={props => <Designer auth={auth} {...props} /> } />
-          <Route exact path="/login" render={props => <Login auth={auth} {...props} /> } />
-          <Route path="/callback" render={(props) => {
-          handleAuthentication(props);
-          return <AuthCallback {...props} /> 
-        }}/>
-          <Route exact path="/search" component={Search} />
-          <Route exact path="/" component={Home} />
-        </Switch>
-      </Router>
-    </React.Fragment>
+    <AuthContext.Provider value={auth}>
+      <React.Fragment>
+        <Router history={history}>
+          <Switch>
+            <Route exact path="/edit" render={props => <Designer auth={auth} {...props} />} />
+            <Route exact path="/login" component={Login} />
+            <Route path="/callback" render={(props) => {
+              handleAuthentication(props);
+              return <AuthCallback {...props} />
+            }} />
+            <Route exact path="/search" component={Search} />
+            <Route exact path="/" component={Home} />
+            <PrivateRoute auth={auth} exact path="/account" component={Account} />
+          </Switch>
+        </Router>
+      </React.Fragment>
+    </AuthContext.Provider>
   </ThemeProvider>
 );
+
+
+export default App;

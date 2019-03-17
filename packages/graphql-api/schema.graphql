@@ -14,43 +14,6 @@ type Delta {
   created: String
 }
 
-# type Invite {
-#   email: String
-#   firstName: String
-#   invitedBy: String
-#   lastName: String
-#   status: String
-#   workspaceId: String
-#   id: String
-# }
-
-# type User {
-#   aud: String
-#   email: String
-#   email_verified: Boolean
-#   exp: Int
-#   family_name: String
-#   gender: String
-#   given_name: String
-#   iat: Int
-#   iss: String
-#   locale: String
-#   name: String
-#   nickname: String
-#   picture: String
-#   plan: String
-#   sub: String
-#   updated_at: String
-# }
-
-# type Component {
-#   created: String
-#   metageneration: String
-#   name: String
-#   updated: String
-#   url: String
-# }
-
 type Query {
   origin(Host: String!): Origin
   deltas(Host: String!) : Delta
@@ -102,9 +65,22 @@ type SaveSiteDeltasResult {
   prototypeUrl: String!
 }
 
+# Create customer
+
+input CreateCustomerInput {
+  source: String!
+}
+
+type CreateCustomerResult {
+  created: String!
+}
+
+
+# Mutations
 type Mutation {
   uploadDesign(file: Upload!, metaData: UploadDesignMeta): UploadResult
   createSiteChange(siteChange: SiteChangeInput!): CreateSiteChangeResult
   createSiteOrigin(input: CreateSiteOriginInput!): CreateSiteOriginResult
+  createCustomer(input: CreateCustomerInput!) : CreateCustomerResult
   saveSiteDeltas(input: SaveSiteDeltasInput!): SaveSiteDeltasResult
 }

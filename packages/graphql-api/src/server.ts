@@ -1,7 +1,7 @@
-const { GraphQLServer } = require("graphql-yoga");
-const path = require("path");
-const resolvers = require("./resolvers");
-const context = require("./context");
+import { GraphQLServer } from 'graphql-yoga';
+import path = require("path");
+import resolvers = require("./resolvers");
+import context from "./context";
 
 const port = process.env.PORT || 8081;
 
@@ -16,7 +16,7 @@ const options = {
 };
 
 const server = new GraphQLServer({
-  typeDefs: path.resolve(__dirname, "./schema.graphql"),
+  typeDefs: path.resolve(__dirname, "../schema.graphql"),
   resolvers,
   context
 });

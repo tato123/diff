@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import Button from "../../components/Button";
 import styled from 'styled-components';
 import Form, { Field } from '@atlaskit/form';
@@ -7,6 +7,7 @@ import Space from '../../components/Space'
 import { Icon } from 'react-icons-kit';
 import { google } from 'react-icons-kit/icomoon/google';
 import Header from '../../components/Header';
+import AuthContext from '../../utils/context'
 
 import AccountLayout from '../../components/Layouts/Account';
 
@@ -136,8 +137,9 @@ const MyForm = () => (
 
 
 
-const Login = ({ history, auth, }) => {
+const Login = ({ history }) => {
   const goTo = (route) => history.replace(`/${route}`)
+  const auth = useContext(AuthContext);
   const login = () => auth.login();
   const logout = () => auth.logout();
   const { isAuthenticated } = auth;
@@ -166,7 +168,7 @@ const Login = ({ history, auth, }) => {
     <AccountLayout>
       <Container className="container">
         <div className="row content" >
-         
+
           <div className="col right">
             <div>
               <h1>Login to Diff</h1>

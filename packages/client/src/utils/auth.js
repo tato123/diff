@@ -1,7 +1,10 @@
 import * as auth0 from 'auth0-js';
 import history from '../history'
+import jwtDecode from 'jwt-decode';
 
 export default class Auth {
+  tokenRenewalTimeout;
+
   auth0 = new auth0.WebAuth({
     domain: process.env.REACT_APP_AUTH0_DOMAIN,
     clientID: process.env.REACT_APP_AUTH0_CLIENT_ID,
@@ -9,6 +12,24 @@ export default class Auth {
     responseType: 'token id_token',
     scope: 'openid profile'
   });
+
+  constructor() {
+    this.scheduleRenewal();
+  }
+
+  scheduleRenewal() {
+    let expiresAt = this.expiresAt;
+    const timeout = expiresAt - Date.now();
+    if (timeout > 0) {
+      this.tokenRenewalTimeout = setTimeout(() => {
+        this.renewSession();
+      }, timeout);
+    }
+  }
+
+  getExpiryDate() {
+    return JSON.stringify(new Date(this.expiresAt));
+  }
 
   login = () => {
     this.auth0.authorize();
@@ -49,30 +70,22 @@ export default class Auth {
     return localStorage.getItem('accessToken');
   }
 
-  getIdToken = ()=> {
-    return  localStorage.getItem('idToken');
+  getIdToken = () => {
+    return localStorage.getItem('idToken');
   }
 
-  getExpiresAt = ()=> {
+  getExpiresAt = () => {
     return localStorage.getItem('expiresAt');
   }
 
   getProfile = () => {
-    return new Promise((resolve, reject) => {
-      if (!this.isAuthenticated() ) {
-        return resolve(null);
-      }
+    const idToken = this.getIdToken();
+    if (!idToken) {
+      return null;
+    }
 
-      this.auth0.client.userInfo(this.getAccessToken(), (err, profile) => {
-          if ( err ) {
-          return resolve(null);
-        }
-        
-        return resolve(profile);
-      });
-    })
-
-    
+    const decoded = jwtDecode(idToken);
+    return decoded;
   }
 
   setSession = (authResult) => {
@@ -83,21 +96,23 @@ export default class Auth {
 
     localStorage.setItem('accessToken', authResult.accessToken);
     localStorage.setItem('idToken', authResult.idToken);
-    localStorage.setItem('expiresAt', expiresAt)
+    localStorage.setItem('expiresAt', expiresAt);
+
+    // schedule a token renewal
+    this.scheduleRenewal();
 
     // navigate to the home route
     history.replace('/');
   }
 
-  renewSession = ()=> {
+  renewSession = () => {
     this.auth0.checkSession({}, (err, authResult) => {
-       if (authResult && authResult.accessToken && authResult.idToken) {
-         this.setSession(authResult);
-       } else if (err) {
-         this.logout();
-         console.log(err);
-         alert(`Could not get a new token (${err.error}: ${err.error_description}).`);
-       }
+      if (authResult && authResult.accessToken && authResult.idToken) {
+        this.setSession(authResult);
+      } else if (err) {
+        this.logout();
+        console.log(err);
+      }
     });
   }
 
@@ -116,11 +131,16 @@ export default class Auth {
 
     this.clear();
 
+    // Clear token renewal
+    clearTimeout(this.tokenRenewalTimeout);
+
+
     // navigate to the home route
     history.replace('/');
   }
 
-  isAuthenticated = ()  =>{
+  isAuthenticated = () => {
+
     // Check whether the current time is past the
     // access token's expiry time
     let expiresAt = this.getExpiresAt();

@@ -1,31 +1,39 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import App from "./App";
-import * as serviceWorker from "./serviceWorker";
-
-import { ApolloClient } from "apollo-client";
 import { InMemoryCache } from "apollo-cache-inmemory";
+import { ApolloClient } from "apollo-client";
 import { split } from "apollo-link";
+import { setContext } from "apollo-link-context";
 import { HttpLink } from "apollo-link-http";
 import { WebSocketLink } from "apollo-link-ws";
 import { getMainDefinition } from "apollo-utilities";
+import "normalize.css";
+import React from "react";
 import { ApolloProvider } from "react-apollo";
 import { ApolloProvider as ApolloHooksProvider } from 'react-apollo-hooks';
+import ReactDOM from "react-dom";
+import { StripeProvider } from 'react-stripe-elements';
+import App from "./App";
+import * as serviceWorker from "./serviceWorker";
+import Auth from './utils/auth';
 
-// import { setContext } from "apollo-link-context";
 
-import "normalize.css";
+const auth = new Auth();
 
 
-// const authLink = setContext((_, { headers }) => {
-//   // return the headers to the context so httpLink can read them
-//   return {
-//     headers: {
-//       ...headers,
-//       authorization: auth.getIdToken()
-//     }
-//   };
-// });
+
+
+const bearerToken = () => {
+  return `Bearer ${auth.getIdToken()}`
+}
+
+const authLink = setContext((_, { headers }) => {
+  // return the headers to the context so httpLink can read them
+  return {
+    headers: {
+      ...headers,
+      authorization: bearerToken()
+    }
+  };
+});
 
 // Create an http link:
 const httpLink = new HttpLink({
@@ -37,10 +45,10 @@ const wsLink = new WebSocketLink({
   uri: process.env.REACT_APP_GRAPHQL_WS_SERVER,
   options: {
     reconnect: true
-  }
-  // connectionParams: () => ({
-  //   authorization: `Bearer ${localStorage.getItem('mytoken')}`,
-  // }),
+  },
+  connectionParams: () => ({
+    authorization: bearerToken(),
+  }),
 });
 
 // using the ability to split links, you can send data to each link
@@ -52,7 +60,7 @@ const link = split(
     return kind === "OperationDefinition" && operation === "subscription";
   },
   wsLink,
-  httpLink
+  authLink.concat(httpLink),
 );
 
 const cache = new InMemoryCache();
@@ -64,8 +72,10 @@ const client = new ApolloClient({
 
 ReactDOM.render(
   <ApolloProvider client={client}>
-  <ApolloHooksProvider client={client}>
-    <App />
+    <ApolloHooksProvider client={client}>
+      <StripeProvider apiKey={process.env.REACT_APP_STRIPE_API_KEY}>
+        <App />
+      </StripeProvider>
     </ApolloHooksProvider>
   </ApolloProvider>,
   document.getElementById("root")

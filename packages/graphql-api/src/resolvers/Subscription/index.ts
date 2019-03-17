@@ -1,9 +1,7 @@
 module.exports = {
   events: {
     subscribe: async (_, args, context) => {
-      const user = await context.user;
       const pubsub = context.pubsub;
-      console.log("user", user);
       const channel = Math.random()
         .toString(36)
         .substring(2, 15); // random channel name

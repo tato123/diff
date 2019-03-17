@@ -24,7 +24,6 @@
     "@babel/plugin-transform-runtime": "^7.1.0",
     "@babel/preset-env": "^7.1.6",
     "@babel/preset-react": "^7.0.0",
-    "@types/adobexd": "https://github.com/tato123/typings",
     "babel-loader": "^8.0.4",
     "copy-webpack-plugin": "^4.6.0",
     "cross-env": "^5.2.0",

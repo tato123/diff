@@ -9,17 +9,12 @@ const FullPage = styled.div`
   padding:0 150px;
   box-sizing: border-box;
 
-  nav {
-      margin-top: 16px;
-      display: inline-block;
-  }
-
 
 `
 
 
 
-const AccountLayout = ({children}) => (
+const AccountLayout = ({ children }) => (
     <FullPage>
         <Header />
         <div>
