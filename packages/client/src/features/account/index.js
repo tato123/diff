@@ -5,6 +5,18 @@ import InjectedCheckoutForm from './CheckoutForm';
 import styled from 'styled-components';
 import { Route, Switch, Redirect } from 'react-router';
 import { Link } from 'react-router-dom'
+import { useQuery } from 'react-apollo-hooks';
+import gql from 'graphql-tag';
+
+
+const GET_ORIGINS = gql`
+  {
+    origins(limit:{mine:true}) {
+      host
+      origin
+    }
+  }
+`;
 
 
 const MainContent = styled.div`
@@ -28,9 +40,27 @@ const Billing = () => (
     </Elements>
 )
 
-const Prototypes = () => (
-    <div>nothing to see yet</div>
-)
+const Prototypes = () => {
+    const { data, error, loading } = useQuery(GET_ORIGINS);
+    if (loading) {
+        return <div>Loading...</div>;
+    };
+    if (error) {
+        return <div>Error! {error.message}</div>;
+    };
+
+    return (
+        <ul>
+            {data.origins.map(origin => (
+                <li key={origin.origin}>
+                    <Link to={"/edit?version=" + origin.host}>
+                        {origin.host}
+                    </Link></li>
+            ))}
+        </ul>
+    );
+}
+
 
 const Account = () => (<AccountLayout>
 

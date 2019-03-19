@@ -18,6 +18,7 @@ import SpecialText from './styles/SpecialText';
 import Step from './styles/Step';
 import { scroller, Element } from 'react-scroll';
 import { isMobile } from 'react-device-detect';
+import Header from '../../components/Header';
 
 
 
@@ -49,9 +50,8 @@ const HomePage = ({ history }) => {
 
   return (
     <Page>
-      <div>
-        <Logo size="200px" />
-      </div>
+      <Header />
+
       <Main>
         <div className="description">
           <div>
@@ -121,7 +121,7 @@ const HomePage = ({ history }) => {
           </React.Fragment>
         )}
         {isMobile && (
-          <div style={{fontSize: "2rem", fontWeight: "200",  textAlign: "center", color: "red"}}>
+          <div style={{ fontSize: "2rem", fontWeight: "200", textAlign: "center", color: "red" }}>
             Oh no, it looks like you're on mobile. You can however try Diff on a non-mobile browser.
           </div>
         )}

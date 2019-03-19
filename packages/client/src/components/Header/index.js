@@ -3,6 +3,7 @@ import Logo from "../Logo";
 import styled from 'styled-components';
 import AuthContext from '../../utils/context'
 import Avatar from '../Avatar'
+import { Link } from 'react-router-dom'
 
 
 const Container = styled.header`
@@ -29,6 +30,7 @@ const Account = styled.div`
     display: flex;
     flex: 1 auto;
     align-items:center;
+    justify-content: flex-end;
 `
 
 
@@ -37,22 +39,29 @@ const Header = () => {
 
     const auth = useContext(AuthContext);
     const user = auth.getProfile();
-    const logout = () => auth.logout();
+
 
     return (
         <Container>
             <Nav>
                 <Brand>
-                    <Logo size="200px" />
+                    <Link to="/">
+                        <Logo size="200px" />
+                    </Link>
                 </Brand>
                 <Menu>
                 </Menu>
                 <Account>
                     {auth.isAuthenticated() && (
                         <React.Fragment>
-                            <Avatar src={user.picture} />
-                            <a onClick={logout}>logout</a>
+                            <Link to="/account">
+                                <Avatar src={user.picture} />
+                            </Link>
+                            <a href="" onClick={auth.logout}>logout</a>
                         </React.Fragment>
+                    )}
+                    {!auth.isAuthenticated() && (
+                        <Link to="/login">Login</Link>
                     )}
 
                 </Account>

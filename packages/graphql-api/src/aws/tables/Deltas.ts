@@ -13,6 +13,14 @@ export interface Delta {
     uid: string;
 }
 
+export interface DeltaQueryResult {
+    host: string;
+    changes: String;
+    css: string;
+    created: string;
+    uid: string;
+}
+
 export const createDelta = (delta: Delta): Promise<void | object> => {
 
     const params = {
@@ -42,4 +50,38 @@ export const createDelta = (delta: Delta): Promise<void | object> => {
             return resolve();
         });
     });
-} 
+}
+
+export const getDelta = async (host: string): Promise<DeltaQueryResult> => {
+    const params = {
+        TableName: DELTAS,
+        Key: {
+            Host: { S: host }
+        }
+    };
+
+    console.log("querying params", params);
+
+    return new Promise((resolve, reject) => {
+        // Call DynamoDB to read the item from the table
+        dynamo.getItem(params, (err, data) => {
+            console.log("results", data);
+
+            // check if we get an error
+            if (err || _.isEmpty(data)) {
+                console.log("Error", err);
+                return resolve();
+            }
+
+            const result: DeltaQueryResult = {
+                host: _.get(data, 'Item.Host.S', null),
+                css: _.get(data, 'Item.CSS.S', null),
+                changes: _.get(data, 'Item.Changes.S', null),
+                created: _.get(data, 'Item.Created.N', null),
+                uid: _.get(data, 'Item.Created.S', null)
+            };
+
+            return resolve(result);
+        });
+    });
+}

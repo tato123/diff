@@ -14,8 +14,13 @@ type Delta {
   created: String
 }
 
+input LimitQuery {
+  mine: Boolean
+}
+
 type Query {
   origin(Host: String!): Origin
+  origins( limit:LimitQuery): [Origin]
   deltas(Host: String!) : Delta
 }
 
