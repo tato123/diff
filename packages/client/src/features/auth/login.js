@@ -1,12 +1,11 @@
-import React, { useEffect, useContext } from 'react';
+import React, { useContext } from 'react';
 import Button from "../../components/Button";
 import styled from 'styled-components';
-import Form, { Field } from '@atlaskit/form';
+import { Field } from '@atlaskit/form';
 import TextField from '@atlaskit/textfield';
 import Space from '../../components/Space'
 import { Icon } from 'react-icons-kit';
 import { google } from 'react-icons-kit/icomoon/google';
-import Header from '../../components/Header';
 import AuthContext from '../../utils/context'
 
 import AccountLayout from '../../components/Layouts/Account';
@@ -69,20 +68,7 @@ const Container = styled.div`
   }
 `;
 
-const RoundButton = styled.button`
-  border-radius: 25px !important;
-  width: 100%;
-  background-color: #43cad9;
 
-  font-weight: 500 !important;
-  font-size: 1.2rem;
-  padding: 8px !important;
-  height: 48px !important;
-  span {
-    color: #fff !important;
-    font-weight: 500;
-  }
-`;
 
 const GoogleButton = styled(Button)`
 position: relative;
@@ -107,42 +93,11 @@ const DarkHR = styled.hr`
   height: 1px;
 `;
 
-const Footer = styled.div`
-  color: #231c47;
-  text-align: center;
-  margin-top: 16px;
-`;
-
-
-const MyForm = () => (
-  <Form onSubmit={data => console.log('form data', data)}>
-    {({ formProps }) => (
-      <form {...formProps}>
-        <Field name="username" defaultValue="" label="User name" isRequired>
-          {({ fieldProps }) => <TextField {...fieldProps} />}
-        </Field>
-
-
-        <Field name="password" defaultValue="" label="Password" isRequired>
-          {({ fieldProps }) => <TextField {...fieldProps} />}
-        </Field>
-        <Button type="submit" appearance="primary">
-          Submit
-        </Button>
-      </form>
-    )}
-  </Form>
-);
-
 
 
 
 const Login = ({ history }) => {
-  const goTo = (route) => history.replace(`/${route}`)
   const auth = useContext(AuthContext);
-  const login = () => auth.login();
-  const logout = () => auth.logout();
-  const { isAuthenticated } = auth;
 
   const onLoginWithGoogle = auth.loginWithGoogle;
 

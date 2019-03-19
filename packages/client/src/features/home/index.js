@@ -2,7 +2,6 @@ import React, { useRef, useState } from "react";
 import { useMutation } from 'react-apollo-hooks';
 import Button from '../../components/Button';
 import Icon from "../../components/Icon";
-import Logo from "../../components/Logo";
 import { CREATE_SITE } from "../../graphql/mutations";
 import Banner from './styles/Banner';
 import Column from './styles/Column';

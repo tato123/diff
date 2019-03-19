@@ -2,15 +2,11 @@
 import React from 'react';
 import Button from '@atlaskit/button';
 import {
-    injectStripe, CardElement,
+    injectStripe,
     CardNumberElement,
     CardExpiryElement,
     CardCVCElement,
-    PaymentRequestButtonElement,
-    IbanElement,
-    IdealBankElement,
-    StripeProvider,
-    Elements,
+
 } from 'react-stripe-elements';
 
 import { useMutation } from 'react-apollo-hooks';
@@ -30,9 +26,7 @@ const handleBlur = () => {
 const handleChange = (change) => {
     console.log('[change]', change);
 };
-const handleClick = () => {
-    console.log('[click]');
-};
+
 const handleFocus = () => {
     console.log('[focus]');
 };

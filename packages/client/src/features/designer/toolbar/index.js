@@ -1,9 +1,7 @@
 import React from "react";
 import Button from "@atlaskit/button";
 import styled from "styled-components";
-import Auth from '../../../utils/auth'
 
-const auth = new Auth();
 
 const View = styled.div`
   display: flex;

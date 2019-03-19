@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext } from 'react';
 import Logo from "../Logo";
 import styled from 'styled-components';
 import AuthContext from '../../utils/context'
@@ -57,7 +57,7 @@ const Header = () => {
                             <Link to="/account">
                                 <Avatar src={user.picture} />
                             </Link>
-                            <a href="" onClick={auth.logout}>logout</a>
+                            <button onClick={auth.logout}>logout</button>
                         </React.Fragment>
                     )}
                     {!auth.isAuthenticated() && (
