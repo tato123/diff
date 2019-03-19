@@ -33,22 +33,12 @@
     "string-to-stream": "^1.1.1",
     "stripe": "^6.27.0",
     "to-css": "^1.2.1",
-    "unique-slug": "^2.0.1"
-  },
-  "devDependencies": {
-    "@babel/cli": "^7.0.0",
-    "@babel/core": "^7.0.0",
-    "@babel/node": "^7.0.0",
-    "@babel/plugin-proposal-class-properties": "^7.0.0",
-    "@babel/plugin-proposal-export-default-from": "^7.0.0",
-    "@babel/plugin-proposal-object-rest-spread": "^7.3.2",
-    "@babel/preset-env": "^7.0.0",
-    "@babel/preset-typescript": "^7.0.0",
-    "@babel/register": "^7.0.0",
-    "jest": "^23.6.0",
-    "nodemon": "^1.18.10",
-    "rimraf": "^2.6.2",
+    "unique-slug": "^2.0.1",
     "ts-node-dev": "^1.0.0-pre.32",
     "typescript": "^3.3.3"
+  },
+  "devDependencies": {
+    "jest": "^23.6.0",
+    "nodemon": "^1.18.10"
   }
 }
