@@ -8,3 +8,4 @@ export const dynamo = new AWS.DynamoDB({
 
 export const DELTAS = process.env.DELTAS || '';
 export const ORIGINS = process.env.ORIGINS || '';
+export const USERS = process.env.USERS || '';

@@ -26,5 +26,7 @@ server.start(options, () =>
   console.log(`Server is running on localhost:${port}`)
 );
 
+const bodyParser = require('body-parser');
+server.express.use(bodyParser.json())
 // register our hooks
 webhooks(server)
