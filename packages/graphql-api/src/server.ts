@@ -2,6 +2,7 @@ import { GraphQLServer } from 'graphql-yoga';
 import path = require("path");
 import resolvers = require("./resolvers");
 import context from "./context";
+import webhooks from './webhooks'
 
 const port = process.env.PORT || 8081;
 
@@ -24,3 +25,6 @@ const server = new GraphQLServer({
 server.start(options, () =>
   console.log(`Server is running on localhost:${port}`)
 );
+
+// register our hooks
+webhooks(server)

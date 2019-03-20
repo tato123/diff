@@ -35,9 +35,17 @@ const MainContent = styled.div`
 `
 
 const Billing = () => (
-    <Elements>
-        <InjectedCheckoutForm />
-    </Elements>
+    <div>
+        <h1>My Billing Information</h1>
+        <div>
+            <label>Plan</label>
+            <div>Trial</div>
+        </div>
+        <Elements>
+            <InjectedCheckoutForm />
+        </Elements>
+    </div>
+
 )
 
 const Prototypes = () => {

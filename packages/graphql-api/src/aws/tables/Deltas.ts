@@ -23,7 +23,7 @@ export interface DeltaQueryResult {
 
 export const createDelta = (delta: Delta): Promise<void | object> => {
 
-    const params = {
+    const params:any = {
         TableName: DELTAS,
         Item: {
             Host: { S: delta.Host },

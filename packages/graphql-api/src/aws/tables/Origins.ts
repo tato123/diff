@@ -64,7 +64,7 @@ export const getByHost = (fields:FieldsQuery) => {
             return JSON.parse(result);
         }
 
-        const params = {
+        const params:any = {
             TableName: ORIGINS,
             Key: fields
         };
