@@ -1,15 +1,8 @@
 import _ from 'lodash';
+import * as Users from '../../aws/tables/Users';
 
 const stripe = require("stripe")(process.env.STRIPE_KEY);
-const ManagementClient = require('auth0').ManagementClient;
-
-const management = new ManagementClient({
-    domain: process.env.AUTH0_MANAGEMENT_DOMAIN,
-    clientId: process.env.AUTH0_MANAGEMENT_CLIENT_ID,
-    clientSecret: process.env.AUTH0_MANAGEMENT_CLIENT_SECRET,
-    scope: 'read:users update:users'
-});
-
+const DIFF_PLAN = process.env.STRIPE_PLAN_ID
 interface CustomerInput {
     input: {
         source: string;
@@ -17,18 +10,9 @@ interface CustomerInput {
 
 }
 
-const addStripeCustomerData = async (customer, user) => {
-    const params = { id: user.sub };
-    const metadata = {
-        plan: 'paid',
-        stripe: customer
-    };
-
-    return management.updateAppMetadata(params, metadata)
-}
 
 
-const createCustomer = async (_parent, args: CustomerInput, context) => {
+const createStripCustomer = async (_parent, args: CustomerInput, context) => {
     const user = await context.getUser();
     console.log('user is ', user)
     console.log('args are', args)
@@ -46,20 +30,29 @@ const createCustomer = async (_parent, args: CustomerInput, context) => {
             source: args.input.source,
         });
 
-
         // store the information against their 
         console.log('customer created', customer);
-        await addStripeCustomerData(customer, user)
+        await Users.updateByUid(user.sub, 'stripe_customer_id', customer.id)
 
-        console.log('succesfully updated')
-        return { created: customer.created };
+        const subscription = await stripe.subscriptions.create({
+            customer: customer.id,
+            items: [{ plan: DIFF_PLAN }]
+        })
+
+        await Users.updateByUid(user.sub, 'stripe_plan_id', subscription.id)
+
+
+        // store the information against their 
+        console.log('subscription created', subscription);
+
+        return { customerId: customer.id };
     } catch (err) {
-        console.error(err);
-        return { created: null }
+        console.error(err.message);
+        return null;
     }
 
 
 }
 
 
-export default createCustomer;
+export default createStripCustomer;

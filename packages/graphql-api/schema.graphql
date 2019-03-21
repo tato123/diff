@@ -68,7 +68,7 @@ input CreateCustomerInput {
 }
 
 type CreateCustomerResult {
-  created: String!
+  customerId: String!
 }
 
 

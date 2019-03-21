@@ -15,7 +15,7 @@ import gql from 'graphql-tag';
 const CREATE_CUSTOMER_SOURCE = gql`
   mutation createCustomerSource($input: CreateCustomerInput!) {
     createCustomer(input: $input) {
-        created
+        customerId
     }
   }
 `;
@@ -58,28 +58,31 @@ const createOptions = (fontSize, padding) => {
 const CheckoutForm = (props) => {
     const createCustomer = useMutation(CREATE_CUSTOMER_SOURCE);
 
-    const handleSubmit = ev => {
+    const handleSubmit = async ev => {
         // We don't want to let default form submission happen here, which would refresh the page.
         ev.preventDefault();
 
 
-        props.stripe.createSource({
-            type: 'card', owner: {
-                name: 'Jonathan Fontanez'
-            }
-        }).then(({ source }) => {
-            // console.log(source)
+        try {
+            const { source } = await props.stripe.createSource({
+                type: 'card',
+                owner: {
+                    name: 'Test account'
+                }
+            })
+            console.log('source id is', source.id)
 
-            return createCustomer({
+            const { data } = await createCustomer({
                 variables: { input: { source: source.id } },
             });
-        })
-            .then(val => {
-                console.log('query returned', val)
-            })
-            .catch(err => {
-                console.log(err)
-            })
+            const customerId = data.createCustomer.customerId;
+            console.log('Customer id is', customerId)
+
+
+        } catch (err) {
+            console.error('Unable to store subscription', err)
+        }
+
     }
 
     return (
