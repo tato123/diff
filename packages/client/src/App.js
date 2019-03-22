@@ -21,7 +21,7 @@ import "./normalize.css";
 
 const handleAuthentication = (nextState, replace) => {
   if (/access_token|id_token|error/.test(nextState.location.hash)) {
-    auth.handleAuthentication();
+    auth.handleAuthentication(nextState.location.hash);
   }
 }
 

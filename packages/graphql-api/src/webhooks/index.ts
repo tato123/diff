@@ -1,28 +1,61 @@
-import * as Users from '../aws/tables/Users'
+import * as Users from '../aws/tables/Users';
+import { client } from '../context/pubsub'
+const passport = require('passport');
+const querystring = require('querystring');
+
+
+
+const Auth0Strategy = require('passport-auth0');
+const strategy = new Auth0Strategy({
+    domain: process.env.AUTH0_DOMAIN,
+    clientID: process.env.AUTH0_CLIENT_ID,
+    clientSecret: process.env.AUTH0_CLIENT_SECRET,
+    callbackURL: '/auth/callback',
+    state: false
+},
+    async (accessToken, refreshToken, extraParams, profile, done) => {
+
+        try {
+            await Users.createUidIfNotExists(profile.id)
+            return done(null, extraParams);
+        } catch (err) {
+
+            return done(err.message)
+        }
+
+    }
+);
+
+passport.use(strategy)
+
+passport.serializeUser(function (user, done) {
+    done(null, user);
+});
+
+passport.deserializeUser(function (user, done) {
+    done(null, user);
+});
 
 /**
  * We need to rely on our testing suite to handle these
  */
-export default ({ express }) => {
+export default ({ express: app }) => {
+    app.use(passport.initialize());
+
     // we can 
-    express.get('/auth0/hook/register', async (req, res) => {
-        console.log('an auth0 register hook was called', req.body);
-        const uid = req.body.user_id || req.body.sub;
-        try {
-            await Users.createUid(uid);
-            res.status(201).json(req.body);
-        } catch (err) {
-            res.status(400).send('unable to register user')
-        }
+    app.get('/auth/callback',
+        passport.authenticate('auth0', { failureRedirect: 'http://localhost:9010/login' }),
+        function (req, res) {
+            const token = {
+                ...req.user,
+                state: "diff_app"
+            }
 
-    })
+            // Successful authentication, redirect home.
+            res.redirect(301, `http://localhost:9010/callback#${querystring.stringify(token)}`);
+        });
 
 
-    // do something else
-    express.get('/auth0/hook/user', (req, res) => {
-        console.log('an auth0 user hook was called', req);
-        res.status(201).send();
-    })
 }
 
 

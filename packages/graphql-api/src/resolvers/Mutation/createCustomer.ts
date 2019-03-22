@@ -40,6 +40,8 @@ const createStripCustomer = async (_parent, args: CustomerInput, context) => {
         })
 
         await Users.updateByUid(user.sub, 'stripe_plan_id', subscription.id)
+        await Users.updateByUid(user.sub, 'plan', 'full');
+        await Users.updateByUid(user.sub, 'plan_status', subscription.status)
 
 
         // store the information against their 

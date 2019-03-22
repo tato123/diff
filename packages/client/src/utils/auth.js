@@ -2,6 +2,8 @@ import * as auth0 from 'auth0-js';
 import history from '../history'
 import jwtDecode from 'jwt-decode';
 
+
+
 export default class Auth {
   tokenRenewalTimeout;
 
@@ -9,8 +11,9 @@ export default class Auth {
     domain: process.env.REACT_APP_AUTH0_DOMAIN,
     clientID: process.env.REACT_APP_AUTH0_CLIENT_ID,
     redirectUri: process.env.REACT_APP_AUTH0_REDIRECT_URI,
-    responseType: 'token id_token',
-    scope: 'openid profile'
+    responseType: 'code',
+    audience: 'https://diff/dev',
+    scope: 'openid profile email'
   });
 
   constructor() {
@@ -31,11 +34,18 @@ export default class Auth {
     return JSON.stringify(new Date(this.expiresAt));
   }
 
+
+  rememberPage = () => {
+    localStorage.setItem('diff_redirectTo', document.referrer);
+  }
+
   login = () => {
+    this.rememberPage();
     this.auth0.authorize();
   }
 
   loginWithGoogle = (redirectUri) => {
+    this.rememberPage();
     this.auth0.authorize({
       connection: 'google-oauth2',
       scope: 'openid profile email'
@@ -43,6 +53,7 @@ export default class Auth {
   }
 
   passwordlessLogin = (email, cb) => {
+    this.rememberPage();
     this.auth0.authorize({
       connection: 'email',
       send: 'link',
@@ -50,8 +61,8 @@ export default class Auth {
     }, cb)
   }
 
-  handleAuthentication = () => {
-    this.auth0.parseHash((err, authResult) => {
+  handleAuthentication = (hash, state = "diff_app") => {
+    this.auth0.parseHash({ hash, state }, (err, authResult) => {
       if (authResult && authResult.accessToken && authResult.idToken) {
         this.setSession(authResult);
       } else if (err) {
@@ -102,7 +113,13 @@ export default class Auth {
     this.scheduleRenewal();
 
     // navigate to the home route
-    history.replace('/');
+    const lastPage = localStorage['diff_redirectTo'];
+    if (lastPage) {
+      delete localStorage['diff_redirectTo'];
+      window.location.replace(lastPage);
+    } else {
+      history.replace('/')
+    }
   }
 
   renewSession = () => {

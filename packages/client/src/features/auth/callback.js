@@ -2,11 +2,14 @@ import React from 'react';
 
 
 
-const AuthCallback = () => (
-  <div>
+const AuthCallback = () => {
+
+  return (<div>
     loading
- </div>
-)
+ </div>)
+}
+
+
 
 
 export default AuthCallback;

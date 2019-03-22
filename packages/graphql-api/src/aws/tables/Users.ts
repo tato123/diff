@@ -2,21 +2,32 @@
 import { dynamo, USERS } from '../dynamodb';
 import _ from 'lodash';
 
-export const createUid = (uid: string): Promise<boolean> => {
+export const createUidIfNotExists = (uid: string): Promise<boolean> => {
+    const timestamp = Date.now().toString();
     const params: any = {
         TableName: USERS,
         Item: {
             uid: { S: uid },
-            plan: { S: 'trial' }
-        }
+            plan: { S: 'trial' },
+            created: { N: timestamp },
+            updated: { N: timestamp }
+        },
+        "ConditionExpression":
+            "attribute_not_exists(#u)",
+        "ExpressionAttributeNames": { "#u": "uid" },
     };
 
 
 
     // Call DynamoDB to read the item from the table
     return new Promise((resolve, reject) => {
-        dynamo.putItem(params, (err: Object) => {
-            if (err) {
+        dynamo.putItem(params, (err: any) => {
+            console.log(JSON.stringify(err, null, 4))
+            if (err && err.code === 'ConditionalCheckFailedException') {
+                // user already exists
+                return resolve();
+            }
+            else if (err) {
                 console.log("Error", err);
                 return reject(err);
             }
