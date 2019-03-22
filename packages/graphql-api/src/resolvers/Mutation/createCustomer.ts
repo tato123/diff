@@ -10,9 +10,18 @@ interface CustomerInput {
 
 }
 
+const getCustomerId = async (uid: string): Promise<string | null> => {
+    try {
+        const customerId = await Users.getUserByUid(uid);
+        return customerId;
+    } catch (err) {
+        return null
+    }
+}
 
 
-const createStripCustomer = async (_parent, args: CustomerInput, context) => {
+
+const createStripeCustomer = async (_parent, args: CustomerInput, context) => {
     const user = await context.getUser();
     console.log('user is ', user)
     console.log('args are', args)
@@ -24,8 +33,11 @@ const createStripCustomer = async (_parent, args: CustomerInput, context) => {
     }
 
     try {
+        const customerId = getCustomerId(user.sub);
+
+
         // get the customer from stripe
-        const customer = await stripe.customers.create({
+        const customer = customerId != null ? customerId : await stripe.customers.create({
             email: user.email,
             source: args.input.source,
         });
@@ -39,15 +51,17 @@ const createStripCustomer = async (_parent, args: CustomerInput, context) => {
             items: [{ plan: DIFF_PLAN }]
         })
 
+        const FULL_PLAN = 'full'
+
         await Users.updateByUid(user.sub, 'stripe_plan_id', subscription.id)
-        await Users.updateByUid(user.sub, 'plan', 'full');
+        await Users.updateByUid(user.sub, 'plan', FULL_PLAN);
         await Users.updateByUid(user.sub, 'plan_status', subscription.status)
 
 
         // store the information against their 
         console.log('subscription created', subscription);
 
-        return { customerId: customer.id };
+        return { plan: FULL_PLAN, status: subscription.status };
     } catch (err) {
         console.error(err.message);
         return null;
@@ -57,4 +71,4 @@ const createStripCustomer = async (_parent, args: CustomerInput, context) => {
 }
 
 
-export default createStripCustomer;
+export default createStripeCustomer;

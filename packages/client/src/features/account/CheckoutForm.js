@@ -14,11 +14,14 @@ import gql from 'graphql-tag';
 
 const CREATE_CUSTOMER_SOURCE = gql`
   mutation createCustomerSource($input: CreateCustomerInput!) {
-    createCustomer(input: $input) {
-        customerId
+    subscribeCustomerToPlan(input: $input) {
+        plan
+        status
     }
   }
 `;
+
+
 
 const handleBlur = () => {
     console.log('[blur]');
@@ -57,6 +60,7 @@ const createOptions = (fontSize, padding) => {
 
 const CheckoutForm = (props) => {
     const createCustomer = useMutation(CREATE_CUSTOMER_SOURCE);
+
 
     const handleSubmit = async ev => {
         // We don't want to let default form submission happen here, which would refresh the page.

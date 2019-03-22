@@ -14,6 +14,11 @@ type Delta {
   created: String
 }
 
+type Subscription {
+  plan: String!
+  status: String!
+}
+
 input LimitQuery {
   mine: Boolean
 }
@@ -22,6 +27,7 @@ type Query {
   origin(Host: String!): Origin
   origins( limit:LimitQuery): [Origin]
   deltas(Host: String!) : Delta
+  subscription(limit:LimitQuery) : Subscription
 }
 
 type Counter {
@@ -67,15 +73,11 @@ input CreateCustomerInput {
   source: String!
 }
 
-type CreateCustomerResult {
-  customerId: String!
-}
-
 
 # Mutations
 type Mutation {
   uploadDesign(file: Upload!, metaData: UploadDesignMeta): UploadResult
   createSiteOrigin(input: CreateSiteOriginInput!): CreateSiteOriginResult
-  createCustomer(input: CreateCustomerInput!) : CreateCustomerResult
+  subscribeCustomerToPlan(input: CreateCustomerInput!) : Subscription
   saveSiteDeltas(input: SaveSiteDeltasInput!): SaveSiteDeltasResult
 }
