@@ -91,8 +91,8 @@ export const getUserByUid = (uid: string): Promise<any> => {
                 plan: _.get(data, 'Item.plan.S', null),
                 status: _.get(data, 'Item.plan_status.S', null),
                 updated: _.get(data, 'Item.updated.S', null),
-                customerId: _.get(data, 'Item.stripe_customer_id', null),
-                planId: _.get(data, 'Item.stripe_plan_id', null)
+                customerId: _.get(data, 'Item.stripe_customer_id.S', null),
+                planId: _.get(data, 'Item.stripe_plan_id.S', null)
             });
         });
     });

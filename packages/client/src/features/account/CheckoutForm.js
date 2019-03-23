@@ -1,5 +1,5 @@
 // CheckoutForm.js
-import React from 'react';
+import React, { useContext } from 'react';
 import Button from '@atlaskit/button';
 import {
     injectStripe,
@@ -10,6 +10,7 @@ import {
 } from 'react-stripe-elements';
 
 import { useMutation } from 'react-apollo-hooks';
+import AuthContext from '../../utils/context'
 import gql from 'graphql-tag';
 
 const CREATE_CUSTOMER_SOURCE = gql`
@@ -58,8 +59,10 @@ const createOptions = (fontSize, padding) => {
 };
 
 
-const CheckoutForm = (props) => {
-    const createCustomer = useMutation(CREATE_CUSTOMER_SOURCE);
+const CheckoutForm = ({ stripe, fontSize, onStartCheckout, onEndCheckout, onChange }) => {
+    const subscribeToPlan = useMutation(CREATE_CUSTOMER_SOURCE);
+    const auth = useContext(AuthContext);
+    const profile = auth.getProfile();
 
 
     const handleSubmit = async ev => {
@@ -68,23 +71,28 @@ const CheckoutForm = (props) => {
 
 
         try {
-            const { source } = await props.stripe.createSource({
+            onStartCheckout();
+
+            const { source } = await stripe.createSource({
                 type: 'card',
                 owner: {
-                    name: 'Test account'
+                    name: profile.name,
+                    email: profile.email
                 }
             })
             console.log('source id is', source.id)
 
-            const { data } = await createCustomer({
+            const { data } = await subscribeToPlan({
                 variables: { input: { source: source.id } },
             });
-            const customerId = data.createCustomer.customerId;
-            console.log('Customer id is', customerId)
 
 
+            onChange(data.subscribeCustomerToPlan)
+
+            onEndCheckout();
         } catch (err) {
-            console.error('Unable to store subscription', err)
+            console.error('Unable to create customer subscription', err)
+            onEndCheckout();
         }
 
     }
@@ -98,7 +106,7 @@ const CheckoutForm = (props) => {
                     onChange={handleChange}
                     onFocus={handleFocus}
                     onReady={handleReady}
-                    {...createOptions(props.fontSize)}
+                    {...createOptions(fontSize)}
                 />
             </label>
             <label>
@@ -108,7 +116,7 @@ const CheckoutForm = (props) => {
                     onChange={handleChange}
                     onFocus={handleFocus}
                     onReady={handleReady}
-                    {...createOptions(props.fontSize)}
+                    {...createOptions(fontSize)}
                 />
             </label>
             <label>
@@ -118,7 +126,7 @@ const CheckoutForm = (props) => {
                     onChange={handleChange}
                     onFocus={handleFocus}
                     onReady={handleReady}
-                    {...createOptions(props.fontSize)}
+                    {...createOptions(fontSize)}
                 />
             </label>
             <Button type="submit">Pay</Button>

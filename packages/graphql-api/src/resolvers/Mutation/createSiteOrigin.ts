@@ -45,7 +45,7 @@ const createSiteOrigin = async (_parent: Object, args: SiteRequest, context) => 
     const originUrl = inputUrl;
     const protocol = await checkProtocol(originUrl);
     const timestamp = Date.now().toString();
-    const user = await context.getUser();
+    const user = context.user;
 
     console.log("host", host);
     console.log("args", args);

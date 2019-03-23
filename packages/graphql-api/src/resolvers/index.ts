@@ -1,6 +1,7 @@
+import Subscription from './Subscription'
+
 const Query = require('./Query');
 const Mutation = require('./Mutation');
-const Subscription = require('./Subscription');
 const Model = require('./Model')
 
 

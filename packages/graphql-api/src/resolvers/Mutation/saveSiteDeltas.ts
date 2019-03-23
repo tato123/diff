@@ -21,7 +21,7 @@ const saveSiteDeltas = async (_parent: Object, args: SaveSiteInput, context) => 
     const Changes = args.input.deltas;
     const CSS = toCss(JSON.parse(Changes));
     const Created = Date.now().toString();
-    const user = await context.getUser();
+    const user = context.user;
 
 
     return Deltas.createDelta({

@@ -1,7 +1,6 @@
 import { dynamo, ORIGINS } from '../dynamodb';
 import _ from 'lodash';
-
-const pubsub = require("../../context/pubsub");
+import pubsub from '../../resolvers/Subscription/pubsub'
 
 interface User {
     sub: string;
@@ -47,12 +46,12 @@ export const createSiteOrigin = (host: string, origin: string, protocol: string,
 }
 
 interface FieldsQuery {
-    Host:{
+    Host: {
         S: string;
     };
 }
 
-export const getByHost = (fields:FieldsQuery) => {
+export const getByHost = (fields: FieldsQuery) => {
     const host = fields.Host.S;
     const REDIS_KEY = `origin::${host}`;
 
@@ -64,7 +63,7 @@ export const getByHost = (fields:FieldsQuery) => {
             return JSON.parse(result);
         }
 
-        const params:any = {
+        const params: any = {
             TableName: ORIGINS,
             Key: fields
         };
@@ -115,29 +114,29 @@ export const getByFields = async (fields) => {
     console.log('\n\n');
 
     return new Promise((resolve, reject) => {
-            // Call DynamoDB to read the item from the table
-            dynamo.scan(params, (err, data) => {
-                console.log("results", data);
+        // Call DynamoDB to read the item from the table
+        dynamo.scan(params, (err, data) => {
+            console.log("results", data);
 
-                // check if we get an error
-                if (err || _.isEmpty(data)) {
-                    console.log("Error", err.message);
-                    return resolve();
-                }
+            // check if we get an error
+            if (err || _.isEmpty(data)) {
+                console.log("Error", err.message);
+                return resolve();
+            }
 
-                const result =  data.Items.map(item => ({
-                    host: _.get(item, 'Host.S', null),
-                    origin: _.get(item, 'Origin.S', null),
-                    protocol: _.get(item, 'Proto.S', null),
-                    created: _.get(item, 'Created.N', null),
-                    uid: _.get(item, 'uid.S', null)
-                }));
+            const result = data.Items.map(item => ({
+                host: _.get(item, 'Host.S', null),
+                origin: _.get(item, 'Origin.S', null),
+                protocol: _.get(item, 'Proto.S', null),
+                created: _.get(item, 'Created.N', null),
+                uid: _.get(item, 'uid.S', null)
+            }));
 
-                return resolve(result)
-            });
+            return resolve(result)
+        });
     })
 
-   
+
 
 }
 

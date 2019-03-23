@@ -14,7 +14,7 @@ export const origin = async (_parent, args, context) => {
   const host = _.get(args, 'Host', null);
 
   const fields = {
-    Host : {S: host}
+    Host: { S: host }
   }
 
   return await Origins.getByHost(fields)
@@ -27,7 +27,7 @@ export const origin = async (_parent, args, context) => {
 export const origins = async (_parent, args, context) => {
   const fields = {};
   const filterByUid = _.get(args, 'limit.mine', false);
-  const user = await context.getUser();
+  const user = await context.user;
 
   if (filterByUid) {
     _.merge(fields, {

@@ -3,8 +3,8 @@ import _ from 'lodash';
 import * as Users from '../../aws/tables/Users';
 
 
-export const subscription = async (_parent: any, args: any, context) => {
-    const user = await context.getUser();
+export const customerSubscription = async (_parent: any, args: any, context) => {
+    const user = context.user;
 
     // by default limit it
     const limit = _.get(args, 'limit.mine', false);

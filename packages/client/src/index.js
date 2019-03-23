@@ -44,11 +44,12 @@ const httpLink = new HttpLink({
 const wsLink = new WebSocketLink({
   uri: process.env.REACT_APP_GRAPHQL_WS_SERVER,
   options: {
-    reconnect: true
+    reconnect: true,
+    connectionParams: () => ({
+      idToken: auth.getIdToken(),
+    })
   },
-  connectionParams: () => ({
-    authorization: bearerToken(),
-  }),
+
 });
 
 // using the ability to split links, you can send data to each link

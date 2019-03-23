@@ -1,5 +1,4 @@
 import * as Users from '../aws/tables/Users';
-import { client } from '../context/pubsub'
 const passport = require('passport');
 const querystring = require('querystring');
 

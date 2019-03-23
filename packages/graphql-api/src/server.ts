@@ -3,12 +3,27 @@ import path = require("path");
 import resolvers = require("./resolvers");
 import context from "./context";
 import webhooks from './webhooks'
+import getUser from './context/auth0';
+import _ from 'lodash';
+
 
 const port = process.env.PORT || 8081;
 
 const options = {
   port,
   endpoint: "/graphql",
+  subscriptions: {
+    path: "/graphql",
+    onConnect: async (connectionParams) => {
+      const idToken = _.get(connectionParams, 'idToken', null);
+      const user = await getUser(idToken);
+
+      // update our context
+      return {
+        user
+      }
+    }
+  },
   bodyParserOptions: {
     limit: "50mb",
     extended: true

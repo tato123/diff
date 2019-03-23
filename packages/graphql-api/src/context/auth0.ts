@@ -20,19 +20,15 @@ const options = {
   algorithms: ["RS256"]
 };
 
-const getUser = ({ request: req }) => async () => {
-  const bearer = _.get(req, 'headers.authorization');
+const getUser = (jwtToken: string): Promise<{} | null> => {
 
-  if (!bearer) {
+  if (!jwtToken) {
     console.log("No user sent");
-    return null;
+    return Promise.resolve(null);
   }
 
-
-  const [_header, jwtToken] = bearer.split(' ');
-  console.log(jwtToken)
   // simple auth check on every request
-  const user = new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     jwt.verify(jwtToken, getKey, options, (err, decoded) => {
       if (err) {
         console.error(err)
@@ -42,8 +38,8 @@ const getUser = ({ request: req }) => async () => {
     });
   });
 
-  return user;
 };
+
 
 
 
