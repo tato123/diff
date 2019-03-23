@@ -9,7 +9,7 @@ const strategy = new Auth0Strategy({
     domain: process.env.AUTH0_DOMAIN,
     clientID: process.env.AUTH0_CLIENT_ID,
     clientSecret: process.env.AUTH0_CLIENT_SECRET,
-    callbackURL: '/auth/callback',
+    callbackURL: `${process.env.API_URL}/auth/callback`,
     state: false
 },
     async (accessToken, refreshToken, extraParams, profile, done) => {
@@ -51,7 +51,7 @@ export default ({ express: app }) => {
             }
 
             // Successful authentication, redirect home.
-            res.redirect(301, `http://localhost:9010/callback#${querystring.stringify(token)}`);
+            res.redirect(301, `${process.env.WEB_APP}/callback#${querystring.stringify(token)}`);
         });
 
 
