@@ -9,6 +9,11 @@ const client = jwksClient({
 
 const getKey = (header, cb) => {
   client.getSigningKey(header.kid, function (err, key) {
+    if (err) {
+      console.error("There was an error retrieving the signing key", err);
+      return cb(err)
+    }
+
     var signingKey = key.publicKey || key.rsaPublicKey;
     cb(null, signingKey);
   });
