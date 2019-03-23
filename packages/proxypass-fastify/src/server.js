@@ -71,6 +71,19 @@ const getBaseApp = (mw = [], opts) => {
     console.info(`server listening on ${opts.port}`);
   });
 
+  app.use((err, req, res, next) => {
+    if (err.expired) {
+      return res.sendFile('expired.html', {
+        root: path.resolve(__dirname, './public')
+      })
+    }
+
+    console.error(err.stack);
+    res.sendFile('error.html', {
+      root: path.resolve(__dirname, './public')
+    })
+  })
+
   return app;
 };
 
@@ -81,9 +94,9 @@ const getBaseApp = (mw = [], opts) => {
  */
 const applyFns = proxy => (name, fns) => {
   if (!Array.isArray(fns)) fns = [fns];
-  proxy.on(name, function() {
+  proxy.on(name, function () {
     var args = arguments;
-    fns.forEach(function(fn) {
+    fns.forEach(function (fn) {
       if (typeof fn === "function") {
         fn.apply(null, args);
       }
@@ -93,6 +106,9 @@ const applyFns = proxy => (name, fns) => {
 
 const proxyError = (err, req, res) => {
   console.error("An error occured proxying", err);
+  res.sendFile('error.html', {
+    root: path.resolve(__dirname, './public')
+  })
 };
 
 const main = () => {
@@ -114,11 +130,11 @@ const main = () => {
   applyToProxy("proxyReqWs", proxyResWs);
   applyToProxy("error", [proxyError]);
 
-  proxy.on("proxyRes", function(proxyRes, req, res) {
+  proxy.on("proxyRes", function (proxyRes, req, res) {
     proxyRes.headers["x-frame-options"] =
       "allow-from " +
       `${req.secure ? "https" : "http"}://${req.headers.host} ${
-        req.proxyTarget
+      req.proxyTarget
       }`;
     proxyRes.headers["access-control-allow-origin"] = "*";
   });
@@ -154,8 +170,8 @@ function getProxyReqFunctions(reqFns, opt, bs) {
   }
 
   if (Map.isMap(reqHeaders)) {
-    return reqFns.concat(function(proxyReq) {
-      reqHeaders.forEach(function(value, key) {
+    return reqFns.concat(function (proxyReq) {
+      reqHeaders.forEach(function (value, key) {
         proxyReq.setHeader(key, value);
       });
     });

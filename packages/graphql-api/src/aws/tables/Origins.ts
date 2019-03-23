@@ -1,6 +1,6 @@
 import { dynamo, ORIGINS } from '../dynamodb';
 import _ from 'lodash';
-import pubsub from '../../resolvers/Subscription/pubsub'
+import { client } from '../../resolvers/Subscription/pubsub'
 
 interface User {
     sub: string;
@@ -55,7 +55,7 @@ export const getByHost = (fields: FieldsQuery) => {
     const host = fields.Host.S;
     const REDIS_KEY = `origin::${host}`;
 
-    return pubsub.client.get(REDIS_KEY).then(result => {
+    return client.get(REDIS_KEY).then(result => {
         const data = result == null ? null : JSON.parse(result);
 
         if (data != null && _.has(data, "host")) {
@@ -89,7 +89,7 @@ export const getByHost = (fields: FieldsQuery) => {
                     uid: _.get(data, 'Item.uid.S', null)
                 };
 
-                pubsub.client.set(REDIS_KEY, JSON.stringify(result));
+                client.set(REDIS_KEY, JSON.stringify(result));
                 return resolve(result);
             });
         });

@@ -3,7 +3,7 @@ import { Elements } from 'react-stripe-elements';
 import CheckoutForm from './CheckoutForm';
 import _ from 'lodash';
 
-import { useQuery, useSubscription } from 'react-apollo-hooks';
+import { useQuery } from 'react-apollo-hooks';
 import gql from 'graphql-tag';
 
 const GET_PLAN = gql`
@@ -13,15 +13,6 @@ const GET_PLAN = gql`
         status
     }
 }`
-
-const PLAN_CHANGE = gql`
-    subscription {
-        customerSubscriptionChange {
-            plan
-            status
-        }
-    }
-`
 
 const Billing = () => {
     const [statePlan, setPlan] = useState(null);
