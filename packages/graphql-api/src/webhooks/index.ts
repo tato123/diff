@@ -43,7 +43,7 @@ export default ({ express: app }) => {
 
     // we can 
     app.get('/auth/callback',
-        passport.authenticate('auth0', { failureRedirect: 'http://localhost:9010/login' }),
+        passport.authenticate('auth0', { failureRedirect: `${process.env.WEB_APP}/login` }),
         function (req, res) {
             const token = {
                 ...req.user,
