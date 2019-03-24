@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
 import { Elements } from 'react-stripe-elements';
 import CheckoutForm from './CheckoutForm';
+import Form from '@atlaskit/form';
+import Button from '@atlaskit/button';
+
 import _ from 'lodash';
+import ModalDialog, { ModalTransition, ModalFooter } from '@atlaskit/modal-dialog';
+
 
 import styled from 'styled-components';
 
@@ -16,7 +21,7 @@ const GET_PLAN = gql`
     }
 }`
 
-const Field = styled.div`
+const CField = styled.div`
     display: block;
     margin-top: 16px;
 
@@ -43,9 +48,18 @@ const Wrapper = ({ children }) => (
 /* eslint-disable jsx-a11y/anchor-is-valid*/
 const Billing = () => {
     const [statePlan, setPlan] = useState(null);
-    const [stateStatus, setStatus] = useState(null);
     const [isCheckout, setIsCheckout] = useState(false);
+    const [isOpen, setOpen] = useState(false)
     const { data, error, loading } = useQuery(GET_PLAN);
+
+    const onClose = () => {
+        setOpen(false)
+    }
+
+    const onFormSubmit = (data) => {
+        console.log('cancelled');
+        setOpen(false)
+    }
 
     if (loading) {
         return <Wrapper>Loading...</Wrapper>;
@@ -55,23 +69,31 @@ const Billing = () => {
     };
 
     const plan = statePlan || _.get(data, 'customerSubscription.plan');
-    const status = stateStatus || _.get(data, 'customerSubscription.status')
+    const footer = props => (
+        <ModalFooter showKeyline={props.showKeyline}>
+            <span />
+            <Button appearance="subtle" onClick={() => setOpen(false)}>Cancel</Button>
 
+            <Button appearance="danger" type="submit">
+                Cancel Subscription
+          </Button>
+        </ModalFooter>
+    );
 
     return (<Wrapper>
         <div>
-            <Field>
+            <CField>
                 <label className="description">Plan:</label>
                 <label className="value">{plan === 'full' ? 'Monthly Subscription' : 'Trial'}</label>
-            </Field>
+            </CField>
 
-            <Field>
+            <CField>
                 <label className="description">Payment Method:</label>
                 <label className="value">{plan === 'full' ? 'Credit Card' : 'None'}</label>
-            </Field>
-            <Field>
-                <a href="#">Cancel Subscription</a>
-            </Field>
+            </CField>
+            <CField>
+                <a href="#" onClick={() => setOpen(true)}>Cancel Subscription</a>
+            </CField>
 
         </div>
         {isCheckout && <label>checking you out</label>}
@@ -82,11 +104,31 @@ const Billing = () => {
                     onEndCheckout={() => setIsCheckout(false)}
                     onChange={({ plan, status }) => {
                         setPlan(plan);
-                        setStatus(status);
                     }}
                 />
             </Elements>
         )}
+
+        <ModalTransition>
+            {isOpen &&
+                <ModalDialog height={300} heading="Cancel your subscription" onClose={onClose} components={{
+                    Container: ({ children, className }) => (
+                        <Form onSubmit={onFormSubmit}>
+                            {({ formProps }) => (
+                                <form {...formProps} className={className}>
+                                    {children}
+                                </form>
+                            )}
+                        </Form>
+                    ),
+                    Footer: footer
+                }}>
+                    <p style={{ fontSize: '1rem' }}>
+                        Please confirm that you would like to confirm your subscription of Diff. Cancelling your subscription
+                        will stop billing for Diff at the end of your current billing period
+                    </p>
+                </ModalDialog>}
+        </ModalTransition>
 
     </Wrapper>)
 }

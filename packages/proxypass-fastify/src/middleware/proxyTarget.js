@@ -47,19 +47,25 @@ const middleware = opts => async (req, res, next) => {
   try {
     console.log("Querying with variables", variables);
     const data = await request(process.env.GRAPHQL_ENDPOINT, query, variables);
-    const isExpired = calculateIsExpired(_.get(data, 'origin.created', Date.now().toString()));
-    const isTrial = _.get(data, 'origin.customerSubscription.plan', 'trial') === 'trial'
-
-
     if (data.origin == null) {
       return next("no data found");
     }
 
-    // expired check
-    if (isTrial && isExpired) {
-      console.error('this link is expired')
-      return next({ expired: true })
+
+    // for old links without created timestamps ignore this, we will grandfather them in for now
+    // todo: purge this after a period of time
+    if (data.created != null) {
+      const isExpired = calculateIsExpired(_.get(data, 'origin.created', Date.now().toString()));
+      const isTrial = _.get(data, 'origin.customerSubscription.plan', 'trial') === 'trial'
+
+
+      // expired check
+      if (isTrial && isExpired) {
+        console.error('this link is expired')
+        return next({ expired: true })
+      }
     }
+
 
     req.proxyTarget = `${data.origin.protocol}://${data.origin.origin}`;
     req.proxyHostname = data.origin.origin;
