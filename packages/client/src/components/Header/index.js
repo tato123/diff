@@ -3,7 +3,7 @@ import Logo from "../Logo";
 import styled from 'styled-components';
 import AuthContext from '../../utils/context'
 import Avatar from '../Avatar'
-import { Link } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 
 
 const Container = styled.header`
@@ -33,7 +33,27 @@ const Account = styled.div`
     justify-content: flex-end;
 `
 
+const LinkStyle = `
+margin-left: 16px;
+    border: none;
+    outline: none;
+    background: none;
+    text-transform: capitalize;
+    font-weight: bold;
+    cursor: pointer;
 
+    &:hover {
+        color:#4648b0;
+    }
+`
+
+const LogoutLink = styled.button`
+${LinkStyle}
+`
+
+const LoginLink = styled(NavLink)`
+${LinkStyle}
+`;
 
 const Header = () => {
 
@@ -57,11 +77,11 @@ const Header = () => {
                             <Link to="/account">
                                 <Avatar src={user.picture} />
                             </Link>
-                            <button onClick={auth.logout}>logout</button>
+                            <LogoutLink onClick={auth.logout}>logout</LogoutLink>
                         </React.Fragment>
                     )}
                     {!auth.isAuthenticated() && (
-                        <Link to="/login">Login</Link>
+                        <LoginLink to="/login" activeStyle={{ display: "none" }}>Login</LoginLink>
                     )}
 
                 </Account>
