@@ -1,11 +1,7 @@
 import React from 'react';
-import AccountLayout from '../../components/Layouts/Account';
 import styled from 'styled-components';
-import { Route, Switch, Redirect } from 'react-router';
-import { Link, NavLink } from 'react-router-dom'
 import { useQuery } from 'react-apollo-hooks';
 import gql from 'graphql-tag';
-import Billing from './Billing'
 import { lighten } from 'polished';
 
 
@@ -24,67 +20,6 @@ const GET_ORIGINS = gql`
   }
 `;
 
-
-const MainContent = styled.div`
-    display: flex;
-    flex: 1 auto;
-    margin-top: 16px;
-    
-
-    .sidebar {
-        flex: 1;
-    }
-
-    .content {
-        flex: 5;
-    }
-`
-
-const List = styled.ul`
-    list-style:none;
-    margin:0;
-    padding-left: 16px;
-    margin-right: 16px;
-
-    li {
-        margin-top: 8px;
-        min-width: 200px;
-    }
-
-    li:first-child {
-        margin-top: 0px;
-    }
-`;
-
-const ListLink = styled(NavLink)`
-    padding: 10px;
-    border-radius:8px;
-    display: inline-block;
-    width: 100%;
-    box-sizing: border-box;
-  
-    text-decoration: none;
-    font-size: 18px;
-    color: #a6a6a6;
-
-
-    &:hover {
-        background-color: #efefef;
-        text-decoration: none;
-    }
-
-
-     
-
-    &.active {
-        color: #4648b0;
-        font-weight: bold;
-    }
-
-    &:focus, &:visited {
-        outline: none;
-    }
-`
 
 const ProtoTypeList = styled.div`
     display: flex;
