@@ -55,7 +55,9 @@ const LoginLink = styled(NavLink)`
 ${LinkStyle}
 `;
 
-const Header = () => {
+
+
+const Header = ({ account }) => {
 
     const auth = useContext(AuthContext);
     const user = auth.getProfile();
@@ -72,7 +74,9 @@ const Header = () => {
                 <Menu>
                 </Menu>
                 <Account>
-                    {auth.isAuthenticated() && (
+                    {account && account(auth)}
+
+                    {!account && auth.isAuthenticated() && (
                         <React.Fragment>
                             <Link to="/account">
                                 <Avatar src={user.picture} />
@@ -80,8 +84,8 @@ const Header = () => {
                             <LogoutLink onClick={auth.logout}>logout</LogoutLink>
                         </React.Fragment>
                     )}
-                    {!auth.isAuthenticated() && (
-                        <LoginLink to="/login" activeStyle={{ display: "none" }}>Login</LoginLink>
+                    {!account && !auth.isAuthenticated() && (
+                        <LoginLink to="/account" activeStyle={{ display: "none" }}>Login</LoginLink>
                     )}
 
                 </Account>
@@ -90,4 +94,7 @@ const Header = () => {
     )
 
 }
+
+
+
 export default Header;

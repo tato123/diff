@@ -18,6 +18,7 @@ import Step from './styles/Step';
 import { scroller, Element } from 'react-scroll';
 import { isMobile } from 'react-device-detect';
 import Header from '../../components/Header';
+import { Link } from 'react-router-dom';
 
 
 
@@ -49,7 +50,12 @@ const HomePage = ({ history }) => {
 
   return (
     <Page>
-      <Header />
+      <Header
+        account={() => (
+          <Link to="/account">Dashboard</Link>
+
+        )}
+      />
 
       <Main>
         <div className="description">

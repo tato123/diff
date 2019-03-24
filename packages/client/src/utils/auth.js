@@ -21,7 +21,7 @@ export default class Auth {
   }
 
   scheduleRenewal() {
-    let expiresAt = this.expiresAt;
+    let expiresAt = this.getExpiresAt();
     const timeout = expiresAt - Date.now();
     if (timeout > 0) {
       this.tokenRenewalTimeout = setTimeout(() => {
@@ -29,11 +29,6 @@ export default class Auth {
       }, timeout);
     }
   }
-
-  getExpiryDate() {
-    return JSON.stringify(new Date(this.expiresAt));
-  }
-
 
   rememberPage = () => {
     localStorage.setItem('diff_redirectTo', document.referrer);
@@ -86,39 +81,46 @@ export default class Auth {
   }
 
   getExpiresAt = () => {
-    return localStorage.getItem('expiresAt');
+    const val = localStorage.getItem('expiresAt');
+    return !!val ? parseInt(val) : null;
   }
 
   getProfile = () => {
-    const idToken = this.getIdToken();
-    if (!idToken) {
+    const val = localStorage.getItem('userProfile');
+
+    try {
+      return JSON.parse(val);
+    } catch (e) {
       return null;
     }
 
-    const decoded = jwtDecode(idToken);
-    return decoded;
   }
 
   setSession = (authResult) => {
-
-    // Set the time that the access token will expire at
     let expiresAt = (authResult.expiresIn * 1000) + new Date().getTime();
-
 
     localStorage.setItem('accessToken', authResult.accessToken);
     localStorage.setItem('idToken', authResult.idToken);
+
+    const decodedIdToken = jwtDecode(authResult.idToken);
+
     localStorage.setItem('expiresAt', expiresAt);
+    localStorage.setItem('userProfile', JSON.stringify(decodedIdToken));
 
     // schedule a token renewal
     this.scheduleRenewal();
+    this.handleRedirect();
 
+  }
+
+  handleRedirect = () => {
     // navigate to the home route
     const lastPage = localStorage['diff_redirectTo'];
     if (lastPage) {
       delete localStorage['diff_redirectTo'];
       window.location.replace(lastPage);
     } else {
-      history.replace('/')
+      history.replace('/account')
     }
   }
 
@@ -138,14 +140,10 @@ export default class Auth {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('idToken');
     localStorage.removeItem('expiresAt');
+    localStorage.removeItem('userProfile');
   }
 
   logout = () => {
-    // Remove tokens and expiry time
-    this.accessToken = null;
-    this.idToken = null;
-    this.expiresAt = 0;
-
     this.clear();
 
     // Clear token renewal
@@ -157,11 +155,11 @@ export default class Auth {
   }
 
   isAuthenticated = () => {
-
     // Check whether the current time is past the
     // access token's expiry time
-    let expiresAt = this.getExpiresAt();
-    return expiresAt == null ? false : new Date().getTime() < expiresAt;
+    const expiresAt = this.getExpiresAt();
+    const current = new Date().getTime();
+    return expiresAt == null ? false : current < expiresAt;
   }
 
 

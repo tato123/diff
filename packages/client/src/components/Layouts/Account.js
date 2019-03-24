@@ -9,10 +9,12 @@ const FullPage = styled.div`
   padding:0 150px;
   box-sizing: border-box;
 
+  h1 {
+      color: #4648b0;
+      font-weight: bold;
+  }
 
 `
-
-
 
 const AccountLayout = ({ children }) => (
     <FullPage>

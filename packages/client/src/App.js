@@ -17,15 +17,6 @@ import "./index.css";
 import "react-toastify/dist/ReactToastify.css";
 import "./normalize.css";
 
-
-
-const handleAuthentication = (nextState, replace) => {
-  if (/access_token|id_token|error/.test(nextState.location.hash)) {
-    auth.handleAuthentication(nextState.location.hash);
-  }
-}
-
-
 if (process.env.NODE_ENV === "production") {
   ReactGA.initialize("UA-124426207-2");
   ReactGA.pageview(window.location.pathname + window.location.search);
@@ -39,10 +30,7 @@ const App = () => (
           <Switch>
             <Route exact path="/edit" render={props => <Designer auth={auth} {...props} />} />
             <Route exact path="/login" component={Login} />
-            <Route path="/callback" render={(props) => {
-              handleAuthentication(props);
-              return <AuthCallback {...props} />
-            }} />
+            <Route path="/callback" component={AuthCallback} />
             <Route exact path="/search" component={Search} />
             <Route exact path="/" component={Home} />
             <PrivateRoute auth={auth} path="/account" component={Account} />

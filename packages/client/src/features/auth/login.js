@@ -8,65 +8,7 @@ import { Icon } from 'react-icons-kit';
 import { google } from 'react-icons-kit/icomoon/google';
 import AuthContext from '../../utils/context'
 
-import AccountLayout from '../../components/Layouts/Account';
-
-
-const Container = styled.div`
-  color: #231c47;
-
-
-  .content {
-    border-radius: 8px;
-
-    background-color: #fff;
-    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
-      0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
-    overflow: hidden;
-    margin-top: 32px;
-  }
-
-  .left {
-    background-color: #231c48;
-    height: inherit;
-    color: #fff;
-    text-align: center;
-    font-size: 1.5rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    font-weight: 300;
-    padding: 64px 32px;
-  }
-
-  .right {
-    background-color: #fff;
-    padding: 64px 48px;
-  }
-
-  label,
-  span {
-    color: #231c47;
-  }
-
-  a {
-    color: #5ccada;
-    text-decoration: underline;
-  }
-
-  .leftIcon {
-    position: absolute;
-    left: 16px;
-  }
-  input[type='email'] {
-    padding: 16px !important;
-    border-radius: 4px;
-  }
-
-  .text span {
-    color: #fff;
-  }
-`;
+import AuthenticationLayout from '../../components/Layouts/Authentication';
 
 
 
@@ -99,6 +41,10 @@ const DarkHR = styled.hr`
 const Login = ({ history }) => {
   const auth = useContext(AuthContext);
 
+  if (auth.isAuthenticated()) {
+    auth.handleRedirect();
+  }
+
   const onLoginWithGoogle = auth.loginWithGoogle;
 
   const onLoginWithMagicLink = evt => {
@@ -120,41 +66,43 @@ const Login = ({ history }) => {
   };
 
   return (
-    <AccountLayout>
-      <Container className="container">
-        <div className="row content" >
+    <AuthenticationLayout>
 
-          <div className="col right">
-            <div>
-              <h1>Login to Diff</h1>
-              <Space top={4}>
-                <p>with Google</p>
-                <GoogleButton onClick={onLoginWithGoogle}>
-                  <span>
-                    <Icon icon={google} className="leftIcon" />
-                    Continue with Google
-                  </span>
-                </GoogleButton>
-              </Space>
-            </div>
-            <div style={{ margin: '32px 0px' }}>
-              <DarkHR />
-            </div>
-            <div>
-              <form onSubmit={onLoginWithMagicLink}>
-                <Field name="username" defaultValue="" label="User name" isRequired>
-                  {({ fieldProps }) => <TextField {...fieldProps} />}
-                </Field>
+      <div className="col right">
+        <div>
+          <p>Login to Diff</p>
 
-                <MagicLinkButton type="submit" primary>
-                  <span>Send Magic Link</span>
-                </MagicLinkButton>
-              </form>
-            </div>
-          </div>
         </div>
-      </Container>
-    </AccountLayout>
+
+        <div>
+          <form onSubmit={onLoginWithMagicLink}>
+            <Field name="username" defaultValue="" label="User name" isRequired>
+              {({ fieldProps }) => <TextField {...fieldProps} />}
+            </Field>
+            <Field name="password" defaultValue="" label="Password" isRequired>
+              {({ fieldProps }) => <TextField {...fieldProps} />}
+            </Field>
+
+            <MagicLinkButton type="submit" primary>
+              <span>Sign in</span>
+            </MagicLinkButton>
+          </form>
+        </div>
+
+        <div style={{ margin: '32px 0px' }}>
+          <DarkHR />
+        </div>
+
+        <Space top={4}>
+          <GoogleButton onClick={onLoginWithGoogle}>
+            <span>
+              <Icon icon={google} className="leftIcon" />
+              Sign in with Google
+                  </span>
+          </GoogleButton>
+        </Space>
+      </div>
+    </AuthenticationLayout>
   )
 }
 
