@@ -1,6 +1,7 @@
 import * as auth0 from 'auth0-js';
 import history from '../history'
 import jwtDecode from 'jwt-decode';
+import _ from 'lodash';
 
 
 
@@ -87,13 +88,22 @@ export default class Auth {
 
   getProfile = () => {
     const val = localStorage.getItem('userProfile');
-
-    try {
-      return JSON.parse(val);
-    } catch (e) {
-      return null;
+    if (val) {
+      try {
+        return JSON.parse(val);
+      } catch (e) {
+        return null;
+      }
     }
+    const idToken = this.getIdToken();
 
+    return !_.isNil(idToken) && jwtDecode(idToken);
+
+  }
+
+  getExp = () => {
+    const accessToken = this.getAccessToken();
+    return !_.isNil(accessToken) && jwtDecode(accessToken).exp;
   }
 
   setSession = (authResult) => {
@@ -155,11 +165,17 @@ export default class Auth {
   }
 
   isAuthenticated = () => {
-    // Check whether the current time is past the
-    // access token's expiry time
-    const expiresAt = this.getExpiresAt();
-    const current = new Date().getTime();
-    return expiresAt == null ? false : current < expiresAt;
+
+    const exp = this.getExp();
+    if (_.isNil(exp)) {
+      return false;
+    }
+
+    const dateNow = new Date();
+    if (exp < dateNow.getTime() / 1000) {
+      return false;
+    }
+    return true;
   }
 
 

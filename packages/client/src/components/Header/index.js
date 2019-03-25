@@ -3,7 +3,8 @@ import Logo from "../Logo";
 import styled from 'styled-components';
 import AuthContext from '../../utils/context'
 import Avatar from '../Avatar'
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom';
+import _ from 'lodash';
 
 
 const Container = styled.header`
@@ -61,6 +62,7 @@ const Header = ({ account }) => {
 
     const auth = useContext(AuthContext);
     const user = auth.getProfile();
+    const picture = _.get(user, 'picture', null);
 
 
     return (
@@ -79,7 +81,7 @@ const Header = ({ account }) => {
                     {!account && auth.isAuthenticated() && (
                         <React.Fragment>
                             <Link to="/account">
-                                <Avatar src={user.picture} />
+                                <Avatar src={picture} />
                             </Link>
                             <LogoutLink onClick={auth.logout}>logout</LogoutLink>
                         </React.Fragment>
