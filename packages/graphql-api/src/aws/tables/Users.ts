@@ -9,6 +9,7 @@ export const createUidIfNotExists = (uid: string): Promise<boolean> => {
         Item: {
             uid: { S: uid },
             plan: { S: 'trial' },
+            plan_status: { S: "not_started" },
             created: { N: timestamp },
             updated: { N: timestamp }
         },
@@ -97,3 +98,37 @@ export const getUserByUid = (uid: string): Promise<any> => {
         });
     });
 }
+
+
+
+export const getUserByCustomerId = (customerId: string): Promise<any> => {
+
+    const params: any = {
+        TableName: USERS,
+        IndexName: 'stripe_customer_id-index',
+        KeyConditionExpression: 'stripe_customer_id = :cus',
+        ExpressionAttributeValues: { ':cus': { S: customerId } }
+    };
+
+    // Call DynamoDB to read the item from the table
+    return new Promise((resolve, reject) => {
+        dynamo.query(params, (err: Object, data: any) => {
+            if (err) {
+                console.log("Error", err);
+                return reject(err);
+            }
+
+            return resolve({
+                uid: _.get(data, 'Items[0].uid.S', null),
+                created: _.get(data, 'Items[0].created.S', null),
+                plan: _.get(data, 'Items[0].plan.S', null),
+                status: _.get(data, 'Items[0].plan_status.S', null),
+                updated: _.get(data, 'Items[0].updated.S', null),
+                customerId: _.get(data, 'Items[0].stripe_customer_id.S', null),
+                planId: _.get(data, 'Items[0].stripe_plan_id.S', null)
+            });
+        });
+    });
+}
+
+

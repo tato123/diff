@@ -66,6 +66,10 @@ input Test {
   source:String
 }
 
+input NullMutation {
+  _: String
+}
+
 ## ----------------------------------
 ## Queries 
 
@@ -90,6 +94,7 @@ type Mutation {
   uploadDesign(file: Upload!, metaData: UploadDesignMeta): UploadResult
   createSiteOrigin(input: CreateSiteOriginInput!): CreateSiteOriginResult
   subscribeCustomerToPlan(input: CreateCustomerInput!) : CustomerSubscription
+  cancelSubscription(input:NullMutation) : CustomerSubscription
   saveSiteDeltas(input: SaveSiteDeltasInput!): SaveSiteDeltasResult
   testSubscriptionChange(input:Test) : CustomerSubscription
 }

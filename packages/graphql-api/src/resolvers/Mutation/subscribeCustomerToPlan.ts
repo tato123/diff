@@ -36,7 +36,7 @@ const createStripeCustomer = async (_parent, args: CustomerInput, context) => {
 
         console.log('CustomerId', customerId)
         // get the customer from stripe
-        const customer = !_.isNil(customerId) ? customerId : await stripe.customers.create({
+        const customer = !_.isNil(customerId) ? { id: customerId } : await stripe.customers.create({
             email: user.email,
             source: args.input.source,
         });

@@ -10,7 +10,7 @@ import ModalDialog, { ModalTransition, ModalFooter } from '@atlaskit/modal-dialo
 
 import styled from 'styled-components';
 
-import { useQuery } from 'react-apollo-hooks';
+import { useQuery, useMutation } from 'react-apollo-hooks';
 import gql from 'graphql-tag';
 
 const GET_PLAN = gql`
@@ -20,6 +20,15 @@ const GET_PLAN = gql`
         status
     }
 }`
+
+const CANCEL_CUSTOMER_PLAN = gql`
+  mutation  {
+    cancelSubscription {
+        plan
+        status
+    }
+  }
+`;
 
 const CField = styled.div`
     display: block;
@@ -37,6 +46,14 @@ const CField = styled.div`
     }
 `
 
+const Warning = styled.div`
+    background-color: #e34fb6;
+    padding: 10px;
+    border-radius: 8px;
+    color: #fff;
+    
+`
+
 const Wrapper = ({ children }) => (
     <div>
         <h1>My Billing Information</h1>
@@ -48,16 +65,20 @@ const Wrapper = ({ children }) => (
 /* eslint-disable jsx-a11y/anchor-is-valid*/
 const Billing = () => {
     const [statePlan, setPlan] = useState(null);
+    const [stateStatus, setStatus] = useState(null);
     const [isCheckout, setIsCheckout] = useState(false);
     const [isOpen, setOpen] = useState(false)
     const { data, error, loading } = useQuery(GET_PLAN);
+    const cancelPlan = useMutation(CANCEL_CUSTOMER_PLAN);
+
 
     const onClose = () => {
         setOpen(false)
     }
 
-    const onFormSubmit = (data) => {
-        console.log('cancelled');
+    const onFormSubmit = async () => {
+        const { data } = await cancelPlan();
+        setStatus(data.cancelSubscription.status);
         setOpen(false)
     }
 
@@ -69,6 +90,9 @@ const Billing = () => {
     };
 
     const plan = statePlan || _.get(data, 'customerSubscription.plan');
+    const status = stateStatus || _.get(data, 'customerSubscription.status');
+    const CANCEL_TYPE = 'cancel_at_period_end';
+
     const footer = props => (
         <ModalFooter showKeyline={props.showKeyline}>
             <span />
@@ -82,6 +106,9 @@ const Billing = () => {
 
     return (<Wrapper>
         <div>
+            {status === CANCEL_TYPE && (
+                <Warning>Your plan is cancelled and will expire after the current billing period</Warning>
+            )}
             <CField>
                 <label className="description">Plan:</label>
                 <label className="value">{plan === 'full' ? 'Monthly Subscription' : 'Trial'}</label>
@@ -91,9 +118,12 @@ const Billing = () => {
                 <label className="description">Payment Method:</label>
                 <label className="value">{plan === 'full' ? 'Credit Card' : 'None'}</label>
             </CField>
-            <CField>
-                <a href="#" onClick={() => setOpen(true)}>Cancel Subscription</a>
-            </CField>
+            {plan === 'full' && status !== CANCEL_TYPE && (
+                <CField>
+                    <a href="#" onClick={() => setOpen(true)}>Cancel Subscription</a>
+                </CField>
+            )}
+
 
         </div>
         {isCheckout && <label>checking you out</label>}
