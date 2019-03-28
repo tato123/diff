@@ -11,11 +11,12 @@ import Account from './features/account'
 import history from './history';
 import PrivateRoute from './components/PrivateRoute';
 import AuthContext, { auth } from './utils/context'
+import PrivacyPolicy from './features/privacy/policy';
+import TOSPolicy from './features/privacy/tos';
 
 import "@atlaskit/css-reset/dist/bundle.css";
 import "./index.css";
 import "react-toastify/dist/ReactToastify.css";
-import "./normalize.css";
 
 if (process.env.NODE_ENV === "production") {
   ReactGA.initialize("UA-124426207-2");
@@ -33,6 +34,8 @@ const App = () => (
             <Route path="/callback" component={AuthCallback} />
             <Route exact path="/search" component={Search} />
             <Route exact path="/" component={Home} />
+            <Route exact path="/privacy" component={PrivacyPolicy} />
+            <Route exact path="/tos" component={TOSPolicy} />
             <PrivateRoute auth={auth} path="/account" component={Account} />
           </Switch>
         </Router>

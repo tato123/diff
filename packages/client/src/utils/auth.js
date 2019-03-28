@@ -48,13 +48,23 @@ export default class Auth {
     })
   }
 
-  passwordlessLogin = (email, cb) => {
+  passwordlessLogin = (email) => {
     this.rememberPage();
-    this.auth0.authorize({
-      connection: 'email',
-      send: 'link',
-      email
-    }, cb)
+
+    return new Promise((resolve, reject) => {
+      this.auth0.passwordlessStart({
+        connection: 'email',
+        send: 'link',
+        email,
+        responseType: 'code',
+      }, (err, res) => {
+        if (err) {
+          return reject(err)
+        }
+        return resolve(res);
+      })
+    })
+
   }
 
   handleAuthentication = (hash, state = "diff_app") => {
@@ -102,8 +112,8 @@ export default class Auth {
   }
 
   getExp = () => {
-    const accessToken = this.getAccessToken();
-    return !_.isNil(accessToken) && jwtDecode(accessToken).exp;
+    const idToken = this.getIdToken();
+    return !_.isNil(idToken) && jwtDecode(idToken).exp;
   }
 
   setSession = (authResult) => {
@@ -171,11 +181,9 @@ export default class Auth {
       return false;
     }
 
-    const dateNow = new Date();
-    if (exp < dateNow.getTime() / 1000) {
-      return false;
-    }
-    return true;
+    const dateNow = new Date().getTime() / 1000;
+    const val = exp < dateNow;
+    return !val;
   }
 
 

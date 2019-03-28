@@ -1,14 +1,8 @@
 import React from 'react';
+import Button, { ButtonGroup } from '@atlaskit/button';
 import styled from 'styled-components';
 import { useQuery } from 'react-apollo-hooks';
 import gql from 'graphql-tag';
-import { lighten } from 'polished';
-
-
-const purple = '#4648b0';
-const purple1 = lighten(0.2, purple);
-const blue = '#00c9d8';
-const blue1 = lighten(0.55, blue);
 
 
 const GET_ORIGINS = gql`
@@ -44,45 +38,6 @@ const Prototype = styled.div`
 
 
 
-const EditLink = styled.a`
-    width: 100%;
-    background: ${purple1};
-    color: #fff;
-    text-decoration: none;
-    padding: 16px;
-    display: block;
-    box-sizing: border-box;
-    border-radius: 4px;
-    text-align:center;
-    font-weight: 500;
-    font-size: 1.2rem;
-    transition: all 250ms;
-
-    &:hover {
-        text-decoration: none;
-        background: ${purple};
-        color: #fff;
-    }
-`;
-
-const ViewLink = styled.a`
-    width: 100%;
-    background: ${blue1};
-    padding: 16px;
-    display: block;
-    box-sizing: border-box;
-    border-radius: 4px;
-    text-align:center;
-    font-weight: 500;
-    font-size: 1.2rem;
-    transition: all 250ms;
-
-    &:hover {
-        text-decoration: none;
-        background: ${blue};
-    }
-`;
-
 const Wrapper = ({ children }) => (
     <div>
         <h1>My Prototypes</h1>
@@ -91,8 +46,12 @@ const Wrapper = ({ children }) => (
     </div>
 )
 
-const Prototypes = () => {
+const Prototypes = ({ history }) => {
     const { data, error, loading } = useQuery(GET_ORIGINS);
+    const goTo = (url) => () => {
+        history.replace(url);
+    }
+
     if (loading) {
         return <Wrapper>Loading...</Wrapper>;
     };
@@ -105,15 +64,15 @@ const Prototypes = () => {
             <ProtoTypeList>
                 {data.origins.map(origin => (
                     <Prototype key={origin.host}>
-                        <label>{origin.origin}</label>
-                        <EditLink href={"/edit?version=" + origin.host}>
-
-                            Edit
-                        </EditLink>
-                        <ViewLink href={`https://${origin.host}`}>
-
-                            View
-                       </ViewLink></Prototype>
+                        <div>
+                            <label>{origin.origin}</label></div>
+                        <div style={{ display: "flex" }}>
+                            <ButtonGroup>
+                                <Button onClick={goTo("/edit?version=" + origin.host)}>Edit</Button>
+                                <Button onClick={goTo(`https://${origin.host}`)}>View</Button>
+                            </ButtonGroup>
+                        </div>
+                    </Prototype>
                 ))}
             </ProtoTypeList>
         </Wrapper>

@@ -11,15 +11,13 @@ import Footer from './styles/Footer';
 import Input from './styles/Input';
 import InputField from './styles/InputField';
 import Main from './styles/Main';
-import Page from './styles/Page';
 import Sentence from './styles/Sentence';
 import SpecialText from './styles/SpecialText';
 import Step from './styles/Step';
 import { scroller, Element } from 'react-scroll';
 import { isMobile } from 'react-device-detect';
-import Header from '../../components/Header';
-import { Link } from 'react-router-dom';
 
+import Layout from './layout';
 
 
 const HomePage = ({ history }) => {
@@ -49,13 +47,7 @@ const HomePage = ({ history }) => {
   }
 
   return (
-    <Page>
-      <Header
-        account={() => (
-          <Link to="/account">Dashboard</Link>
-
-        )}
-      />
+    <Layout>
 
       <Main>
         <div className="description">
@@ -134,7 +126,7 @@ const HomePage = ({ history }) => {
 
       </Footer>
       <Copy>&copy; 2019 getDiff, Inc.</Copy>
-    </Page>
+    </Layout>
   );
 };
 

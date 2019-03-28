@@ -32,9 +32,6 @@ const Container = styled.div`
   }
  
 
-  .right {
-    background-color: #fff;
-  }
 
   label,
   span {

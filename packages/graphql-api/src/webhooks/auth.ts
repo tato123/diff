@@ -13,7 +13,7 @@ const strategy = new Auth0Strategy({
     state: false
 },
     async (accessToken, refreshToken, extraParams, profile, done) => {
-
+        console.log('Received a profile of', profile)
         try {
             await Users.createUidIfNotExists(profile.id)
             return done(null, extraParams);

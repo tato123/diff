@@ -1,20 +1,19 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import Button from "../../components/Button";
 import styled from 'styled-components';
-import { Field } from '@atlaskit/form';
+import Form, { Field } from '@atlaskit/form';
 import TextField from '@atlaskit/textfield';
-import Space from '../../components/Space'
 import { Icon } from 'react-icons-kit';
 import { google } from 'react-icons-kit/icomoon/google';
 import AuthContext from '../../utils/context'
 
 import AuthenticationLayout from '../../components/Layouts/Authentication';
+import { resolve, reject } from 'q';
 
 
 
 const GoogleButton = styled(Button)`
 position: relative;
-  margin-top: 16px;
   background-color: #4949b3 !important;
   color: #fff;
   width: 100%;
@@ -23,6 +22,7 @@ position: relative;
 const MagicLinkButton = styled(Button)`
   margin-top: 16px;
   background-color: #43cad9 !important;
+  width: 100%;
 `;
 
 const DarkHR = styled.hr`
@@ -35,11 +35,75 @@ const DarkHR = styled.hr`
   height: 1px;
 `;
 
+const LoginRegion = styled.div`
+  display: grid;
+  grid-template-areas: "." "." ".";
+  grid-template-rows: 64px 5fr 1fr;
+  height: ${props => props.height || '450px'};
+  transition: height 250ms cubic-bezier(0.4, 0.0, 0.2, 1);
 
 
+  > div:last-child {
+    justify-content: center;
+    display: flex;
+    align-items: flex-end;
+  }
+
+`
+
+
+const SignupForm = ({ onSubmit }) => {
+  return (
+    <Form
+      onSubmit={onSubmit}
+    >
+      {({ formProps, submitting }) => (
+        <form {...formProps} autoComplete="off">
+          <Field name="email" defaultValue="" label="Email" isRequired>
+            {({ fieldProps }) => <TextField {...fieldProps} />}
+          </Field>
+          <Field name="password" defaultValue="" label="Password" isRequired>
+            {({ fieldProps }) => <TextField {...fieldProps} type="password" />}
+          </Field>
+          <Field name="confirmPassword" defaultValue="" label="Confirm Password" isRequired>
+            {({ fieldProps }) => <TextField {...fieldProps} type="password" />}
+          </Field>
+          <MagicLinkButton type="submit" primary>
+            <span>Create Account</span>
+          </MagicLinkButton>
+        </form>
+      )}
+    </Form>
+  )
+}
+
+const SigninForm = ({ onSubmit }) => {
+  return (
+    <Form
+      onSubmit={onSubmit}
+    >
+      {({ formProps, submitting }) => (
+        <form {...formProps} autoComplete="off">
+
+          <Field name="email" defaultValue="" label="Email" isRequired>
+            {({ fieldProps }) => <TextField {...fieldProps} />}
+          </Field>
+          <Field name="password" defaultValue="" label="Password" isRequired>
+            {({ fieldProps }) => <TextField {...fieldProps} type="password" />}
+          </Field>
+          <MagicLinkButton type="submit" primary>
+            <span>Sign in</span>
+          </MagicLinkButton>
+        </form>
+      )}
+
+    </Form>
+  )
+}
 
 const Login = ({ history }) => {
   const auth = useContext(AuthContext);
+  const [signup, setSignup] = useState(false)
 
   if (auth.isAuthenticated()) {
     auth.handleRedirect();
@@ -47,61 +111,65 @@ const Login = ({ history }) => {
 
   const onLoginWithGoogle = auth.loginWithGoogle;
 
-  const onLoginWithMagicLink = evt => {
-    evt.preventDefault();
+  const onLoginWithMagicLink = async (data) => {
 
-    auth.passwordlessLogin(evt.target.email.value,
-      (err, res) => {
-        if (err) {
-          console.error('an error occured', err);
-          return;
-        }
+    try {
+      const res = await auth.passwordlessLogin(data.email);
+      console.log(res)
+    } catch (err) {
+      console.error(err);
+    }
 
-        console.log(res);
-        // handle errors or continue
-      }
-    );
 
-    return false;
+
   };
+
+  const onUsernamePasswordSignin = async (data) => {
+    throw new Error("nope")
+  }
 
   return (
     <AuthenticationLayout>
 
-      <div className="col right">
+      <LoginRegion height={signup ? '500px' : '450px'}>
         <div>
-          <p>Login to Diff</p>
-
+          <h1 style={{ height: "48px", marginTop: "16px" }}>
+            {signup ? "Create a Diff account..." : "Login with a Diff account..."}
+          </h1>
         </div>
 
-        <div>
-          <form onSubmit={onLoginWithMagicLink}>
-            <Field name="username" defaultValue="" label="User name" isRequired>
-              {({ fieldProps }) => <TextField {...fieldProps} />}
-            </Field>
-            <Field name="password" defaultValue="" label="Password" isRequired>
-              {({ fieldProps }) => <TextField {...fieldProps} />}
-            </Field>
-
-            <MagicLinkButton type="submit" primary>
-              <span>Sign in</span>
-            </MagicLinkButton>
-          </form>
-        </div>
-
-        <div style={{ margin: '32px 0px' }}>
-          <DarkHR />
-        </div>
-
-        <Space top={4}>
+        <div style={{ display: "flex", flexDirection: "column" }}>
           <GoogleButton onClick={onLoginWithGoogle}>
             <span>
               <Icon icon={google} className="leftIcon" />
               Sign in with Google
                   </span>
           </GoogleButton>
-        </Space>
-      </div>
+
+
+          <div style={{ marginTop: '32px' }}>
+            <DarkHR />
+          </div>
+
+          <div>
+            {signup && <SignupForm onSubmit={onLoginWithMagicLink} />}
+            {!signup && <SigninForm onSubmit={onUsernamePasswordSignin} />}
+          </div>
+
+        </div>
+
+
+        <div>
+          {!signup && (
+            <p>Don't have an account, <a href="#" onClick={() => setSignup(true)}>Create one now</a></p>
+
+          )}
+          {signup && (
+            <p>Already have an account, <a href="#" onClick={() => setSignup(false)}>Sign in</a></p>
+
+          )}
+        </div>
+      </LoginRegion>
     </AuthenticationLayout>
   )
 }

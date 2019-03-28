@@ -27,7 +27,7 @@ export const origin = async (_parent, args, context) => {
 export const origins = async (_parent, args, context) => {
   const fields = {};
   const filterByUid = _.get(args, 'limit.mine', false);
-  const user = await context.user;
+  const user = context.user;
 
   if (filterByUid) {
     _.merge(fields, {
