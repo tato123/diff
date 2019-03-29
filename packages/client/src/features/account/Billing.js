@@ -157,6 +157,10 @@ const Billing = () => {
                     <ul>
                         <li>Prototypes can be viewed and shared after 48 hours</li>
                     </ul>
+                    <div style={{ marginTop: "16px", marginLeft: "48px" }}>
+
+                        <label style={{ fontSize: "2rem" }}>$5 / month</label>
+                    </div>
 
                 </div>
 
