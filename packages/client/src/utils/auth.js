@@ -48,6 +48,16 @@ export default class Auth {
     })
   }
 
+  loginWithEmail = (email, password) => {
+    this.rememberPage();
+    this.auth0.redirect.loginWithCredentials({
+      connection: 'Username-Password-Authentication',
+      username: email,
+      password: password,
+    });
+
+  }
+
   passwordlessLogin = (email) => {
     this.rememberPage();
 
@@ -64,6 +74,24 @@ export default class Auth {
         return resolve(res);
       })
     })
+
+  }
+
+  signup = (email, password) => {
+
+    return new Promise((resolve, reject) => {
+      this.auth0.signup({
+        connection: 'Username-Password-Authentication',
+        email,
+        password,
+      }, (err, data) => {
+        if (err) {
+          return reject(err);
+        }
+        this.loginWithEmail(email, password)
+        return resolve(data);
+      });
+    });
 
   }
 

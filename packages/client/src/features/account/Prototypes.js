@@ -2,6 +2,8 @@ import React from 'react';
 import Button, { ButtonGroup } from '@atlaskit/button';
 import styled from 'styled-components';
 import { useQuery } from 'react-apollo-hooks';
+import EmptyState from '@atlaskit/empty-state';
+
 import gql from 'graphql-tag';
 
 
@@ -59,9 +61,17 @@ const Prototypes = ({ history }) => {
         return <Wrapper>Error! {error.message}</Wrapper>;
     };
 
+    console.log(data)
+
     return (
         <Wrapper>
             <ProtoTypeList>
+                {data.origins.length === 0 && (
+                    <EmptyState
+                        header={'No prototypes yet'}
+                        description={`Looks like you haven't created any prototypes yet. No worries, go ahead and get started`}
+                    />
+                )}
                 {data.origins.map(origin => (
                     <Prototype key={origin.host}>
                         <div>

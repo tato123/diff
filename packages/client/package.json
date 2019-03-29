@@ -5,7 +5,7 @@
   "dependencies": {
     "@atlaskit/button": "^10.1.1",
     "@atlaskit/css-reset": "^3.0.5",
-    "@atlaskit/empty-state": "^3.1.4",
+    "@atlaskit/empty-state": "^4.0.2",
     "@atlaskit/field-text": "^7.0.19",
     "@atlaskit/form": "^5.2.2",
     "@atlaskit/modal-dialog": "^7.2.3",
@@ -46,7 +46,7 @@
     "subscriptions-transport-ws": "^0.9.15",
     "to-css": "^1.2.1",
     "unique-slug": "^2.0.1",
-    "yup": "^0.26.7"
+    "yup": "^0.27.0"
   },
   "scripts": {
     "start": "react-app-rewired start",

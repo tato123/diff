@@ -1,5 +1,5 @@
 // CheckoutForm.js
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import Button from '@atlaskit/button';
 import {
     injectStripe,
@@ -12,6 +12,7 @@ import {
 import { useMutation } from 'react-apollo-hooks';
 import AuthContext from '../../utils/context'
 import gql from 'graphql-tag';
+import styled from 'styled-components';
 
 const CREATE_CUSTOMER_SOURCE = gql`
   mutation createCustomerSource($input: CreateCustomerInput!) {
@@ -22,6 +23,29 @@ const CREATE_CUSTOMER_SOURCE = gql`
   }
 `;
 
+
+
+const Form = styled.form`
+  label {
+    font-size: 20px;
+    margin-top: 16px  ;
+    display: block;
+
+    >div {
+        border: 2px solid rgb(223, 225, 230);
+        padding: 6px;
+    }
+  }
+
+  label:first-child {
+      margin-top: 0px;
+  }
+`
+
+const CButton = styled(Button)`
+  margin-top: 16px;
+  width: 100%;
+`
 
 
 const handleBlur = () => {
@@ -61,6 +85,7 @@ const createOptions = (fontSize, padding) => {
 
 const CheckoutForm = ({ stripe, fontSize, onStartCheckout, onEndCheckout, onChange }) => {
     const subscribeToPlan = useMutation(CREATE_CUSTOMER_SOURCE);
+    const [loading, setLoading] = useState(false);
     const auth = useContext(AuthContext);
     const profile = auth.getProfile();
 
@@ -71,6 +96,7 @@ const CheckoutForm = ({ stripe, fontSize, onStartCheckout, onEndCheckout, onChan
 
 
         try {
+            setLoading(true);
             onStartCheckout();
 
             const { source } = await stripe.createSource({
@@ -88,17 +114,18 @@ const CheckoutForm = ({ stripe, fontSize, onStartCheckout, onEndCheckout, onChan
 
 
             onChange(data.subscribeCustomerToPlan)
-
+            setLoading(false);
             onEndCheckout();
         } catch (err) {
             console.error('Unable to create customer subscription', err)
             onEndCheckout();
+            setLoading(false);
         }
 
     }
 
     return (
-        <form onSubmit={handleSubmit}>
+        <Form onSubmit={handleSubmit}>
             <label>
                 Card number
           <CardNumberElement
@@ -129,8 +156,8 @@ const CheckoutForm = ({ stripe, fontSize, onStartCheckout, onEndCheckout, onChan
                     {...createOptions(fontSize)}
                 />
             </label>
-            <Button type="submit">Pay</Button>
-        </form>
+            <CButton type="submit" appearance="primary" isLoading={loading} isDisabled={loading}>Pay</CButton>
+        </Form>
     )
 }
 

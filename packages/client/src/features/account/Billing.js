@@ -32,14 +32,14 @@ const CANCEL_CUSTOMER_PLAN = gql`
 
 const CField = styled.div`
     display: block;
-    margin-top: 16px;
 
     .description {
-        font-size: 1rem;
         display: block;
     }
 
     .value {
+      
+
         font-size: 1.2rem;
         font-weight: bold;
         display: block;
@@ -51,7 +51,21 @@ const Warning = styled.div`
     padding: 10px;
     border-radius: 8px;
     color: #fff;
-    
+    margin-top: 16px;
+`
+
+const StyledBox = styled.div`
+border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    box-sizing: border-box;
+    margin-top: 16px;
+`
+
+const InnerDiv = styled(StyledBox)`
+    display: grid;
+    grid-template-areas: ". .";
+    grid-column-gap: 16px;
 `
 
 const Wrapper = ({ children }) => (
@@ -105,39 +119,69 @@ const Billing = () => {
     );
 
     return (<Wrapper>
-        <div>
+        <div style={{
+            margin: '32px 0'
+        }}>
+            <h2>Your current plan</h2>
             {status === CANCEL_TYPE && (
                 <Warning>Your plan is cancelled and will expire after the current billing period</Warning>
             )}
-            <CField>
-                <label className="description">Plan:</label>
-                <label className="value">{plan === 'full' ? 'Monthly Subscription' : 'Trial'}</label>
-            </CField>
+            <InnerDiv>
 
-            <CField>
-                <label className="description">Payment Method:</label>
-                <label className="value">{plan === 'full' ? 'Credit Card' : 'None'}</label>
-            </CField>
-            {plan === 'full' && status !== CANCEL_TYPE && (
-                <CField>
-                    <a href="#" onClick={() => setOpen(true)}>Cancel Subscription</a>
-                </CField>
-            )}
+                <div>
+
+                    <CField>
+                        <label className="description">Plan:</label>
+                        <label className="value">{plan === 'full' ? 'Monthly Subscription' : 'Trial'}</label>
+                    </CField>
+
+                    <CField style={{ marginTop: '16px' }}>
+                        <label className="description">Payment Method:</label>
+                        <label className="value">{plan === 'full' ? 'Credit Card' : 'None'}</label>
+                    </CField>
+                    {plan === 'full' && status !== CANCEL_TYPE && (
+                        <CField style={{ marginTop: '16px' }}>
+                            <a href="#" onClick={() => setOpen(true)}>Cancel Subscription</a>
+                        </CField>
+                    )}
 
 
+                </div>
+                <div>
+                    {plan === 'trial' && (
+                        <label>Sign up for a Diff subscription to get the following features</label>
+                    )}
+                    {plan === 'full' && (
+                        <label>Thanks for Signing up for Diff, you get the following benefits</label>
+                    )}
+                    <ul>
+                        <li>Prototypes can be viewed and shared after 48 hours</li>
+                    </ul>
+
+                </div>
+
+            </InnerDiv>
         </div>
-        {isCheckout && <label>checking you out</label>}
-        {plan === 'trial' && (
-            <Elements>
-                <CheckoutForm
-                    onStartCheckout={() => setIsCheckout(true)}
-                    onEndCheckout={() => setIsCheckout(false)}
-                    onChange={({ plan, status }) => {
-                        setPlan(plan);
-                    }}
-                />
-            </Elements>
-        )}
+        <div>
+            <h2>Upgrade your plan</h2>
+            <StyledBox>
+                {plan === 'full' && <label>You're signed up for Diff!</label>}
+                {isCheckout && <label>checking you out</label>}
+                {plan === 'trial' && (
+                    <Elements>
+                        <CheckoutForm
+                            fontSize={'18px'}
+                            onStartCheckout={() => setIsCheckout(true)}
+                            onEndCheckout={() => setIsCheckout(false)}
+                            onChange={({ plan, status }) => {
+                                setPlan(plan);
+                            }}
+                        />
+                    </Elements>
+                )}
+            </StyledBox>
+        </div>
+
 
         <ModalTransition>
             {isOpen &&

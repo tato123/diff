@@ -22,6 +22,13 @@
   dependencies:
     "@atlaskit/type-helpers" "^2.1.0"
 
+"@atlaskit/analytics-next-types@^4.0.1":
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/@atlaskit/analytics-next-types/-/analytics-next-types-4.0.1.tgz#e5aa085a1a4c59cf76cb10c8d6851c40c1c7aa8f"
+  integrity sha512-cedCxCkPY0R6XvlPOM1zzff3H54r9SLMr++8YNxg/fkcemsuxGS/8+vPWq8IxcvertQjs6w3u/t2rwPOVbloRQ==
+  dependencies:
+    "@atlaskit/type-helpers" "^3.0.1"
+
 "@atlaskit/analytics-next@^3.1.2":
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/@atlaskit/analytics-next/-/analytics-next-3.2.1.tgz#c6c3bafc6d5a4160dd8d7fe4be5b50e2c079819d"
@@ -38,6 +45,14 @@
   dependencies:
     "@babel/runtime" "^7.0.0"
     babel-runtime "^6.26.0"
+    prop-types "^15.5.10"
+
+"@atlaskit/analytics-next@^4.0.2":
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/@atlaskit/analytics-next/-/analytics-next-4.0.2.tgz#bfc117eda02aa384d9af10c8ea6087e857b3667c"
+  integrity sha512-P80C5KIfdat2JAJ/121EoCUDOR0B7zJS79KoOj6ZvvPP9JCnbCVESsuwGUE/P+0DNlMM6IuMmbIicGGXP/LmrA==
+  dependencies:
+    "@babel/runtime" "^7.0.0"
     prop-types "^15.5.10"
 
 "@atlaskit/blanket@^7.0.12":
@@ -63,6 +78,19 @@
     babel-runtime "^6.26.0"
     tslib "^1.8.0"
 
+"@atlaskit/button@^11.0.5":
+  version "11.0.5"
+  resolved "https://registry.yarnpkg.com/@atlaskit/button/-/button-11.0.5.tgz#1f60650ec9fbe2fdb3312f5351cfb08d77152dd2"
+  integrity sha512-30AK7sH8yXD1rCH7g8RbSr9T2+MvxwlqA5nr5+GWUdWlbd11QjnMmjy5voWBDuL85dDkImBn7tLbRrU5f0WADg==
+  dependencies:
+    "@atlaskit/analytics-next" "^4.0.2"
+    "@atlaskit/analytics-next-types" "^4.0.1"
+    "@atlaskit/spinner" "10.0.3"
+    "@atlaskit/theme" "^8.0.1"
+    "@atlaskit/type-helpers" "^3.0.2"
+    "@babel/runtime" "^7.0.0"
+    tslib "^1.8.0"
+
 "@atlaskit/css-reset@^3.0.5":
   version "3.0.6"
   resolved "https://registry.yarnpkg.com/@atlaskit/css-reset/-/css-reset-3.0.6.tgz#51c48e3cb6b259d6b0902dd43761ca5960c14130"
@@ -72,16 +100,15 @@
     fbjs "^1.0.0"
     mkdirp "^0.5.1"
 
-"@atlaskit/empty-state@^3.1.4":
-  version "3.1.4"
-  resolved "https://registry.yarnpkg.com/@atlaskit/empty-state/-/empty-state-3.1.4.tgz#d8a0394e29443b82b5659de75c5fd080d6405e42"
-  integrity sha512-9UeILpGmlGxkz1/E0q4L2HnEE2T+vyJyYq8XF1BMN1eXILdijbONQfm1ynNm6IWBYpcBRZetHTw6RS46zxmgwQ==
+"@atlaskit/empty-state@^4.0.2":
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/@atlaskit/empty-state/-/empty-state-4.0.2.tgz#271df796556c70623190cb7f491dc34a660b12c1"
+  integrity sha512-gDg9rMC60cI3H2RUcYb8xY9pQs/6ISAmNPUXPur70GLmzFPDx4BYaIPOSM37HgDsFyyXEmqYTZu//NKGioitrA==
   dependencies:
-    "@atlaskit/button" "^10.1.1"
-    "@atlaskit/spinner" "^9.0.13"
-    "@atlaskit/theme" "^7.0.1"
+    "@atlaskit/button" "^11.0.5"
+    "@atlaskit/spinner" "^10.0.3"
+    "@atlaskit/theme" "^8.0.1"
     "@babel/runtime" "^7.0.0"
-    babel-runtime "^6.26.0"
 
 "@atlaskit/field-base@^11.0.13":
   version "11.0.15"
@@ -214,6 +241,15 @@
     babel-runtime "^6.26.0"
     react-transition-group "^2.2.1"
 
+"@atlaskit/spinner@10.0.3", "@atlaskit/spinner@^10.0.3":
+  version "10.0.3"
+  resolved "https://registry.yarnpkg.com/@atlaskit/spinner/-/spinner-10.0.3.tgz#7664501177b968714f20a2d72c07220192f1d205"
+  integrity sha512-KSESSO+ORo9KqrrnCfo4hafjb3YkGB+ikjJxZ5OB2TOnkE/E9bOMVbVG3K31Jj7E/qrya0Y20fRSIkZPRfJ8Pg==
+  dependencies:
+    "@atlaskit/theme" "^8.0.1"
+    "@babel/runtime" "^7.0.0"
+    react-transition-group "^2.2.1"
+
 "@atlaskit/spinner@^9.0.13":
   version "9.0.13"
   resolved "https://registry.yarnpkg.com/@atlaskit/spinner/-/spinner-9.0.13.tgz#030005c51a8acab842ce0771e16fe8c6cc7d585a"
@@ -265,6 +301,13 @@
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/@atlaskit/type-helpers/-/type-helpers-2.1.0.tgz#c20786b417e714f0d0116b5c4a069e278f3874a2"
   integrity sha512-1UMF+OCAq1QcqXJOXBQfmaOO5iSsEuLlvSTd/uKn9k9xUxPAV5GdCEPYNaORnIVhVUGIZF+WukeBYR+3MDw6CQ==
+  dependencies:
+    react "^16.4.0"
+
+"@atlaskit/type-helpers@^3.0.1", "@atlaskit/type-helpers@^3.0.2":
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/@atlaskit/type-helpers/-/type-helpers-3.0.2.tgz#d6da9a3367c177fad05d159db330d2e388ede90e"
+  integrity sha512-7QHB0Uegq2PBtLiA1VTt3pxI+KQijXWLLvWKRM/4LxgQC/dWXYuiMm7HfIY88gGWarg3cpOVUZKMU4CvbfT/5g==
   dependencies:
     react "^16.4.0"
 
@@ -1115,13 +1158,6 @@
   dependencies:
     "@babel/helper-plugin-utils" "^7.0.0"
     "@babel/plugin-transform-typescript" "^7.3.2"
-
-"@babel/runtime@7.0.0":
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.0.0.tgz#adeb78fedfc855aa05bc041640f3f6f98e85424c"
-  integrity sha512-7hGhzlcmg01CvH1EHdSPVXYX1aJ8KCEyz6I9xYIi/asDtzBPMyMhVibhM/K6g/5qnKBwjZtp10bNZIEFTRW1MA==
-  dependencies:
-    regenerator-runtime "^0.12.0"
 
 "@babel/runtime@7.3.1":
   version "7.3.1"
@@ -14735,7 +14771,7 @@ symbol-tree@^3.2.2:
   resolved "https://registry.yarnpkg.com/symbol-tree/-/symbol-tree-3.2.2.tgz#ae27db38f660a7ae2e1c3b7d1bc290819b8519e6"
   integrity sha1-rifbOPZgp64uHDt9G8KQgZuFGeY=
 
-synchronous-promise@^2.0.5:
+synchronous-promise@^2.0.6:
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/synchronous-promise/-/synchronous-promise-2.0.6.tgz#de76e0ea2b3558c1e673942e47e714a930fa64aa"
   integrity sha512-TyOuWLwkmtPL49LHCX1caIwHjRzcVd62+GF6h8W/jHOeZUFHpnd2XJDVuUlaTaLPH1nuu2M69mfHr5XbQJnf/g==
@@ -16347,16 +16383,16 @@ yn@^3.0.0:
   resolved "https://registry.yarnpkg.com/yn/-/yn-3.0.0.tgz#0073c6b56e92aed652fbdfd62431f2d6b9a7a091"
   integrity sha512-+Wo/p5VRfxUgBUGy2j/6KX2mj9AYJWOHuhMjMcbBFc3y54o9/4buK1ksBvuiK01C3kby8DH9lSmJdSxw+4G/2Q==
 
-yup@^0.26.7:
-  version "0.26.10"
-  resolved "https://registry.yarnpkg.com/yup/-/yup-0.26.10.tgz#3545839663289038faf25facfc07e11fd67c0cb1"
-  integrity sha512-keuNEbNSnsOTOuGCt3UJW69jDE3O4P+UHAakO7vSeFMnjaitcmlbij/a3oNb9g1Y1KvSKH/7O1R2PQ4m4TRylw==
+yup@^0.27.0:
+  version "0.27.0"
+  resolved "https://registry.yarnpkg.com/yup/-/yup-0.27.0.tgz#f8cb198c8e7dd2124beddc2457571329096b06e7"
+  integrity sha512-v1yFnE4+u9za42gG/b/081E7uNW9mUj3qtkmelLbW5YPROZzSH/KUUyJu9Wt8vxFJcT9otL/eZopS0YK1L5yPQ==
   dependencies:
-    "@babel/runtime" "7.0.0"
+    "@babel/runtime" "^7.0.0"
     fn-name "~2.0.1"
-    lodash "^4.17.10"
+    lodash "^4.17.11"
     property-expr "^1.5.0"
-    synchronous-promise "^2.0.5"
+    synchronous-promise "^2.0.6"
     toposort "^2.0.2"
 
 zen-observable-ts@^0.8.18:
