@@ -24,10 +24,15 @@ const getCustomerId = (uid: string): Promise<string | null> => {
 const createStripeCustomer = async (_parent, args: CustomerInput, context) => {
     console.log('[createStripeCustomer]---------------------------------------');
     const user = context.user;
+    const useDiscount = _.indexOf(_.get(user, 'permissions', []), 'create:discountRate') !== -1;
 
     // cant do anything
     if (!_.has(args, 'input.source') || !_.isString(args.input.source)) {
         return null;
+    }
+
+    if (useDiscount) {
+        console.log('Applying discount code to user', user.sub)
     }
 
     try {
@@ -44,11 +49,16 @@ const createStripeCustomer = async (_parent, args: CustomerInput, context) => {
         // store the information against their 
         console.log('customer created', customer);
         await Users.updateByUid(user.sub, 'stripe_customer_id', customer.id)
-
-        const subscription = await stripe.subscriptions.create({
+        const subOptions = {
             customer: customer.id,
-            items: [{ plan: DIFF_PLAN }]
-        })
+            items: [{ plan: DIFF_PLAN }],
+
+        };
+
+        if (useDiscount) {
+            subOptions['coupon'] = process.env.STRIPE_ADMIN_COUPON;
+        }
+        const subscription = await stripe.subscriptions.create(subOptions)
 
         const FULL_PLAN = 'full'
 

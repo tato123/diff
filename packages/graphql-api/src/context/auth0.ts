@@ -21,6 +21,7 @@ const getKey = (header, cb) => {
 
 
 const options = {
+  audience: 'https://diff/dev',
   issuer: `https://${process.env.AUTH0_DOMAIN}/`,
   algorithms: ["RS256"]
 };

@@ -22,7 +22,7 @@ const auth = new Auth();
 
 
 const bearerToken = () => {
-  return `Bearer ${auth.getIdToken()}`
+  return `Bearer ${auth.getAccessToken()}`
 }
 
 const authLink = setContext((_, { headers }) => {
@@ -46,7 +46,7 @@ const wsLink = new WebSocketLink({
   options: {
     reconnect: true,
     connectionParams: () => ({
-      idToken: auth.getIdToken(),
+      idToken: auth.getAccessToken(),
     })
   },
 
