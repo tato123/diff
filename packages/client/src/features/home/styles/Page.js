@@ -24,6 +24,36 @@ const Page = styled.div`
   }
 
   margin-bottom: 16px;
+
+  
+div > form button{
+  height:60px;
+  width:calc(100% - 20px);
+}
+div input{
+  max-height:60px;
+  border-radius:1000px;
+  width:calc(100% - 30px);
+}
+
+
+div:nth-child(4) > div:nth-child(2){
+  width:calc(100% - 60px);
+  padding:15px 30px;
+}
+div > div:nth-child(3) > div:nth-child(1) > div{
+  font-size:1.5em;
+}
+div:nth-child(1) > div > div:nth-child(2) > div{
+  font-size:1.5em;
+}
+div:nth-child(1) > div > div:nth-child(3) > div{
+  font-size:1.5em;
+}
+#root form{
+  margin-top:30px;
+}
+
 `;
 
 export default Page;

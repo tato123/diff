@@ -2,6 +2,7 @@ import React from "react";
 import Button from "@atlaskit/button";
 import styled from "styled-components";
 
+
 const View = styled.div`
   display: flex;
   flex: 1;
@@ -9,7 +10,13 @@ const View = styled.div`
   padding: 16px;
 `;
 
-const Toolbar = ({ count, onSave, onEdit, onShare, onClickChanges }) => (
+const Avatar = styled.img`
+width: 32px;
+height: 32px;
+border-radius: 50%;
+`
+
+const Toolbar = ({ count, onSave, onEdit, onShare, onClickChanges, isLoggedIn, userImage }) => (
   <View className="toolbar">
     <div>
       <div>{count} elements have modified styles</div>
@@ -21,21 +28,28 @@ const Toolbar = ({ count, onSave, onEdit, onShare, onClickChanges }) => (
         display: "flex",
         marginLeft: "-10%"
       }}
-    >      
+    >
       <Button onClick={onSave} isDisabled={count === 0} appearance="primary">
         Save Changes
       </Button>
-      
-    </div>   
+      {isLoggedIn && (
+        <a href="/account">
+          <Avatar src={userImage} />
+        </a>
+      )}
+      {!isLoggedIn && (
+        <a href="/login">login</a>
+      )}
+    </div>
   </View>
 );
 
 Toolbar.defaultProps = {
   count: 0,
-  onSave: () => {},
-  onEdit: () => {},
-  onShare: () => {},
-  onClickChanges: () => {}
+  onSave: () => { },
+  onEdit: () => { },
+  onShare: () => { },
+  onClickChanges: () => { }
 };
 
 export default Toolbar;

@@ -7,8 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npx forever src/index.js -- --max-http-header-size=80000",
     "start:dev": "cross-env NODE_ENV=development nodemon src/index.js -- --max-http-header-size=80000",
-    "switch:stage" : "rsync -a --stats .deploy/stage/ ./",
-    "switch:prod" : "rsync -a --stats .deploy/prod/ ./"
+    "switch:stage": "rsync -a --stats .deploy/stage/ ./",
+    "switch:prod": "rsync -a --stats .deploy/prod/ ./"
   },
   "author": "Jonathan Fontanez <jfontanez@getdiff.app>",
   "license": "ISC",
@@ -20,6 +20,8 @@
     "graphql-request": "^1.8.2",
     "http-parser-js": "^0.5.0",
     "http-proxy": "^1.17.0",
+    "lodash": "^4.17.11",
+    "moment": "^2.24.0",
     "resp-modifier": "^6.0.2"
   },
   "devDependencies": {

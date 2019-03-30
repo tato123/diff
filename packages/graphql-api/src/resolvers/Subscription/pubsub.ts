@@ -5,7 +5,7 @@ const fs = require("fs");
 let redisServer = "localhost";
 
 if (process.env.NODE_ENV === "production" || process.env.NODE_ENV === "stage") {
-  const data = fs.readFileSync("/var/nodelist", "UTF8", function(err) {
+  const data = fs.readFileSync("/var/nodelist", "UTF8", function (err) {
     if (err) throw err;
   });
 
@@ -44,5 +44,6 @@ const pubsub = new RedisPubSub({
   subscriber: new Redis(options)
 });
 
-module.exports = pubsub;
-module.exports.client = new Redis(options);
+export default pubsub;
+export const client = new Redis(options);
+

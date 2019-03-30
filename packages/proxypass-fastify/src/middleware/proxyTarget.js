@@ -1,8 +1,27 @@
 "use strict";
 const { request } = require("graphql-request");
 const url = require("url");
+const moment = require('moment');
+const _ = require('lodash');
 
-const middleware = opts => (req, res, next) => {
+const MAX_EXPIRY = 24.0;
+
+const calculateIsExpired = (createdTimestamp) => {
+  const initialUtc = createdTimestamp ? parseInt(createdTimestamp) : 1552845566051;
+  const created = moment.utc(initialUtc);
+  const end = moment.utc();
+  const duration = moment.duration(end.diff(created)).asHours();
+  console.log('it has been', duration)
+
+  if (duration > MAX_EXPIRY) {
+    return true
+  }
+
+  return false
+
+}
+
+const middleware = opts => async (req, res, next) => {
   console.log("[proxyTarget] executing middleware");
 
   const query = `
@@ -11,6 +30,11 @@ const middleware = opts => (req, res, next) => {
         host
         origin
         protocol
+        created
+        customerSubscription {
+          plan
+          status
+        }
       }
     }
   `;
@@ -19,21 +43,36 @@ const middleware = opts => (req, res, next) => {
     host: req.headers.host
   };
 
-  console.log("Querying with variables", variables);
 
-  request(process.env.GRAPHQL_ENDPOINT, query, variables)
-    .then(data => {
-      if (data.origin == null) {
-        return next("no data found");
+  try {
+    console.log("Querying with variables", variables);
+    const data = await request(process.env.GRAPHQL_ENDPOINT, query, variables);
+    if (data.origin == null) {
+      return next("no data found");
+    }
+
+
+    // for old links without created timestamps ignore this, we will grandfather them in for now
+    // todo: purge this after a period of time
+    if (data.created != null) {
+      const isExpired = calculateIsExpired(_.get(data, 'origin.created', Date.now().toString()));
+      const isTrial = _.get(data, 'origin.customerSubscription.plan', 'trial') === 'trial'
+
+
+      // expired check
+      if (isTrial && isExpired) {
+        console.error('this link is expired')
+        return next({ expired: true })
       }
+    }
 
-      req.proxyTarget = `${data.origin.protocol}://${data.origin.origin}`;
-      req.proxyHostname = data.origin.origin;
-      next();
-    })
-    .catch(err => {
-      next(err);
-    });
+
+    req.proxyTarget = `${data.origin.protocol}://${data.origin.origin}`;
+    req.proxyHostname = data.origin.origin;
+    next();
+  } catch (err) {
+    next(err);
+  }
 };
 
 module.exports = {

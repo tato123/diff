@@ -13,16 +13,21 @@ import Toolbar from "./toolbar";
 
 
 class Designer extends React.Component {
+  
+
+
   state = {
     version: null,
     changed: false,
     styles: null,
     isEditing: false,
     count: 0,
-    isOpen: false
+    isOpen: false,
+    isLoggedIn: false,
+    userImage: ''
   };
 
-  componentDidMount() {
+  async componentDidMount() {
     
     const params = new URLSearchParams(this.props.location.search);
     const version = params.get("version")
@@ -44,6 +49,16 @@ class Designer extends React.Component {
         isOpen: true
       });
     }
+
+    
+    const isLoggedIn = this.props.auth.isAuthenticated();
+    const userProfiles = await this.props.auth.getProfile();
+
+
+    this.setState({
+      isLoggedIn,
+      userImage: userProfiles && userProfiles.picture
+    })
   }
 
   componentWillUnmount() {
@@ -124,8 +139,9 @@ class Designer extends React.Component {
 
   render() {
     const {
-      state: { isEditing, version, count }
+      state: { isEditing, version, count,isLoggedIn,userImage }
     } = this;
+
 
 
     return (
@@ -139,6 +155,8 @@ class Designer extends React.Component {
           onSave={this.onSave}
           count={count}
           onClickChanges={() => this.setState({ isOpen: true })}
+          isLoggedIn={isLoggedIn}
+          userImage={userImage}
         />
         <input
           type="text"

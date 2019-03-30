@@ -1,0 +1,100 @@
+type Origin {
+  host: String
+  origin: String
+  protocol: String
+  uid: String
+  created: String
+  customerSubscription: CustomerSubscription
+}
+
+type Delta {
+  host: String
+  css: String
+  changes: String
+  uid: String
+  created: String
+}
+
+type CustomerSubscription {
+  plan: String
+  status: String
+}
+
+type SaveSiteDeltasResult {
+  prototypeUrl: String!
+}
+
+type UploadResult {
+  status: String!
+}
+
+type CreateSiteOriginResult {
+  prototypeUrl: String!
+}
+
+## ----------------------------------
+## Scalars 
+
+scalar Upload
+
+
+## ----------------------------------
+## Inputs 
+
+input UploadDesignMeta {
+  name: String!
+}
+
+input CreateSiteOriginInput {
+  url: String!
+}
+
+input SaveSiteDeltasInput {
+  host: String!
+  deltas: String!
+}
+
+input LimitQuery {
+  mine: Boolean
+}
+
+input CreateCustomerInput {
+  source: String!
+}
+
+input Test {
+  source:String
+}
+
+input NullMutation {
+  _: String
+}
+
+## ----------------------------------
+## Queries 
+
+type Query {
+  origin(Host: String!): Origin
+  origins( limit:LimitQuery): [Origin]
+  deltas(Host: String!) : Delta
+  customerSubscription(limit:LimitQuery) : CustomerSubscription
+}
+
+## ----------------------------------
+## Subscriptions 
+
+type Subscription {
+  customerSubscriptionChange: CustomerSubscription
+}
+
+## ----------------------------------
+## Mutations 
+
+type Mutation {
+  uploadDesign(file: Upload!, metaData: UploadDesignMeta): UploadResult
+  createSiteOrigin(input: CreateSiteOriginInput!): CreateSiteOriginResult
+  subscribeCustomerToPlan(input: CreateCustomerInput!) : CustomerSubscription
+  cancelSubscription(input:NullMutation) : CustomerSubscription
+  saveSiteDeltas(input: SaveSiteDeltasInput!): SaveSiteDeltasResult
+  testSubscriptionChange(input:Test) : CustomerSubscription
+}

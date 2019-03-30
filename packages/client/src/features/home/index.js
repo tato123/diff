@@ -2,7 +2,6 @@ import React, { useRef, useState } from "react";
 import { useMutation } from 'react-apollo-hooks';
 import Button from '../../components/Button';
 import Icon from "../../components/Icon";
-import Logo from "../../components/Logo";
 import { CREATE_SITE } from "../../graphql/mutations";
 import Banner from './styles/Banner';
 import Column from './styles/Column';
@@ -12,13 +11,13 @@ import Footer from './styles/Footer';
 import Input from './styles/Input';
 import InputField from './styles/InputField';
 import Main from './styles/Main';
-import Page from './styles/Page';
 import Sentence from './styles/Sentence';
 import SpecialText from './styles/SpecialText';
 import Step from './styles/Step';
 import { scroller, Element } from 'react-scroll';
 import { isMobile } from 'react-device-detect';
 
+import Layout from './layout';
 
 
 const HomePage = ({ history }) => {
@@ -48,10 +47,8 @@ const HomePage = ({ history }) => {
   }
 
   return (
-    <Page>
-      <div>
-        <Logo size="200px" />
-      </div>
+    <Layout>
+
       <Main>
         <div className="description">
           <div>
@@ -121,7 +118,7 @@ const HomePage = ({ history }) => {
           </React.Fragment>
         )}
         {isMobile && (
-          <div style={{fontSize: "2rem", fontWeight: "200",  textAlign: "center", color: "red"}}>
+          <div style={{ fontSize: "2rem", fontWeight: "200", textAlign: "center", color: "red" }}>
             Oh no, it looks like you're on mobile. You can however try Diff on a non-mobile browser.
           </div>
         )}
@@ -129,7 +126,7 @@ const HomePage = ({ history }) => {
 
       </Footer>
       <Copy>&copy; 2019 getDiff, Inc.</Copy>
-    </Page>
+    </Layout>
   );
 };
 
