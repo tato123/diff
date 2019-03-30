@@ -102,10 +102,6 @@ const Prototypes = ({ history }) => {
         history.replace(url);
     }
 
-    const externalLink = (url) => {
-
-    }
-
     if (loading) {
         return <Wrapper>Loading...</Wrapper>;
     };
