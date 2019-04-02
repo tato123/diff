@@ -4,11 +4,11 @@
   "description": "Bridge library that handles most of the client side execution",
   "main": "src/index.js",
   "scripts": {
-    "prebuild": "rimraf dist",
-    "build:prod": "cross-env NODE_ENV=production webpack --config webpack.config.js",
-    "build:stage": "cross-env NODE_ENV=stage webpack --config webpack.config.js",
-    "watch": "cross-env NODE_ENV=development webpack-dev-server --config webpack.config.js --progress --watch",
-    "start:dev": "npm run watch"
+    "clean": "rimraf dist",
+    "build:prod": "npm run clean && cross-env NODE_ENV=production npx rollup --config rollupconfig.js",
+    "build:stage": "npm run clean && cross-env NODE_ENV=stage npx rollup --config rollupconfig.js",
+    "start:dev": "npm run clean && cross-env NODE_ENV=developmen npx rollup --watch --config rollup.config.js",
+    "demo": "npm run clean && cross-env NODE_ENV=developmen npx rollup --watch --config rollup.config.webserver.js"
   },
   "repository": {
     "type": "git",
@@ -40,26 +40,31 @@
     "html-loader": "^0.5.5",
     "prettier": "^1.16.4",
     "rimraf": "^2.6.2",
+    "rollup": "^1.7.4",
+    "rollup-plugin-commonjs": "^9.2.2",
+    "rollup-plugin-json": "^4.0.0",
+    "rollup-plugin-typescript": "^1.0.1",
     "text-loader": "^0.0.1",
-    "url-loader": "^1.1.2",
-    "webpack": "^4.29.3",
-    "webpack-cli": "^3.2.3",
-    "webpack-dev-server": "^3.1.14"
+    "tslib": "^1.9.3",
+    "typescript": "^3.4.1",
+    "url-loader": "^1.1.2"
   },
   "dependencies": {
     "@medv/finder": "^1.1.1",
+    "@ryanmorr/ready": "^1.3.1",
+    "@types/lodash": "^4.14.123",
     "@webcomponents/webcomponentsjs": "^2.2.7",
     "apollo-boost": "^0.1.28",
     "asdfjkl": "^0.0.2",
     "css-typed-om": "^0.4.0",
     "graphql": "^14.0.2",
     "graphql-tag": "^2.10.0",
-    "lodash-es": "^4.17.11",
+    "lodash": "^4.17.11",
+    "mobx": "^5.9.4",
     "optimal-select": "^4.0.1",
     "prop-types": "^15.7.2",
-    "react": "^16.8.2",
-    "react-apollo": "^2.3.3",
-    "react-dom": "^16.8.2",
+    "rollup-plugin-node-resolve": "^4.0.1",
+    "rollup-plugin-serve": "^1.0.1",
     "rxjs": "^6.3.3",
     "to-css": "^1.2.1"
   }
