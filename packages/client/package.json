@@ -11,6 +11,7 @@
     "@atlaskit/modal-dialog": "^7.2.3",
     "@atlaskit/page": "^8.0.12",
     "@atlaskit/textfield": "^0.1.6",
+    "antd": "^3.16.1",
     "apollo-boost": "^0.1.28",
     "apollo-cache-inmemory": "^1.4.3",
     "apollo-link-context": "^1.0.14",

@@ -1,174 +1,105 @@
-import _ from "lodash";
-import React from "react";
-import { compose, graphql } from "react-apollo";
-import { toast, ToastContainer } from "react-toastify";
-import { SAVE_VERSION } from "../../graphql/mutations";
-import StringWorker from "./string.worker.js";
-import Page from './styles/Page';
-import SharedView from './styles/SharedView';
-import Iframe from './styles/Iframe'
-import Toolbar from "./toolbar";
+import React, { useState, useRef } from 'react';
+import { Layout, Input } from 'antd';
+import styled from 'styled-components';
+
+import 'antd/dist/antd.css';
 
 
+const Search = Input.Search;
+
+const {
+    Header, Content,
+} = Layout;
 
 
-class Designer extends React.Component {
-  
+const Iframe = styled.iframe`
+    width: 100%;
+    height: 100%;
+    border: none;
+    outline: none;
+    overflow: auto;
+`
 
 
-  state = {
-    version: null,
-    changed: false,
-    styles: null,
-    isEditing: false,
-    count: 0,
-    isOpen: false,
-    isLoggedIn: false,
-    userImage: ''
-  };
+const Active = styled.div`
+width: 16px;
+border-radius: 50%;
+height: 16px;
+display: inline-block;
+position: absolute;
+top: 24px;
+left: 16px;
+    background-color: ${props => !props.active ? 'red' : 'green'}
+`
 
-  async componentDidMount() {
-    
-    const params = new URLSearchParams(this.props.location.search);
-    const version = params.get("version")
-    const proto = version.indexOf('localhost') !== -1 ? 'http' : 'https';
-    this.setState({
-      versionId: version,
-      version: `${proto}://${version}`
+const Tool = styled.div`
+    position: absolute;
+    top: 20px;
+    right: 100px;
+    height: 300px;
+    width: 200px;
+    border-radius: 24px;
+    background-color: #fff;
+    border: 5px solid blue;
+    padding: 16px;
 
-    });
+`
 
-    window.addEventListener("message", this.eventHandler);
-    this.stringWorker = new StringWorker();
-
-    this.stringWorker.onmessage = _.debounce(this.handleWorkerMessage, 10);
-
-    const walkthrough = localStorage.getItem("_walkthrough_01");
-    if (!walkthrough) {
-      this.setState({
-        isOpen: true
-      });
+const CSSTool = ({ iframeEl }) => {
+    const changeColors = () => {
+        iframeEl.current.contentWindow.postMessage({ type: 'diff:stylesheet', data: `* {color:red}` }, '*')
     }
-
-    
-    const isLoggedIn = this.props.auth.isAuthenticated();
-    const userProfiles = await this.props.auth.getProfile();
-
-
-    this.setState({
-      isLoggedIn,
-      userImage: userProfiles && userProfiles.picture
-    })
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener("message", this.eventHandler);
-  }
-
-  handleWorkerMessage = m => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log("[development] worker message", m.data);
-    }
-    
-    const styles = m.data;
-    this.setState({
-      styles,
-      changed: true,
-      count: Object.keys(styles).length
-    });
-  };
-
-  eventHandler = evt => {
-    const data = evt.data;
-    const stringworker = this.stringWorker;
-    if (data.source === "getDiff-client" && data.type === "SITE_CHANGE") {
-      const deltas = data.payload;
-      stringworker.postMessage(deltas);
-    }
-  };
-
-  getDiff = () => {
-    const frame = document.querySelector("#frame");
-    frame.contentWindow.postMessage(
-      {
-        type: "getDiff"
-      },
-      "*"
-    );
-  };
-
-  onEdit = () => {
-    this.setState(state => ({ isEditing: !state.isEditing }));
-  };
-
-  onSave = evt => {
-    const input = {
-      host: this.state.versionId,
-      deltas: JSON.stringify(this.state.styles)
-    };
-    const host = `https://${this.state.versionId}`;
-
-    const copyText = document.querySelector("#clipboardText");
-    copyText.value = host;
-    copyText.select();
-    const successful = document.execCommand("copy");
-
-    this.props
-      .saveSiteVersion({ variables: { input } })
-      .then(() => {
-        if (!successful) {
-          throw new Error("Unable to copy content");
-        }
-      })
-      .then(() => {
-        toast.info("Prototype URL copied to clipboard", {
-          position: "bottom-right",
-          autoClose: 2000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: false
-        });
-      })
-
-      .catch(error => {
-        console.error(" Unable to copy to clipboard", error);
-        window.open(host);
-      });
-  };
-
-  render() {
-    const {
-      state: { isEditing, version, count,isLoggedIn,userImage }
-    } = this;
-
 
 
     return (
-      <Page>
-        <SharedView isEditing={isEditing}>
-          <ToastContainer />
-          <Iframe id="frame" src={`${version}?edit=true`} title="prototype" />
-        </SharedView>
-        <Toolbar
-          onEdit={this.onEdit}
-          onSave={this.onSave}
-          count={count}
-          onClickChanges={() => this.setState({ isOpen: true })}
-          isLoggedIn={isLoggedIn}
-          userImage={userImage}
-        />
-        <input
-          type="text"
-          id="clipboardText"
-          value={version}
-          style={{ position: "absolute", opacity: 0 }}
-        />
-      </Page>
-    );
-  }
+        <Tool>
+            <label>h1 .abc</label>
+            <button onClick={changeColors}>change everything</button>
+        </Tool>
+    )
 }
 
-export default compose(graphql(SAVE_VERSION, { name: "saveSiteVersion" }))(
-  Designer
-);
+const Designer = () => {
+    const [page, setPage] = useState();
+    const [handshake, setHandshake] = useState(false);
+    const iframeEl = useRef(null);
+
+    const onLoad = () => {
+        console.log('loaded')
+
+
+        const interval = setInterval(() => {
+            iframeEl.current.contentWindow.postMessage({ type: 'diff:handshake' }, '*')
+        }, 100);
+
+        window.addEventListener('message', evt => {
+            if (evt.data && evt.data.type === 'diff:handshake:response') {
+                clearInterval(interval);
+                console.log('received response', evt.data.data)
+                setHandshake(true)
+            }
+        })
+    }
+
+
+    return (
+        <Layout style={{ height: "100vh", overflow: 'hidden' }}>
+            <Header>
+                <Active active={handshake} />
+                <Search onSearch={val => setPage(`//${val}`)} />
+            </Header>
+            <Content style={{ position: "relative" }}>
+                {handshake && <CSSTool iframeEl={iframeEl} />}
+                {page && (
+                    <Iframe innerRef={iframeEl} src={page} onLoad={onLoad} />
+                )}
+
+
+
+            </Content>
+        </Layout>
+    )
+
+}
+
+export default Designer;

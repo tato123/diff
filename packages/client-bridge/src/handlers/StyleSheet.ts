@@ -3,6 +3,7 @@ import { PageMutationHandler, MutationRecord, PageMutationOptions } from '../cor
 
 
 const Handler: PageMutationHandler = (mutation: MutationRecord, { win }: PageMutationOptions) => {
+
     win.ready(() => {
         const body = document.querySelector('body');
         if (body != null && !!mutation.value) {

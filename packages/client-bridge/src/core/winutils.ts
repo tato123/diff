@@ -3,6 +3,8 @@ import { WindowTools } from './types';
 import ready from '@ryanmorr/ready';
 
 
+let loaded = false;
+
 const winUtils: WindowTools = {
     getWidth() {
         return 10
@@ -10,8 +12,15 @@ const winUtils: WindowTools = {
     observeElements(selector: string, cb: any) {
         ready(selector, cb);
     },
-    ready(cb: EventListener | EventListenerObject) {
-        window.addEventListener('DOMContentLoaded', cb);
+    ready(cb: () => void) {
+        if (loaded) {
+            cb();
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loaded = true;
+            cb();
+        });
     }
 }
 

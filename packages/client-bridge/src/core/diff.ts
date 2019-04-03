@@ -1,5 +1,5 @@
 
-import { ToolBuilder, Middleware, CommandBuilder, WindowTool, Context, WindowTools, Handler, CommandEntry } from './types';
+import { ToolBuilder, Middleware, CommandBuilder, WindowTool, Context, WindowTools, Handler, CommandEntry, CommandOptions, EventTypeHandler } from './types';
 import { observable, toJS, autorun, set, reaction, get, observe, action, runInAction } from 'mobx';
 
 import ContextImpl from './context';
@@ -8,6 +8,7 @@ import _ from 'lodash';
 
 import { fromEvent, Observable } from 'rxjs';
 import { filter, map, tap } from 'rxjs/operators'
+
 
 const Types = {
     ON_RECORD: 'onRecord',
@@ -57,24 +58,52 @@ export default class Diff implements WindowTool {
         }
     }
 
+    getFnOptions(): CommandOptions {
+        return {
+            win: winUtils,
+            ctx: this.context
+        }
+    }
+
     private configPostMessageHandlers() {
-        const postMessageSource = fromEvent(window, 'message');
 
+
+        // Get event listeners
         const onRecordTypes = _.filter(this._handlers, { type: Types.ON_MESSAGE });
+        // Convert to a dictionary 
+        const eventListener = _.chain(onRecordTypes)
+            .reduce((acc: { [val: string]: any }, listener: Handler) => {
+                if (!_.has(acc, listener.filter)) {
+                    acc[listener.filter] = [listener.func];
+                } else {
+                    acc[listener.filter].push(listener.func)
+                }
 
-        _.chain(this._handlers)
-            .filter(handler => handler.type === Types.ON_MESSAGE)
-            .forEach(handler => {
-                postMessageSource.pipe(
-                    tap(evt => this.debugMessage('[diff][MessageHandler]', evt)),
-                    filter(evt => _.get(evt, 'data.type') === handler.filter),
-                    map(evt => _.get(evt, 'data', {})),
-                    tap(data => handler.func(data))
-                )
-                    .subscribe();
-
-            })
+                return acc;
+            }, {})
             .value();
+
+        const postResponse = (responseType: string) => (val: any) => {
+            window.parent.postMessage({
+                type: `${responseType}:response`,
+                data: val
+            }, '*')
+        }
+
+        const postMessageSource = fromEvent(window, 'message')
+            .pipe(
+                tap(evt => this.debugMessage('[diff][MessageHandler]', evt)),
+                tap(evt => {
+                    const type = _.get(evt, 'data.type');
+                    const data = _.get(evt, 'data.data', {});
+                    const listeners: EventTypeHandler[] = _.get(eventListener, type, []);
+                    listeners.forEach(fn =>
+                        fn(data, this.getFnOptions(), postResponse(type))
+                    )
+                })
+            )
+            .subscribe();
+
     }
 
 

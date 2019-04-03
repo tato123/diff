@@ -13,11 +13,14 @@ export interface Command {
 
 }
 
+export type EventTypeCallback = (val: any) => void;
+export type EventTypeHandler = (val: any, opts: CommandOptions, callback: EventTypeCallback) => void;
+
 export interface ToolBuilder {
     command: (name: string, command: CommandBuilder) => ToolBuilder
     create: () => WindowTool
     onRecordType: (filter: string, cb: Function) => ToolBuilder;
-    onEventType: (filter: string, cb: (val: any) => void) => ToolBuilder;
+    onEventType: (filter: string, cb?: EventTypeHandler) => ToolBuilder;
 }
 
 export interface WindowTools {
