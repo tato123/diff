@@ -2,7 +2,6 @@ import React, { useState, useRef } from 'react';
 import { Layout, Input } from 'antd';
 import styled from 'styled-components';
 
-import 'antd/dist/antd.css';
 
 
 const Search = Input.Search;

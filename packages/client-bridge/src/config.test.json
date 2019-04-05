@@ -1,0 +1,16 @@
+{
+    "_API_KEY_": "goes here",
+    "_INITIAL_STATE_": {
+        "records": [
+            {
+                "type": "inline-style",
+                "selector": "h1",
+                "value": "color:blue; font-size: 13px;"
+            },
+            {
+                "type": "stylesheet",
+                "value": "label { font-size: 32px; } label:hover { cursor: pointer; background-color:gray; }"
+            }
+        ]
+    }
+}

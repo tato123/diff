@@ -9,7 +9,7 @@ export default ({ children }) => (
         <Router history={history}>
             <Header
                 account={() => (
-                    <Link to="/account">Dashboard</Link>
+                    <Link to="/dashboard">Dashboard</Link>
 
                 )}
             />
