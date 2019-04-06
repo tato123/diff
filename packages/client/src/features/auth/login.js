@@ -3,22 +3,25 @@ import Button from "../../components/Button";
 import styled from 'styled-components';
 import Form, { Field, ErrorMessage } from '@atlaskit/form';
 import TextField from '@atlaskit/textfield';
-import { Icon } from 'react-icons-kit';
-import { google } from 'react-icons-kit/icomoon/google';
 import AuthContext from '../../utils/context'
+import LoginForm from './forms/login';
+import GoogleButton from 'react-google-button'
 
-import AuthenticationLayout from '../../components/Layouts/Authentication';
-import { Link, Router } from 'react-router-dom';
+
+
+import {
+  Layout, Divider, Typography
+} from 'antd';
+
+
+import { Router } from 'react-router-dom';
 
 import * as yup from 'yup';
 
+const {Text} = Typography
 
-const GoogleButton = styled(Button)`
-position: relative;
-  background-color: #4949b3 !important;
-  color: #fff;
-  width: 100%;
-`;
+
+
 
 const MagicLinkButton = styled(Button)`
   margin-top: 16px;
@@ -26,33 +29,11 @@ const MagicLinkButton = styled(Button)`
   width: 100%;
 `;
 
-const DarkHR = styled.hr`
-
-  background: #dbdbdb;
-  opacity: 1;
-  box-shadow: none;
-  outline: none;
-  border: none;
-  height: 1px;
+const FormWrapper = styled.div`
+  max-width: 600px;
+  padding: 32px;
 `;
 
-const LoginRegion = styled.div`
-  display: grid;
-  grid-template-areas: "." "." ".";
-  grid-template-rows: 64px 5fr 80px;
-  height: ${props => props.height || '450px'};
-  transition: height 250ms cubic-bezier(0.4, 0.0, 0.2, 1);
-
-
-  > div:last-child {
-    display: flex;
-    justify-content: flex-end;
-    flex: 1 auto;
-    flex-direction: column;
-    align-items: center;
-  }
-
-`
 
 const schema = yup.object().shape({
 
@@ -154,7 +135,6 @@ const Login = ({ history }) => {
     auth.handleRedirect();
   }
 
-  const onLoginWithGoogle = auth.loginWithGoogle;
 
   // const onLoginWithMagicLink = async (data) => {
 
@@ -186,53 +166,22 @@ const Login = ({ history }) => {
 
   return (
     <Router history={history}>
-      <AuthenticationLayout>
+      <Layout style={{ height: '100vh' }}>
+        <Layout.Content style={{ justifyContent: "center", display: "flex", alignItems: "center" }}>
 
-        <LoginRegion height={signup ? '500px' : '500px'}>
-          <div>
-            <h1 style={{ height: "48px", marginTop: "16px" }}>
-              {signup ? "Create a Diff account..." : "Login with a Diff account..."}
-            </h1>
-          </div>
+          <FormWrapper>
+            <LoginForm />
 
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <GoogleButton onClick={onLoginWithGoogle}>
-              <span>
-                <Icon icon={google} className="leftIcon" />
-                Sign in with Google
-                  </span>
-            </GoogleButton>
+            <Divider orientation="left" style={{fontSize: 14}}>Or login with...</Divider>
+            <GoogleButton
+              style={{width: "100%", fontSize: 14}}
+              type="light" // can also be written as disabled={true} for clarity
+              onClick={auth.loginWithGoogle}
+            />
+          </FormWrapper>
 
-
-            <div style={{ marginTop: '32px' }}>
-              <DarkHR />
-            </div>
-
-            <div>
-              {signup && <SignupForm onSubmit={onUsernamePasswordSignup} />}
-              {!signup && <SigninForm onSubmit={onUsernamePasswordSignin} />}
-            </div>
-
-          </div>
-
-
-          <div>
-            <div style={{ fontSize: '20px' }}>
-              {!signup && (
-                <p>Don't have an account, <a href="#" onClick={() => setSignup(true)}>Create one now</a></p>
-
-              )}
-              {signup && (
-                <p>Already have an account, <a href="#" onClick={() => setSignup(false)}>Sign in</a></p>
-
-              )}
-            </div>
-            <div style={{ marginTop: "16px" }}>
-              <p>I agree to the <Link to="/privacy">privacy policy</Link> and <Link to="/tos">terms of service</Link></p>
-            </div>
-          </div>
-        </LoginRegion>
-      </AuthenticationLayout>
+        </Layout.Content>
+      </Layout>
     </Router>
   )
 }

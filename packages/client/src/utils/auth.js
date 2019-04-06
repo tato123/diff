@@ -168,7 +168,7 @@ export default class Auth {
       delete localStorage['diff_redirectTo'];
       window.location.replace(lastPage);
     } else {
-      history.replace('/account')
+      history.replace('/dashboard')
     }
   }
 

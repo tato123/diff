@@ -6,14 +6,9 @@ import AuthCallback from './features/auth/callback';
 import Login from './features/auth/login';
 import Designer from "./features/designer";
 import Dashboard from './features/dashboard';
-import Home from "./features/home";
-import Search from "./features/search";
-import Account from './features/account'
 import history from './history';
 import PrivateRoute from './components/PrivateRoute';
 import AuthContext, { auth } from './utils/context'
-import PrivacyPolicy from './features/privacy/policy';
-import TOSPolicy from './features/privacy/tos';
 
 import 'antd/dist/antd.css';
 
@@ -32,11 +27,7 @@ const App = () => (
             <Route exact path="/edit" render={props => <Designer auth={auth} {...props} />} />
             <Route exact path="/login" component={Login} />
             <Route path="/callback" component={AuthCallback} />
-            <Route exact path="/search" component={Search} />
-            <Route exact path="/" component={Home} />
-            <Route exact path="/privacy" component={PrivacyPolicy} />
-            <Route exact path="/tos" component={TOSPolicy} />
-            <PrivateRoute auth={auth} path="/account" component={Account} />
+            <Route exact path="/" component={Login} />
             <PrivateRoute auth={auth} path="/dashboard" component={Dashboard} />
           </Switch>
         </Router>
