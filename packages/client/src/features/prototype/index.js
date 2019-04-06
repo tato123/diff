@@ -1,102 +1,77 @@
-import React, { useState, useRef } from 'react';
-import { Layout, Input } from 'antd';
+import React from 'react';
+import { Layout, Radio, Typography } from 'antd';
+import { useQuery } from 'react-apollo-hooks';
+import { ORIGIN_BY_ID } from '../../graphql/query';
 import styled from 'styled-components';
 
+const { Content, Header } = Layout;
 
-
-const Search = Input.Search;
-
-const {
-    Header, Content,
-} = Layout;
+const {Title } = Typography;
 
 
 const Iframe = styled.iframe`
-    width: 100%;
     height: 100%;
-    border: none;
+    width: 100%;
     outline: none;
-    overflow: auto;
-`
-
-
-const Active = styled.div`
-width: 16px;
-border-radius: 50%;
-height: 16px;
-display: inline-block;
-position: absolute;
-top: 24px;
-left: 16px;
-    background-color: ${props => !props.active ? 'red' : 'green'}
-`
-
-const Tool = styled.div`
-    position: absolute;
-    top: 20px;
-    right: 100px;
-    height: 300px;
-    width: 200px;
-    border-radius: 24px;
-    background-color: #fff;
-    border: 5px solid blue;
-    padding: 16px;
+    border: none;
 
 `
 
-const CSSTool = ({ iframeEl }) => {
-    const changeColors = () => {
-        iframeEl.current.contentWindow.postMessage({ type: 'diff:stylesheet', data: `* {color:red}` }, '*')
+const Pagelayout = styled(Layout)`
+    .header {
+        border-bottom: 1px solid #ebedf0;
+        background: #fff;
+        height: 42px;
+        line-height: 42px;
     }
 
+    .documentName {
+        display: inline-block;
+    }
 
-    return (
-        <Tool>
-            <label>h1 .abc</label>
-            <button onClick={changeColors}>change everything</button>
-        </Tool>
-    )
-}
+    .right {
+        float: right;
+        display: inline-block;
+    }
+`
+
+const Editor = styled.div`
+    display: grid;
+    grid-template-areas: ". .";
+    grid-template-rows: 1fr;
+    grid-template-columns:  1fr;
+    height: 100%;
+    width: 100%;
+`;
+
 
 const Designer = () => {
-    const [page, setPage] = useState();
-    const [handshake, setHandshake] = useState(false);
-    const iframeEl = useRef(null);
-
-    const onLoad = () => {
-        console.log('loaded')
-
-
-        const interval = setInterval(() => {
-            iframeEl.current.contentWindow.postMessage({ type: 'diff:handshake' }, '*')
-        }, 100);
-
-        window.addEventListener('message', evt => {
-            if (evt.data && evt.data.type === 'diff:handshake:response') {
-                clearInterval(interval);
-                console.log('received response', evt.data.data)
-                setHandshake(true)
-            }
-        })
-    }
-
-
+    const { data, error, loading } = useQuery(ORIGIN_BY_ID, { variables: { host: "8abd7bac" } });
     return (
-        <Layout style={{ height: "100vh", overflow: 'hidden' }}>
-            <Header>
-                <Active active={handshake} />
-                <Search onSearch={val => setPage(`//${val}`)} />
-            </Header>
-            <Content style={{ position: "relative" }}>
-                {handshake && <CSSTool iframeEl={iframeEl} />}
-                {page && (
-                    <Iframe innerRef={iframeEl} src={page} onLoad={onLoad} />
-                )}
+        <Pagelayout style={{ height: "100vh", overflow: 'hidden' }}>
+            {loading && <div>Loading page</div>}
+            {!loading && (
+                <React.Fragment>
+                    <Header className="header" >
+                        <div className="documentName"><Title level={4}>{data.origin.name}</Title></div>
+                        <div className="right">
+                            <Radio.Group defaultValue="a" buttonStyle="solid">
+                                <Radio.Button value="a">Edit</Radio.Button>
+                                <Radio.Button value="b">Preview</Radio.Button>
+                            </Radio.Group>
+                        </div>
+                    </Header>
+                    <Content style={{ position: "relative" }}>
+                        <Editor>
+                            <div>
+                                <Iframe src={data.origin.protocol + "://" + data.origin.origin} />
+                            </div>
+                        </Editor>
+                    </Content>
+                </React.Fragment>
+            )}
 
-
-
-            </Content>
-        </Layout>
+        </Pagelayout>
     )
 
 }
