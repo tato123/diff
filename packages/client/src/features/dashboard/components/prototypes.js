@@ -5,6 +5,7 @@ import gql from 'graphql-tag';
 import Icon from 'react-icons-kit';
 import { images } from 'react-icons-kit/icomoon/images'
 import styled from 'styled-components';
+import _ from 'lodash';
 
 const { Meta } = Card;
 
@@ -44,7 +45,7 @@ background: #efefef;
 `
 
 
-const Prototypes = ({ history }) => {
+const Prototypes = ({ history, filter }) => {
     const { data, error, loading } = useQuery(GET_ORIGINS);
     const goTo = (url) => () => {
         history.replace(url);
@@ -61,13 +62,14 @@ const Prototypes = ({ history }) => {
         return <div>Error! {error.message}</div>;
     };
 
+    
 
     return (
         <Block layout>
             {data.origins.length === 0 && (
                 <label>empty</label>
             )}
-            {data.origins.map(origin => (
+            {data.origins.filter(x => _.isEmpty(filter) ? true : x.origin.indexOf(filter) !== -1 ).map(origin => (
                 <Card
                     hoverable
                     style={CardStyles}

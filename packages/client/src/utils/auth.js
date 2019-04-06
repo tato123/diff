@@ -199,7 +199,7 @@ export default class Auth {
 
 
     // navigate to the home route
-    history.replace('/');
+    history.push('/');
   }
 
   isAuthenticated = () => {

@@ -6,11 +6,10 @@ import {
 import AuthContext from '../../utils/context';
 import Logo from './logo.svg';
 import Prototypes from './pages/Prototypes';
-import NewPrototype from './pages/NewPrototypes';
 import Account from './pages/Account';
 import { Route, Switch, Redirect } from 'react-router';
 
-
+const SubMenu = Menu.SubMenu;
 const { Header, Content } = Layout;
 
 const TopSection = styled.header`
@@ -55,12 +54,25 @@ height: 100vh;
 }
 `
 
+const upgrade = {
+    background: '#EF3B7B',
+    padding:8,
+    color: '#fff',
+    borderRadius: 4,
+    fontWeight: 500,
+    fontSize: 10
+}
+
 const Dashboard = ({ history, location }) => {
     const auth = useContext(AuthContext);
 
 
     const user = auth.getProfile();
     const handleMenuClick = (e) => {
+        if (e.key === '6') {
+            return auth.logout();
+        }
+
         history.push(e.key)
     }
 
@@ -79,11 +91,16 @@ const Dashboard = ({ history, location }) => {
                     onClick={handleMenuClick}
                 >
                     <Menu.Item key="/dashboard/prototypes">Prototypes</Menu.Item>
-                    <Menu.Item key="/dashboard/account">Account</Menu.Item>
-                    <Menu.Item key="3" style={{ float: "right", }} >
-                        <Avatar src={user.picture} size="small" icon="user" style={{ marginRight: 8 }} />
-                        <label>{user.email}</label>
-                    </Menu.Item>
+                    <SubMenu style={{ float: "right" }} key="sub3" title={<React.Fragment><Avatar src={user.picture} size="small" icon="user" style={{ marginRight: 8 }} />
+                        <label>{user.email}</label></React.Fragment>}>
+                        <Menu.Item key="/dashboard/account">Account</Menu.Item>
+                        <Menu.Item key="6">Logout</Menu.Item>
+                    </SubMenu>
+                    <Menu.Item key="/dashboard/upgrade" style={{ float: "right" }}>
+                        <span style={upgrade}>UPGRADE NOW</span>
+
+                        </Menu.Item>
+
                 </Menu>
             </Header>
             <TopSection >
@@ -97,7 +114,6 @@ const Dashboard = ({ history, location }) => {
                 <Switch>
                     <Route exact path="/dashboard/account" component={Account} />
                     <Route exact path="/dashboard/prototypes" component={Prototypes} />
-                    <Route exact path="/dashboard/prototypes/new" component={NewPrototype} />
                     <Redirect to="/dashboard/prototypes" />
                 </Switch>
             </Content>
