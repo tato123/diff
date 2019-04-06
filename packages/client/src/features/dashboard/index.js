@@ -47,7 +47,8 @@ img {
 `
 
 const Page = styled(Layout)`
-height: 100vh;
+height: 100%;
+min-height: 100vh;
 .ant-menu.ant-menu-dark .ant-menu-item-selected, .ant-menu-submenu-popup.ant-menu-dark .ant-menu-item-selected {
     background-color: transparent !important;
     color: #EF3B7B;
@@ -56,7 +57,7 @@ height: 100vh;
 
 const upgrade = {
     background: '#EF3B7B',
-    padding:8,
+    padding: 8,
     color: '#fff',
     borderRadius: 4,
     fontWeight: 500,
@@ -99,7 +100,7 @@ const Dashboard = ({ history, location }) => {
                     <Menu.Item key="/dashboard/upgrade" style={{ float: "right" }}>
                         <span style={upgrade}>UPGRADE NOW</span>
 
-                        </Menu.Item>
+                    </Menu.Item>
 
                 </Menu>
             </Header>
@@ -110,7 +111,7 @@ const Dashboard = ({ history, location }) => {
                 </div>
 
             </TopSection>
-            <Content>
+            <Content style={{ overflow: "auto" }}>
                 <Switch>
                     <Route exact path="/dashboard/account" component={Account} />
                     <Route exact path="/dashboard/prototypes" component={Prototypes} />

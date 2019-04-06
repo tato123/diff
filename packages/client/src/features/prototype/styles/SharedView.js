@@ -1,6 +1,6 @@
 // eslint-disable-next-line no-unused-vars
-import React from 'react';
-import styled from 'styled-components';
+import React from 'features/prototype/styles/react';
+import styled from 'features/prototype/styles/styled-components';
 
 const SharedView = styled.div`
 position: relative;

@@ -1,9 +1,9 @@
-import _ from "lodash";
-import React from "react";
-import { compose, graphql } from "react-apollo";
-import { toast, ToastContainer } from "react-toastify";
+import _ from "features/prototype/lodash";
+import React from "features/prototype/react";
+import { compose, graphql } from "features/prototype/react-apollo";
+import { toast, ToastContainer } from "features/prototype/react-toastify";
 import { SAVE_VERSION } from "../../graphql/mutations";
-import StringWorker from "./string.worker.js";
+import StringWorker from "./string.worker.js.js";
 import Page from './styles/Page';
 import SharedView from './styles/SharedView';
 import Iframe from './styles/Iframe'
@@ -13,7 +13,7 @@ import Toolbar from "./toolbar";
 
 
 class Designer extends React.Component {
-  
+
 
 
   state = {
@@ -28,7 +28,7 @@ class Designer extends React.Component {
   };
 
   async componentDidMount() {
-    
+
     const params = new URLSearchParams(this.props.location.search);
     const version = params.get("version")
     const proto = version.indexOf('localhost') !== -1 ? 'http' : 'https';
@@ -50,7 +50,7 @@ class Designer extends React.Component {
       });
     }
 
-    
+
     const isLoggedIn = this.props.auth.isAuthenticated();
     const userProfiles = await this.props.auth.getProfile();
 
@@ -69,7 +69,7 @@ class Designer extends React.Component {
     if (process.env.NODE_ENV === 'development') {
       console.log("[development] worker message", m.data);
     }
-    
+
     const styles = m.data;
     this.setState({
       styles,
@@ -139,7 +139,7 @@ class Designer extends React.Component {
 
   render() {
     const {
-      state: { isEditing, version, count,isLoggedIn,userImage }
+      state: { isEditing, version, count, isLoggedIn, userImage }
     } = this;
 
 

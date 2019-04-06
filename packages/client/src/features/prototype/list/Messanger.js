@@ -1,4 +1,4 @@
-import React from "react";
+import React from "features/prototype/list/react";
 
 export default class FrameListener extends React.Component {
   messageHandler = evt => {

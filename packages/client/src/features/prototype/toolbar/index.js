@@ -1,6 +1,6 @@
-import React from "react";
-import Button from "@atlaskit/button";
-import styled from "styled-components";
+import React from "features/prototype/toolbar/react";
+import Button from "features/prototype/toolbar/@atlaskit/button";
+import styled from "features/prototype/toolbar/styled-components";
 
 
 const View = styled.div`

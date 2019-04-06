@@ -1,9 +1,9 @@
-import React from "react";
-import styled from "styled-components";
+import React from "features/prototype/list/react";
+import styled from "features/prototype/list/styled-components";
 import Messanger from "./Messanger";
-import { CheckBox } from "grommet";
-import { Query } from "react-apollo";
-import gql from "graphql-tag";
+import { CheckBox } from "features/prototype/list/grommet";
+import { Query } from "features/prototype/list/react-apollo";
+import gql from "features/prototype/list/graphql-tag";
 
 const GET_COMPONENTS = gql`
   {
