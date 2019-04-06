@@ -94,8 +94,7 @@ const Create = ({ visible, onClose }) => {
         leave: { opacity: 0 },
     })
     const onCreate = (form) => {
-        const website = form.values.website;
-        const siteResponse = createSite({ variables: { input: { url: website } } });
+        const siteResponse = createSite({ variables: { input: { url: form.values.website, name: form.values.name } } });
         setLoading(true);
         siteResponse
             .then(response => {
@@ -139,6 +138,17 @@ const Create = ({ visible, onClose }) => {
                         <Col span={6} className="title closeGroup">
                             <Button type="secondary" shape="circle" icon="close" size={"large"} onClick={onClose} className="close" />
 
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <Field>
+                                <label>Name of your prototype</label>
+                                <Input {...text('name', {
+                                    validate: (value) => !_.isEmpty(value),
+
+                                })} />
+                            </Field>
                         </Col>
                     </Row>
                     <Row>

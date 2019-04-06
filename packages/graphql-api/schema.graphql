@@ -5,6 +5,7 @@ type Origin {
   uid: String
   created: String
   customerSubscription: CustomerSubscription
+  name: String
 }
 
 type Delta {
@@ -47,6 +48,7 @@ input UploadDesignMeta {
 
 input CreateSiteOriginInput {
   url: String!
+  name: String
 }
 
 input SaveSiteDeltasInput {

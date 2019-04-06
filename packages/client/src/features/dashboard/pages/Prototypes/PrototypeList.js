@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from 'react-apollo-hooks';
-import { Card, Typography } from 'antd';
+import { Card, Typography, Empty } from 'antd';
 import gql from 'graphql-tag';
 import Icon from 'react-icons-kit';
 import { images } from 'react-icons-kit/icomoon/images'
@@ -8,7 +8,7 @@ import styled from 'styled-components';
 import _ from 'lodash';
 
 const { Meta } = Card;
-const {Title} = Typography;
+const { Title } = Typography;
 
 
 
@@ -17,6 +17,7 @@ const GET_ORIGINS = gql`
     origins(limit:{mine:true}) {
       host
       origin
+      name
     }
   }
 `;
@@ -46,7 +47,7 @@ background: #efefef;
 `
 
 
-const Prototypes = ({ history, filter }) => {
+const Prototypes = ({ history, filter, onClick }) => {
     const { data, error, loading } = useQuery(GET_ORIGINS);
     const goTo = (url) => () => {
         history.replace(url);
@@ -85,35 +86,36 @@ const Prototypes = ({ history, filter }) => {
     return (
         <div>
             {data.origins.length === 0 && (
-                <label>empty</label>
+                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} imageStyle={{ height: 120 }} description={<label>Looks like you haven't created any prototypes yet</label>} /> 
+
             )}
             {_.keys(groups).map(key => {
                 return (
-                    <div style={{marginBottom: 32}}>
+                    <div style={{ marginBottom: 32 }} key={key}>
                         <Title level={4}>{key}</Title>
                         <Block layout>
-                        {groups[key].map(origin => (
-                            <Card
-                                hoverable
-                                style={CardStyles}
-                                key={origin.host}
-                                cover={<CardCover><Icon size={32} icon={images} /></CardCover>}
+                            {groups[key].map(origin => (
+                                <Card
+                                    onClick={() => onClick(origin)}
+                                    hoverable
+                                    style={CardStyles}
+                                    key={origin.host}
+                                    cover={<CardCover><Icon size={32} icon={images} /></CardCover>}
 
-                            >
-                                <Meta
-                                    title={origin.host}
-                                    description={origin.origin}
-                                />
-                            </Card>
+                                >
+                                    <Meta
+                                        title={origin.name}
+                                    />
+                                </Card>
 
-                        ))}
+                            ))}
                         </Block>
 
                     </div>
                 )
             })}
         </div>
-      
+
     );
 }
 

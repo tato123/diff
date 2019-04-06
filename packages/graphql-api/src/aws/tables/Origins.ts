@@ -15,7 +15,7 @@ export interface Origin {
 }
 
 
-export const createSiteOrigin = (host: string, origin: string, protocol: string, created: string, user: User | undefined): Promise<boolean> => {
+export const createSiteOrigin = (host: string, origin: string, protocol: string, created: string, name: string, user: User | undefined): Promise<boolean> => {
     const params = {
         TableName: ORIGINS,
         Item: {
@@ -23,6 +23,7 @@ export const createSiteOrigin = (host: string, origin: string, protocol: string,
             Origin: { S: origin },
             Proto: { S: protocol },
             Created: { N: created },
+            Name: { S: name }
 
         }
     };
@@ -55,45 +56,38 @@ export const getByHost = (fields: FieldsQuery) => {
     const host = fields.Host.S;
     const REDIS_KEY = `origin::${host}`;
 
-    return client.get(REDIS_KEY).then(result => {
-        const data = result == null ? null : JSON.parse(result);
 
-        if (data != null && _.has(data, "host")) {
-            console.log("cache hit", result);
-            return JSON.parse(result);
-        }
+    const params: any = {
+        TableName: ORIGINS,
+        Key: fields
+    };
 
-        const params: any = {
-            TableName: ORIGINS,
-            Key: fields
-        };
+    console.log("querying params", params);
 
-        console.log("querying params", params);
+    return new Promise((resolve, reject) => {
+        // Call DynamoDB to read the item from the table
+        dynamo.getItem(params, (err, data) => {
+            console.log("results", data);
 
-        return new Promise((resolve, reject) => {
-            // Call DynamoDB to read the item from the table
-            dynamo.getItem(params, (err, data) => {
-                console.log("results", data);
+            // check if we get an error
+            if (err || _.isEmpty(data)) {
+                console.log("Error", err);
+                return resolve();
+            }
 
-                // check if we get an error
-                if (err || _.isEmpty(data)) {
-                    console.log("Error", err);
-                    return resolve();
-                }
+            const result = {
+                host: _.get(data, 'Item.Host.S', null),
+                origin: _.get(data, 'Item.Origin.S', null),
+                protocol: _.get(data, 'Item.Proto.S', null),
+                created: _.get(data, 'Item.Created.N', null),
+                uid: _.get(data, 'Item.uid.S', null),
+                name: _.get(data, 'Item.Name.S', null)
+            };
 
-                const result = {
-                    host: _.get(data, 'Item.Host.S', null),
-                    origin: _.get(data, 'Item.Origin.S', null),
-                    protocol: _.get(data, 'Item.Proto.S', null),
-                    created: _.get(data, 'Item.Created.N', null),
-                    uid: _.get(data, 'Item.uid.S', null)
-                };
-
-                client.set(REDIS_KEY, JSON.stringify(result));
-                return resolve(result);
-            });
+            return resolve(result);
         });
     });
+
 }
 
 export const getByFields = async (fields) => {
@@ -116,7 +110,6 @@ export const getByFields = async (fields) => {
     return new Promise((resolve, reject) => {
         // Call DynamoDB to read the item from the table
         dynamo.scan(params, (err, data) => {
-            console.log("results", data);
 
             // check if we get an error
             if (err || _.isEmpty(data)) {
@@ -129,8 +122,15 @@ export const getByFields = async (fields) => {
                 origin: _.get(item, 'Origin.S', null),
                 protocol: _.get(item, 'Proto.S', null),
                 created: _.get(item, 'Created.N', null),
-                uid: _.get(item, 'uid.S', null)
+                uid: _.get(item, 'uid.S', null),
+                name: _.get(item, 'Name.S', null)
             }));
+
+            console.log("input results", JSON.stringify(data, null, 4));
+
+
+            console.log("output results", JSON.stringify(result, null, 4));
+
 
             return resolve(result)
         });

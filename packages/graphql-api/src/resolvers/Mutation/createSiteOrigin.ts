@@ -23,15 +23,16 @@ const checkProtocol = async (origin: string): Promise<string> => {
 };
 
 interface SiteRequest {
-    url: string
     input: {
         url: string;
+        name: string;
     }
 }
 
 const createSiteOrigin = async (_parent: Object, args: SiteRequest, context) => {
-    const randomSlug = uniqueSlug(args.url);
-    const host = `${randomSlug}.${process.env.PROTOTYPE_URL}`;
+    console.log
+    const randomSlug = uniqueSlug(args.input.url);
+    const docId = `${randomSlug}`;
 
     // cleanup url
     const { host: inputHost } = new URL(
@@ -46,14 +47,16 @@ const createSiteOrigin = async (_parent: Object, args: SiteRequest, context) => 
     const protocol = await checkProtocol(originUrl);
     const timestamp = Date.now().toString();
     const user = context.user;
+    const name = args.input.name || docId;
 
-    console.log("host", host);
+    console.log("host", docId);
     console.log("args", args);
     console.log("protocol", protocol);
 
-    return Origins.createSiteOrigin(host, originUrl, protocol, timestamp, user)
+
+    return Origins.createSiteOrigin(docId, originUrl, protocol, timestamp, name, user)
         .then(() => ({
-            prototypeUrl: host
+            prototypeUrl: docId
         }))
 
 };

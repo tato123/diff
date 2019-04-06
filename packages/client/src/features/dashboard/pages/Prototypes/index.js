@@ -12,7 +12,10 @@ const Page = ({ history }) => {
     const [searchVal, setSearchVal] = useState('');
     const [createVisible, setSearchVisible] = useState(false)
 
-
+    const onClickPrototype = (proto) => {
+        console.log('going to', proto);
+        history.push(`/prototype?docId=${proto.host}&version=1`)
+    }
 
 
     return (
@@ -23,7 +26,6 @@ const Page = ({ history }) => {
                     size="large"
                     onChange={e => {
                         const value = e.target.value;
-                        console.log(value)
                         setSearchVal(value)
                     }}
                     style={{ width: '100%' }}
@@ -35,7 +37,7 @@ const Page = ({ history }) => {
 
             </PageHeader>
             <div style={{ padding: 64 }}>
-                <Prototypes filter={searchVal} />
+                <Prototypes filter={searchVal} onClick={onClickPrototype} />
             </div>
 
             <Create visible={createVisible} onClose={() => setSearchVisible(false)} />

@@ -38,7 +38,7 @@ export const origins = async (_parent, args, context) => {
 
   return await Origins.query(fields)
     .then(result => {
-      // console.log('response is ', result);
+      console.log('response is ', result);
       return result;
     })
     .catch(err => {
