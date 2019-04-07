@@ -6,6 +6,7 @@ import { action, autorun, runInAction } from 'mobx';
 // Commands are things that we can do, actively modify
 // the page in some way or provide some way of interacting in diff
 import AddPagelet from './commands/AddPagelet';
+import Designer from './commands/Designer';
 
 // Handlers are reactive, they consume infomration about the 
 // context and allow us to perform operations
@@ -43,6 +44,7 @@ let diff = build('diff')
 
     // contruct the commands that can be performed by diff
     .command('addPagelet', AddPagelet)
+    .command('designer', Designer)
     .create();
 
 expose(diff, config['_API_KEY_'], config['_INITIAL_STATE_'])

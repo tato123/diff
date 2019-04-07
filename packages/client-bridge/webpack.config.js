@@ -9,13 +9,14 @@ module.exports = {
   devtool: ENV !== "production" ? "cheap-eval-source-map" : "none",
   mode: ENV !== "production" ? "development" : "production",
   entry: {
-    clientBridge: "./src/index.js"
+    diff: "./src/main.ts"
   },
 
   output: {
     path: OUTPUT,
     filename: "[name].js",
-    libraryTarget: "umd"
+    libraryTarget: "umd",
+    publicPath: "/assets/"
   },
   resolve: {
     mainFields: ["main", "module"],
@@ -35,6 +36,13 @@ module.exports = {
       {
         test: /\.html$/,
         use: ["html-loader"]
+      },
+      {
+        test: /\.css$/,
+        use: [
+          { loader: "react-web-component-style-loader" },
+          { loader: "css-loader" }
+        ]
       }
     ]
   },
@@ -44,9 +52,10 @@ module.exports = {
     })
   ],
   devServer: {
-    contentBase: path.join(__dirname, "dist"),
+    contentBase: path.join(__dirname, "example"),
     compress: true,
     port: 9000,
-    disableHostCheck: true
+    disableHostCheck: true,
+    publicPath: '/assets/'
   }
 };
