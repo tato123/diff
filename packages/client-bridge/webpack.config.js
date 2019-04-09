@@ -50,12 +50,5 @@ module.exports = {
     new Dotenv({
       path: path.resolve(__dirname, "./.env." + ENV)
     })
-  ],
-  devServer: {
-    contentBase: path.join(__dirname, "example"),
-    compress: true,
-    port: 9000,
-    disableHostCheck: true,
-    publicPath: '/assets/'
-  }
+  ]
 };

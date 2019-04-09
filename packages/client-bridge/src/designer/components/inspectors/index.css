@@ -1,0 +1,37 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:400,600,700');
+
+:root, :host {
+    font-family: -apple-system, BlinkMacSystemFont, proxima-nova, Roboto, Arial, sans-serif, Georgia, serif;
+}
+
+.inspector {
+    display: block;
+    position: absolute;
+    width: 200px;
+    padding: 42px 24px 50px;
+    border: 1px solid #ebedf0;
+    border-radius: 2px;
+    top: 10px;
+    right: 32px;
+    background: #fff;
+    box-shadow: 0 0.25em 0.5em hsla(0,0%,0%,10%);
+    z-index: 9999999999;
+}
+
+.inspector-field {
+  margin-bottom: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+.inspector-field label:first-child {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    color: rgba(0, 0, 0, 0.8);
+}
+
+.inspector-field label:nth-child(2) {
+    font-size: 11px;
+    color: rgb(241, 107, 22);
+}
