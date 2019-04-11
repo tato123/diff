@@ -26,21 +26,6 @@ let diff = build('diff')
 
     // Event Types
     .onEventType(HandshakeType, Handshake)
-    .onEventType('diff:stylesheet', (val, ctx) => {
-
-        runInAction(() => {
-            const records = ctx.ctx.state.records;
-
-            records.push({
-                type: 'stylesheet',
-                value: val
-            })
-
-        })
-
-
-
-    })
 
     // contruct the commands that can be performed by diff
     .command('addPagelet', AddPagelet)

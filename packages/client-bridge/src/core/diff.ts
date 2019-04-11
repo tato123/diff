@@ -7,7 +7,10 @@ import winUtils from './winutils';
 import _ from 'lodash';
 
 import { fromEvent, Observable } from 'rxjs';
-import { filter, map, tap } from 'rxjs/operators'
+import { filter, map, tap } from 'rxjs/operators';
+
+import RxPostmessenger from 'rx-postmessenger';
+
 
 
 const Types = {
@@ -66,12 +69,29 @@ export default class Diff implements WindowTool {
     }
 
     private configPostMessageHandlers() {
+        const url = (window.location != window.parent.location)
+            ? document.referrer
+            : document.location.href;
+        const innerUrl = new URL(url);
 
+
+        const parentMessenger = RxPostmessenger.connect(
+            window.parent,
+            innerUrl.origin
+        );
+
+
+
+
+        type Event = (s: any) => {}
+        type EventArray = {
+            [key: string]: Event[]
+        }
 
         // Get event listeners
         const onRecordTypes = _.filter(this._handlers, { type: Types.ON_MESSAGE });
         // Convert to a dictionary 
-        const eventListener = _.chain(onRecordTypes)
+        const eventListener: EventArray = _.chain(onRecordTypes)
             .reduce((acc: { [val: string]: any }, listener: Handler) => {
                 if (!_.has(acc, listener.filter)) {
                     acc[listener.filter] = [listener.func];
@@ -83,26 +103,18 @@ export default class Diff implements WindowTool {
             }, {})
             .value();
 
-        const postResponse = (responseType: string) => (val: any) => {
-            window.parent.postMessage({
-                type: `${responseType}:response`,
-                data: val
-            }, '*')
-        }
 
-        const postMessageSource = fromEvent(window, 'message')
-            .pipe(
-                tap(evt => this.debugMessage('[diff][MessageHandler]', evt)),
-                tap(evt => {
-                    const type = _.get(evt, 'data.type');
-                    const data = _.get(evt, 'data.data', {});
-                    const listeners: EventTypeHandler[] = _.get(eventListener, type, []);
-                    listeners.forEach(fn =>
-                        fn(data, this.getFnOptions(), postResponse(type))
-                    )
+        Object.keys(eventListener).forEach(key => {
+            parentMessenger
+                .requests(key)
+                .subscribe((val: RxPostmessenger.request) => {
+                    if (eventListener[key].length > 1) {
+                        console.error('[client-bridge] more than 1 registered responder for ', key)
+                    }
+                    eventListener[key][0](val)
                 })
-            )
-            .subscribe();
+        });
+
 
     }
 

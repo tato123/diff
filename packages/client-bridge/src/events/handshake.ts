@@ -1,9 +1,31 @@
 import { EventTypeHandler } from '../core/types'
+import RxPostmessenger from 'rx-postmessenger';
 
-const Handshake: EventTypeHandler = (val, _opts, callback) => {
-    callback('version')
+
+
+
+
+const createAndReturn = (): HTMLStyleElement => {
+    const wrapper = document.createElement('div');
+    wrapper.id = 'df-01-style';
+
+    const style = document.createElement('style');
+    wrapper.appendChild(style);
+
+    document.body.appendChild(wrapper);
+    return style;
+
 }
 
-export const type = 'diff:handshake';
+const Handshake: EventTypeHandler = (request: RxPostmessenger.Request) => {
+    if (!document.body) {
+        return;
+    }
+
+    const stylesheet = document.querySelector('#df-01-style > style') || createAndReturn();
+    stylesheet.innerHTML = request.payload;
+}
+
+export const type = 'stylesheet';
 
 export default Handshake;
