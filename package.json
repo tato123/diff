@@ -10,12 +10,12 @@
     ]
   },
   "scripts": {
-    "start": "lerna run --parallel start:dev",
+    "start": "npx lerna run --parallel start:dev",
     "build": "npm run build:prod",
-    "build:prod": "lerna run --parallel build:prod",
-    "build:stage": "lerna run --parallel build:stage",
-    "test": "lerna run --parallel test",
-    "switch:stage": "lerna run --parallel switch:stage",
-    "switch:prod": "lerna run --parallel switch:prod"
+    "build:prod": "npx lerna run --parallel build:prod",
+    "build:stage": "npx lerna run --parallel build:stage",
+    "test": "npx lerna run --parallel test",
+    "switch:stage": "npx lerna run --parallel switch:stage",
+    "switch:prod": "npx lerna run --parallel switch:prod"
   }
 }

@@ -6,7 +6,7 @@ version: 2.1
 defaults: &defaults
   working_directory: ~/app
   docker:
-    - image: circleci/node:10.5.0
+    - image: circleci/node:10.15.3
 
 stageFilter: &stageFilter
   context: Stage
@@ -39,14 +39,8 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install NPX
-          command: sudo npm i -g npx
-      - run:
-          name: Install Lerna
-          command: sudo npm i -g lerna
-      - run:
           name: Install lerna dependencies
-          command: lerna bootstrap
+          command: npx lerna bootstrap
       - save_cache:
           key: dependency-cache-{{ checksum "package.json" }}-{{ checksum "lerna.json"}}-{{ .Revision }}
           paths:
