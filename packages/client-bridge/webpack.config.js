@@ -16,7 +16,7 @@ module.exports = {
     path: OUTPUT,
     filename: "[name].js",
     libraryTarget: "umd",
-    publicPath: "/assets/"
+    publicPath: "/"
   },
   resolve: {
     mainFields: ["main", "module"],

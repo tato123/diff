@@ -11,7 +11,7 @@
   },
   "scripts": {
     "start": "lerna run --parallel start:dev",
-    "build": "yarn run build:prod",
+    "build": "npm run build:prod",
     "build:prod": "lerna run --parallel build:prod",
     "build:stage": "lerna run --parallel build:stage",
     "test": "lerna run --parallel test",
