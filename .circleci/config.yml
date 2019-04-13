@@ -41,6 +41,7 @@ jobs:
       - run:
           name: Install lerna dependencies
           command: npx lerna bootstrap --no-ci
+          no_output_timeout: 20m
       - save_cache:
           key: dependency-cache-{{ checksum "package.json" }}-{{ checksum "lerna.json"}}-{{ .Revision }}
           paths:
