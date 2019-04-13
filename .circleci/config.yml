@@ -40,7 +40,7 @@ jobs:
       - checkout
       - run:
           name: Install NPX
-          command: yarn global add npx
+          command: npm i -g npx
       - run:
           name: Install dependencies with yarn workspaces
           command: npx lerna bootstrap
@@ -62,7 +62,7 @@ jobs:
       - run:
           name: Build Packages in parallel
           command: |
-            yarn build:$env
+            npm run build:$env
       - persist_to_workspace:
           root: packages
           paths:
