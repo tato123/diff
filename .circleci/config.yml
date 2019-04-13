@@ -40,7 +40,7 @@ jobs:
       - checkout
       - run:
           name: Install NPX
-          command: npm i -g npx
+          command: sudo npm i -g npx
       - run:
           name: Install dependencies with yarn workspaces
           command: npx lerna bootstrap
