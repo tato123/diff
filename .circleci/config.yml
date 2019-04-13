@@ -42,13 +42,15 @@ jobs:
           name: Install NPX
           command: sudo npm i -g npx
       - run:
-          name: Install dependencies with yarn workspaces
-          command: npx lerna bootstrap
+          name: Install Lerna
+          command: sudo npm i -g lerna
+      - run:
+          name: Install lerna dependencies
+          command: lerna bootstrap
       - save_cache:
           key: dependency-cache-{{ checksum "package.json" }}-{{ checksum "lerna.json"}}-{{ .Revision }}
           paths:
             - node_modules
-            - packages/adobexd-plugin/node_modules
             - packages/client/node_modules
             - packages/client-bridge/node_modules
             - packages/functions-lambda@edge/node_modules
