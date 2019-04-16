@@ -11,6 +11,10 @@
     "@atlaskit/modal-dialog": "^7.2.3",
     "@atlaskit/page": "^8.0.12",
     "@atlaskit/textfield": "^0.1.6",
+    "@types/jest": "^24.0.11",
+    "@types/node": "^11.13.4",
+    "@types/react": "^16.8.13",
+    "@types/react-dom": "^16.8.4",
     "antd": "^3.16.1",
     "apollo-boost": "^0.1.28",
     "apollo-cache-inmemory": "^1.4.3",
@@ -42,7 +46,7 @@
     "react-monaco-editor": "^0.25.1",
     "react-router": "^5.0.0",
     "react-router-dom": "^5.0.0",
-    "react-scripts": "2.1.5",
+    "react-scripts": "^2.1.8",
     "react-scroll": "^1.7.11",
     "react-spring": "^8.0.19",
     "react-stripe-elements": "^2.0.3",
@@ -54,6 +58,7 @@
     "styled-react-modal": "^1.1.2",
     "subscriptions-transport-ws": "^0.9.15",
     "to-css": "^1.2.1",
+    "typescript": "^3.4.3",
     "unique-slug": "^2.0.1",
     "use-debounce": "^1.1.2",
     "yup": "^0.27.0"
@@ -77,7 +82,7 @@
   ],
   "devDependencies": {
     "cross-env": "^5.2.0",
-    "lerna": "^3.12.1",
+    "lerna": "^3.13.2",
     "react-app-rewired": "^2.1.1",
     "worker-loader": "^2.0.0"
   }

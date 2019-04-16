@@ -85,10 +85,6 @@ export default class Diff implements WindowTool {
   }
 
   private configPostMessageHandlers() {
-    if (window.parent === window.top) {
-      console.warn("Loaded as topmost, cannot use event listeners");
-      return;
-    }
     const url =
       window.location != window.parent.location
         ? document.referrer
@@ -124,7 +120,7 @@ export default class Diff implements WindowTool {
     Object.keys(eventListener).forEach(key => {
       parentMessenger
         .requests(key)
-        .subscribe((val: RxPostmessenger.request) => {
+        .subscribe((val: RxPostmessenger.Request<any, any>) => {
           if (eventListener[key].length > 1) {
             console.error(
               "[client-bridge] more than 1 registered responder for ",

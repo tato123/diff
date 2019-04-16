@@ -2,7 +2,11 @@
   "name": "root",
   "private": true,
   "devDependencies": {
-    "lerna": "^3.13.1"
+    "lerna": "^3.13.2",
+    "tslint": "^5.15.0",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-plugin-prettier": "^2.0.1",
+    "tslint-react": "^4.0.0"
   },
   "workspaces": {
     "packages": [
@@ -17,5 +21,9 @@
     "test": "npx lerna run --parallel test",
     "switch:stage": "npx lerna run --parallel switch:stage",
     "switch:prod": "npx lerna run --parallel switch:prod"
+  },
+  "dependencies": {
+    "@types/node": "^11.13.4",
+    "typescript": "^3.4.3"
   }
 }

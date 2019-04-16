@@ -6,6 +6,9 @@ import styled from "styled-components";
 import RxPostmessenger from "rx-postmessenger";
 import MonacoEditor from "react-monaco-editor";
 import { useDebounce } from "use-debounce";
+import { Collapse } from "antd";
+
+const Panel = Collapse.Panel;
 
 const { Content, Header } = Layout;
 
@@ -79,6 +82,38 @@ const Editor = styled.div`
       padding: 4px;
       border-radius: 4px;
     }
+
+    .view {
+      overflow: auto;
+      height: 100%;
+    }
+  }
+
+  .preview {
+    display: block;
+    height: 16px;
+    width: 16px;
+    border: rgba(0, 0, 0, 0.08);
+  }
+
+  .preview-field {
+    display: grid;
+    grid-template-areas: ". .";
+    grid-template-columns: 20% 9fr;
+    grid-column-gap: 16px;
+    justify-content: center;
+    align-items: center;
+    margin-top: 12px;
+
+    .font {
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  .preview-field.vertical {
+    grid-template-areas: "." ".";
+    grid-template-columns: 1fr;
+    grid-row-gap: 4px;
   }
 
   @supports (font-variation-settings: normal) {
@@ -87,6 +122,46 @@ const Editor = styled.div`
     }
   }
 `;
+
+const ComponentsView = ({ items }) => {
+  if (items == null) {
+    return null;
+  }
+  return (
+    <Collapse bordered={false}>
+      {Object.keys(items).map(key => (
+        <Panel header={key} key={key}>
+          <div className="preview-field">
+            <label>Color</label>
+            <span
+              className="preview"
+              style={{ backgroundColor: items[key].color }}
+            />
+          </div>
+          <div className="preview-field ">
+            <label>Font</label>
+            <span className="font">{items[key].fontSize}</span>
+          </div>
+
+          <div className="preview-field ">
+            <label>Weight</label>
+            <span className="font">{items[key].fontWeight}</span>
+          </div>
+
+          <div className="preview-field ">
+            <label>Padding</label>
+            <span className="font">{items[key].padding}</span>
+          </div>
+
+          <div className="preview-field ">
+            <label>Margin</label>
+            <span className="font">{items[key].margin}</span>
+          </div>
+        </Panel>
+      ))}
+    </Collapse>
+  );
+};
 
 const Designer = ({ location }) => {
   const params = new URLSearchParams(location.search);
@@ -97,6 +172,8 @@ const Designer = ({ location }) => {
   const { data, loading } = useQuery(ORIGIN_BY_ID, {
     variables: { host: docId }
   });
+
+  const [components, setComponents] = useState(null);
 
   const [debouncedText] = useDebounce(textbox, 100);
 
@@ -113,6 +190,13 @@ const Designer = ({ location }) => {
       enabled: false
     }
   };
+
+  useEffect(() => {
+    if (!messanger) {
+      return;
+    }
+    messanger.request("getPageTheme").subscribe(val => setComponents(val));
+  }, [messanger]);
 
   useEffect(() => {
     if (!messanger) {
@@ -148,18 +232,9 @@ const Designer = ({ location }) => {
               </div>
 
               <div className="tools">
-                <span className="section-title">StyleSheets</span>
-                <div className="editor">
-                  <MonacoEditor
-                    width="100%"
-                    height="90%"
-                    language="css"
-                    theme="vs-light"
-                    options={options}
-                    value={textbox}
-                    editorDidMount={editor => editor.focus()}
-                    onChange={newValue => setTextbox(newValue)}
-                  />
+                <span className="section-title">Page Theme</span>
+                <div className="view">
+                  <ComponentsView items={components} />
                 </div>
               </div>
             </Editor>
@@ -171,3 +246,16 @@ const Designer = ({ location }) => {
 };
 
 export default Designer;
+
+// <div className="editor">
+// <MonacoEditor
+//   width="100%"
+//   height="90%"
+//   language="css"
+//   theme="vs-light"
+//   options={options}
+//   value={textbox}
+//   editorDidMount={editor => editor.focus()}
+//   onChange={newValue => setTextbox(newValue)}
+// />
+// </div>
