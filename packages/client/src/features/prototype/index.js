@@ -4,7 +4,7 @@ import { useQuery } from "react-apollo-hooks";
 import { ORIGIN_BY_ID } from "../../graphql/query";
 import styled from "styled-components";
 import RxPostmessenger from "rx-postmessenger";
-import MonacoEditor from "react-monaco-editor";
+// import MonacoEditor from "react-monaco-editor";
 import { useDebounce } from "use-debounce";
 import { Collapse } from "antd";
 
@@ -166,7 +166,7 @@ const ComponentsView = ({ items }) => {
 const Designer = ({ location }) => {
   const params = new URLSearchParams(location.search);
   const iframe = useRef(null);
-  const [textbox, setTextbox] = useState("");
+  const [textbox] = useState("");
   const [messanger, setMessanger] = useState(null);
   const docId = params.get("docId");
   const { data, loading } = useQuery(ORIGIN_BY_ID, {
@@ -185,11 +185,11 @@ const Designer = ({ location }) => {
     setMessanger(childMessenger);
   };
 
-  const options = {
-    minimap: {
-      enabled: false
-    }
-  };
+  // const options = {
+  //   minimap: {
+  //     enabled: false
+  //   }
+  // };
 
   useEffect(() => {
     if (!messanger) {
