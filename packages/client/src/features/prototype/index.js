@@ -6,9 +6,12 @@ import styled from "styled-components";
 import RxPostmessenger from "rx-postmessenger";
 // import MonacoEditor from "react-monaco-editor";
 import { useDebounce } from "use-debounce";
-import { Collapse } from "antd";
+import { Tabs } from "antd";
+import StyledElements from "./StyledElements";
+import Theme from "./Theme";
+import _ from "lodash";
 
-const Panel = Collapse.Panel;
+const TabPane = Tabs.TabPane;
 
 const { Content, Header } = Layout;
 
@@ -123,51 +126,12 @@ const Editor = styled.div`
   }
 `;
 
-const ComponentsView = ({ items }) => {
-  if (items == null) {
-    return null;
-  }
-  return (
-    <Collapse bordered={false}>
-      {Object.keys(items).map(key => (
-        <Panel header={key} key={key}>
-          <div className="preview-field">
-            <label>Color</label>
-            <span
-              className="preview"
-              style={{ backgroundColor: items[key].color }}
-            />
-          </div>
-          <div className="preview-field ">
-            <label>Font</label>
-            <span className="font">{items[key].fontSize}</span>
-          </div>
-
-          <div className="preview-field ">
-            <label>Weight</label>
-            <span className="font">{items[key].fontWeight}</span>
-          </div>
-
-          <div className="preview-field ">
-            <label>Padding</label>
-            <span className="font">{items[key].padding}</span>
-          </div>
-
-          <div className="preview-field ">
-            <label>Margin</label>
-            <span className="font">{items[key].margin}</span>
-          </div>
-        </Panel>
-      ))}
-    </Collapse>
-  );
-};
-
 const Designer = ({ location }) => {
   const params = new URLSearchParams(location.search);
   const iframe = useRef(null);
   const [textbox] = useState("");
   const [messanger, setMessanger] = useState(null);
+  const [theme, setTheme] = useState({});
   const docId = params.get("docId");
   const { data, loading } = useQuery(ORIGIN_BY_ID, {
     variables: { host: docId }
@@ -197,6 +161,20 @@ const Designer = ({ location }) => {
     }
     messanger.request("getPageTheme").subscribe(val => setComponents(val));
   }, [messanger]);
+
+  useEffect(() => {
+    if (components) {
+      const newTheme = _.chain(_.values(components))
+        .reduce((acc, val) => {
+          return {
+            colors: _.uniq([..._.get(acc, "colors", []), val.color]),
+            fontSize: _.uniq([..._.get(acc, "fontSize", []), val.fontSize])
+          };
+        }, {})
+        .value();
+      setTheme(newTheme);
+    }
+  }, [components]);
 
   useEffect(() => {
     if (!messanger) {
@@ -232,10 +210,19 @@ const Designer = ({ location }) => {
               </div>
 
               <div className="tools">
-                <span className="section-title">Page Theme</span>
-                <div className="view">
-                  <ComponentsView items={components} />
-                </div>
+                <Tabs defaultActiveKey="1">
+                  <TabPane tab="Components" key="1">
+                    <div className="view">
+                      <StyledElements items={components} />
+                    </div>
+                  </TabPane>
+                  <TabPane tab="Theme" key="2">
+                    <Theme items={theme} />
+                  </TabPane>
+                  <TabPane tab="Comments" key="3">
+                    comment
+                  </TabPane>
+                </Tabs>
               </div>
             </Editor>
           </Content>
