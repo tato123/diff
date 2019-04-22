@@ -1,7 +1,7 @@
-import stripe from './stripe';
-import auth from './auth';
+import stripe from "./stripe";
+import auth from "./auth";
 
-export default (server) => {
-    stripe(server);
-    auth(server);
-}
+export default app => {
+  app.use(stripe);
+  app.use(auth);
+};

@@ -1,21 +1,30 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useContext } from "react";
 import { Layout, Radio, Typography } from "antd";
 import { useQuery } from "react-apollo-hooks";
 import { ORIGIN_BY_ID } from "../../graphql/query";
 import styled from "styled-components";
 import RxPostmessenger from "rx-postmessenger";
-// import MonacoEditor from "react-monaco-editor";
 import { useDebounce } from "use-debounce";
 import { Tabs } from "antd";
 import StyledElements from "./StyledElements";
 import Theme from "./Theme";
 import _ from "lodash";
+import { useDocument, useActiveUsers } from "./useDocument";
+import CustomComponent from "./CustomComponent";
 
 const TabPane = Tabs.TabPane;
 
 const { Content, Header } = Layout;
 
 const { Title } = Typography;
+
+const Avatar = styled.div`
+  height: 16px;
+  width: 16px;
+  background-color: #ccc;
+  border-radius: 50%;
+  display: inline-block;
+`;
 
 const Iframe = styled.iframe`
   height: 100%;
@@ -132,8 +141,12 @@ const Designer = ({ location }) => {
   const [textbox] = useState("");
   const [messanger, setMessanger] = useState(null);
   const [theme, setTheme] = useState({});
+
   const docId = params.get("docId");
-  const { data, loading } = useQuery(ORIGIN_BY_ID, {
+
+  const { doc: editorDoc, change } = useDocument(docId);
+  const activeUsers = useActiveUsers(docId);
+  const { data, loading, error } = useQuery(ORIGIN_BY_ID, {
     variables: { host: docId }
   });
 
@@ -149,11 +162,9 @@ const Designer = ({ location }) => {
     setMessanger(childMessenger);
   };
 
-  // const options = {
-  //   minimap: {
-  //     enabled: false
-  //   }
-  // };
+  if (error) {
+    return null;
+  }
 
   useEffect(() => {
     if (!messanger) {
@@ -193,6 +204,7 @@ const Designer = ({ location }) => {
               <Title level={4}>{data.origin.name}</Title>
             </div>
             <div className="right">
+              {activeUsers && activeUsers.map(user => <Avatar />)}
               <Radio.Group defaultValue="a" buttonStyle="solid">
                 <Radio.Button value="a">Edit</Radio.Button>
                 <Radio.Button value="b">Preview</Radio.Button>
@@ -213,7 +225,10 @@ const Designer = ({ location }) => {
                 <Tabs defaultActiveKey="1">
                   <TabPane tab="Components" key="1">
                     <div className="view">
-                      <StyledElements items={components} />
+                      <CustomComponent
+                        value={_.get(editorDoc, "style", "")}
+                        onChange={val => change(doc => (doc.style = val))}
+                      />
                     </div>
                   </TabPane>
                   <TabPane tab="Theme" key="2">
@@ -233,16 +248,3 @@ const Designer = ({ location }) => {
 };
 
 export default Designer;
-
-// <div className="editor">
-// <MonacoEditor
-//   width="100%"
-//   height="90%"
-//   language="css"
-//   theme="vs-light"
-//   options={options}
-//   value={textbox}
-//   editorDidMount={editor => editor.focus()}
-//   onChange={newValue => setTextbox(newValue)}
-// />
-// </div>

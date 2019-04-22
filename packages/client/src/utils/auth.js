@@ -1,9 +1,7 @@
-import * as auth0 from 'auth0-js';
-import history from '../history'
-import jwtDecode from 'jwt-decode';
-import _ from 'lodash';
-
-
+import * as auth0 from "auth0-js";
+import history from "../history";
+import jwtDecode from "jwt-decode";
+import _ from "lodash";
 
 export default class Auth {
   tokenRenewalTimeout;
@@ -12,9 +10,9 @@ export default class Auth {
     domain: process.env.REACT_APP_AUTH0_DOMAIN,
     clientID: process.env.REACT_APP_AUTH0_CLIENT_ID,
     redirectUri: process.env.REACT_APP_AUTH0_REDIRECT_URI,
-    responseType: 'code',
-    audience: 'https://diff/dev',
-    scope: 'openid profile email'
+    responseType: "code",
+    audience: "https://diff/dev",
+    scope: "openid profile email"
   });
 
   constructor() {
@@ -32,100 +30,102 @@ export default class Auth {
   }
 
   rememberPage = () => {
-    localStorage.setItem('diff_redirectTo', document.referrer);
-  }
+    localStorage.setItem("diff_redirectTo", document.referrer);
+  };
 
   login = () => {
     this.rememberPage();
     this.auth0.authorize();
-  }
+  };
 
-  loginWithGoogle = (redirectUri) => {
+  loginWithGoogle = redirectUri => {
     this.rememberPage();
     this.auth0.authorize({
-      connection: 'google-oauth2',
-      scope: 'openid profile email'
-    })
-  }
+      connection: "google-oauth2",
+      scope: "openid profile email"
+    });
+  };
 
   loginWithEmail = (email, password) => {
     this.rememberPage();
     this.auth0.redirect.loginWithCredentials({
-      connection: 'Username-Password-Authentication',
+      connection: "Username-Password-Authentication",
       username: email,
-      password: password,
+      password: password
     });
+  };
 
-  }
-
-  passwordlessLogin = (email) => {
+  passwordlessLogin = email => {
     this.rememberPage();
 
     return new Promise((resolve, reject) => {
-      this.auth0.passwordlessStart({
-        connection: 'email',
-        send: 'link',
-        email,
-        responseType: 'code',
-      }, (err, res) => {
-        if (err) {
-          return reject(err)
+      this.auth0.passwordlessStart(
+        {
+          connection: "email",
+          send: "link",
+          email,
+          responseType: "code"
+        },
+        (err, res) => {
+          if (err) {
+            return reject(err);
+          }
+          return resolve(res);
         }
-        return resolve(res);
-      })
-    })
-
-  }
+      );
+    });
+  };
 
   signup = (email, password) => {
-
     return new Promise((resolve, reject) => {
-      this.auth0.signup({
-        connection: 'Username-Password-Authentication',
-        email,
-        password,
-      }, (err, data) => {
-        if (err) {
-          return reject(err);
+      this.auth0.signup(
+        {
+          connection: "Username-Password-Authentication",
+          email,
+          password
+        },
+        (err, data) => {
+          if (err) {
+            return reject(err);
+          }
+          this.loginWithEmail(email, password);
+          return resolve(data);
         }
-        this.loginWithEmail(email, password)
-        return resolve(data);
-      });
+      );
     });
-
-  }
+  };
 
   handleAuthentication = (hash, state = "diff_app") => {
     this.auth0.parseHash({ hash, state }, (err, authResult) => {
       if (authResult && authResult.accessToken && authResult.idToken) {
         this.setSession(authResult);
       } else if (err) {
-        history.replace('/');
+        history.replace("/");
         console.log(err);
         alert(`Error: ${err.error}. Check the console for further details.`);
       }
     });
-  }
+  };
 
   get webAuth() {
     return this.auth0;
   }
 
   getAccessToken = () => {
-    return localStorage.getItem('accessToken');
-  }
+    return localStorage.getItem("accessToken");
+  };
 
   getIdToken = () => {
-    return localStorage.getItem('idToken');
-  }
+    return localStorage.getItem("idToken");
+  };
 
   getExpiresAt = () => {
-    const val = localStorage.getItem('expiresAt');
+    const val = localStorage.getItem("expiresAt");
     return !!val ? parseInt(val) : null;
-  }
+  };
 
   getProfile = () => {
-    const val = localStorage.getItem('userProfile');
+    const val = localStorage.getItem("userProfile");
     if (val) {
       try {
         return JSON.parse(val);
@@ -136,41 +136,39 @@ export default class Auth {
     const idToken = this.getIdToken();
 
     return !_.isNil(idToken) && jwtDecode(idToken);
-
-  }
+  };
 
   getExp = () => {
     const idToken = this.getIdToken();
     return !_.isNil(idToken) && jwtDecode(idToken).exp;
-  }
+  };
 
-  setSession = (authResult) => {
-    let expiresAt = (authResult.expiresIn * 1000) + new Date().getTime();
+  setSession = authResult => {
+    let expiresAt = authResult.expiresIn * 1000 + new Date().getTime();
 
-    localStorage.setItem('accessToken', authResult.accessToken);
-    localStorage.setItem('idToken', authResult.idToken);
+    localStorage.setItem("accessToken", authResult.accessToken);
+    localStorage.setItem("idToken", authResult.idToken);
 
     const decodedIdToken = jwtDecode(authResult.idToken);
 
-    localStorage.setItem('expiresAt', expiresAt);
-    localStorage.setItem('userProfile', JSON.stringify(decodedIdToken));
+    localStorage.setItem("expiresAt", expiresAt);
+    localStorage.setItem("userProfile", JSON.stringify(decodedIdToken));
 
     // schedule a token renewal
     this.scheduleRenewal();
     this.handleRedirect();
-
-  }
+  };
 
   handleRedirect = () => {
     // navigate to the home route
-    const lastPage = localStorage['diff_redirectTo'];
+    const lastPage = localStorage["diff_redirectTo"];
     if (lastPage) {
-      delete localStorage['diff_redirectTo'];
+      delete localStorage["diff_redirectTo"];
       window.location.replace(lastPage);
     } else {
-      history.replace('/dashboard')
+      history.replace("/dashboard");
     }
-  }
+  };
 
   renewSession = () => {
     this.auth0.checkSession({}, (err, authResult) => {
@@ -181,15 +179,30 @@ export default class Auth {
         console.log(err);
       }
     });
-  }
+  };
+
+  exchangeForTwilioToken = params => {
+    const queryParams = params ? `?${params.join("&")}` : "";
+    return fetch("http://localhost:8081/twilio/token" + queryParams, {
+      headers: {
+        authorization: `Bearer ${this.getAccessToken()}`
+      },
+      method: "GET"
+    }).then(response => {
+      if (response.ok) {
+        return response.json();
+      }
+      throw new Error("Unable to exchange for token");
+    });
+  };
 
   clear = () => {
     // Remove isLoggedIn flag from localStorage
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('idToken');
-    localStorage.removeItem('expiresAt');
-    localStorage.removeItem('userProfile');
-  }
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("idToken");
+    localStorage.removeItem("expiresAt");
+    localStorage.removeItem("userProfile");
+  };
 
   logout = () => {
     this.clear();
@@ -197,13 +210,11 @@ export default class Auth {
     // Clear token renewal
     clearTimeout(this.tokenRenewalTimeout);
 
-
     // navigate to the home route
-    history.push('/');
-  }
+    history.push("/");
+  };
 
   isAuthenticated = () => {
-
     const exp = this.getExp();
     if (_.isNil(exp)) {
       return false;
@@ -212,8 +223,5 @@ export default class Auth {
     const dateNow = new Date().getTime() / 1000;
     const val = exp < dateNow;
     return !val;
-  }
-
-
-
+  };
 }

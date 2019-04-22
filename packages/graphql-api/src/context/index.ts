@@ -1,9 +1,7 @@
+import getUser from "./auth0";
+import _ from "lodash";
 
-import getUser from './auth0';
-import _ from 'lodash'
-
-const graphqlContext = async ({ request: req, connection }) => {
-
+const graphqlContext = async ({ req, connection }) => {
   // if we already have a context, from an alternate connection
   // use that
   if (connection) {
@@ -11,13 +9,13 @@ const graphqlContext = async ({ request: req, connection }) => {
     return connection.context;
   }
 
-  const bearer = _.get(req, 'headers.authorization', '');
-  const [_header, jwtToken] = bearer.split(' ');
+  const bearer = _.get(req, "headers.authorization", "");
+  const [_header, jwtToken] = bearer.split(" ");
   const user = await getUser(jwtToken);
 
   return {
     user
-  }
-}
+  };
+};
 
 export default graphqlContext;
