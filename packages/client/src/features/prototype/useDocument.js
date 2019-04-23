@@ -7,29 +7,9 @@ import Pusher from "pusher-js";
 import { WebSocketChannel } from "twilsock/lib/websocketchannel";
 import { connect, LocalDataTrack } from "twilio-video";
 
-export const useTwilioSync = () => {
-  const [syncClient, setSyncClient] = useState(null);
-  const user = useContext(UserContext);
-
-  useEffect(() => {
-    user
-      .exchangeForTwilioToken()
-      .then(tokenResponse => {
-        const syncClient = new SyncClient(tokenResponse.token, {
-          logLevel: "info"
-        });
-        setSyncClient(syncClient);
-      })
-      .catch(err => {
-        console.error(err);
-      });
-  }, []);
-
-  return syncClient;
-};
-
 export const useVideo = docId => {
   const [room, setRoom] = useState();
+  const [dataTrack, setDatatrack] = useState();
   const user = useContext(UserContext);
 
   useEffect(() => {
@@ -37,7 +17,7 @@ export const useVideo = docId => {
       .exchangeForTwilioToken([`room=${docId}`])
       .then(tokenResponse => {
         const dataTrack = new LocalDataTrack();
-
+        setDatatrack(dataTrack);
         return connect(
           tokenResponse.token,
           {
@@ -60,193 +40,184 @@ export const useVideo = docId => {
       });
   }, []);
 
-  return room;
-};
-
-export const useSyncStream = streamName => {
-  const [stream, setStream] = useState(null);
-  const [loading, setLoading] = useState();
-  const [error, setError] = useState();
-  const syncClient = useTwilioSync();
-
-  useEffect(() => {
-    if (!syncClient) {
-      return;
-    }
-    setLoading(true);
-    syncClient
-      .stream("MyStream")
-      .then(stream => {
-        setStream(stream);
-        setLoading(false);
-      })
-      .catch(error => {
-        setLoading(false);
-        setError(error);
-      });
-  }, [syncClient]);
-
-  return { stream, loading, error };
+  return [room, dataTrack];
 };
 
 export const useActiveUsers = docId => {
-  const [users, setUsers] = useState([]);
-  const syncClient = useTwilioSync();
-  const user = useContext(UserContext);
-
-  useEffect(() => {
-    if (!syncClient) {
-      return;
-    }
-    syncClient
-      .list(docId + "-presence")
-      .then(list => {
-        // when we add an item add to the list
-        list.on("itemAdded", args => {
-          if (args.isLocal) {
-            return;
-          }
-          setUsers([...users, args.item.value]);
-        });
-
-        list.on("itemRemoved", args => {
-          if (args.isLocal) {
-            return;
-          }
-          const newUsers = _.remove(users, x => x === args.value);
-          setUsers(newUsers);
-        });
-
-        // get all of the current users when we first start
-        list
-          .getItems({ from: 0, order: "asc" })
-          .then(paginator => {
-            paginator.items.forEach(item => setUsers([...users, item]));
-          })
-          .catch(function(error) {
-            console.error("List getItems() failed", error);
-          });
-
-        // add ourself
-        list.push(user.sub);
-      })
-
-      .catch(function(error) {
-        console.error("Unexpected error", error);
-      });
-
-    // check when a user goes offline if it's one of ours
-    syncClient.list("online").then(list => {
-      list.on("itemRemoved", args => {
-        if (args.isLocal) {
-          return;
-        }
-        const newUsers = _.remove(users, x => x === args.value);
-        setUsers(newUsers);
-      });
-    });
-  }, [syncClient]);
-
-  return users;
-};
-
-export const usePusher = docId => {
-  const [members, setMembers] = useState([]);
-  const [count, setCount] = useState(0);
-  const [channel, setChannel] = useState();
-
-  useEffect(() => {
-    // Enable pusher logging - don't include this in production
-    Pusher.logToConsole = true;
-
-    var pusher = new Pusher("738f996660519e1aade6", {
-      cluster: "mt1",
-      forceTLS: true,
-      authEndpoint: "http://localhost:8081/pusher/auth",
-      headers: {
-        authorization: "Bearer test"
-      }
-    });
-
-    const channel = pusher.subscribe("presence-" + docId);
-
-    channel.bind("pusher:subscription_error", function(status) {
-      console.error("[pusher] got status", status);
-    });
-
-    channel.bind("pusher:subscription_succeeded", function(members) {
-      // for example
-      setCount(members.count);
-
-      members.each(function(member) {
-        // for example:
-        setMembers(m => [...m, { id: member.id, info: member.info }]);
-      });
-    });
-
-    channel.bind("pusher_internal:subscription_succeeded", () => {
-      console.log("succeeded");
-    });
-
-    setChannel(channel);
-  }, []);
-
-  return { channel, members, count };
+  return [];
 };
 
 export const useDocument = docId => {
   // first lets create a document
   const [doc, setDoc] = useState();
-  const { channel, members, count } = usePusher(docId);
   const user = useContext(UserContext);
-  const video = useVideo();
+  const [room, dataTrack] = useVideo();
 
-  // // lets grab the current document id
-  // useEffect(() => {
-  //   if (!stream) {
-  //     return;
-  //   }
-  // const doc1 = Automerge.init();
-  // setDoc(doc1);
+  const canvas = document.getElementById("canvas");
+  const connectButton = document.getElementById("connect");
+  const disconnectButton = document.getElementById("disconnect");
+  const form = document.getElementById("form");
+  const identityInput = document.getElementById("identity");
+  const nameInput = document.getElementById("name");
+  const participants = document.getElementById("participants");
+  const video = document.querySelector("#local-participant > video");
 
-  //   stream.on("messagePublished", function(args) {
-  //     if (args.isLocal) {
-  //       return;
-  //     }
+  /**
+   * Handle a connected RemoteParticipant.
+   * @param {RemoteParticipant} participant
+   * @retruns {void}
+   */
+  function participantConnected(participant) {
+    const participantDiv = document.createElement("div");
+    participantDiv.className = "participant";
+    participantDiv.id = participant.sid;
 
-  //     const changes = JSON.parse(args.message.value.val);
-  //     console.log("new revision created", changes);
+    const videoElement = document.createElement("video");
+    participantDiv.appendChild(videoElement);
+    document.body.appendChild(participantDiv);
 
-  // const newDoc = Automerge.applyChanges(doc1, changes);
-  // setDoc(newDoc);
-  //   });
-  // }, [stream]);
+    participant.tracks.forEach(publication =>
+      trackPublished(participant, publication)
+    );
+    participant.on("trackPublished", publication =>
+      trackPublished(participant, publication)
+    );
+    participant.on("trackUnpublished", publication =>
+      trackUnpublished(participant, publication)
+    );
+  }
 
-  // const toChange = cb => {
-  //   const newRevision = Automerge.change(doc, "effect change", cb);
-  //   let changes = Automerge.getChanges(doc, newRevision);
-  //   console.log("new revision created", newRevision);
-  //   stream.publishMessage({ val: JSON.stringify(changes) });
-  // };
+  /**
+   * Handle a disconnnected RemoteParticipant.
+   * @param {RemoteParticipant} participant
+   * @returns {void}
+   */
+  function participantDisconnected(participant) {
+    console.log(`RemoteParticipant "${participant.identity}" disconnected`);
+    const participantDiv = document.getElementById(participant.sid);
+    if (participantDiv) {
+      participantDiv.remove();
+    }
+  }
+
+  /**
+   * Handle a published Track.
+   * @param {RemoteParticipant} participant
+   * @param {RemoteTrackPublication} publication
+   */
+  function trackPublished(participant, publication) {
+    console.log(
+      `RemoteParticipant "${participant.identity}" published ${
+        publication.kind
+      } Track ${publication.trackSid}`
+    );
+    if (publication.isSubscribed) {
+      trackSubscribed(participant, publication.track);
+    } else {
+      publication.on("subscribed", track =>
+        trackSubscribed(participant, track)
+      );
+    }
+    publication.on("unsubscribed", track =>
+      trackUnsubscribed(participant, track)
+    );
+  }
+
+  /**
+   * Handle a subscribed Track.
+   * @param {RemoteParticipant} participant
+   * @param {Track} track
+   * @returns {void}
+   */
+  function trackSubscribed(participant, track) {
+    console.log(
+      `LocalParticipant subscribed to RemoteParticipant "${
+        participant.identity
+      }"'s ${track.kind} Track ${track.sid}`
+    );
+    if (track.kind === "audio" || track.kind === "video") {
+      track.attach(`#${participant.sid} > video`);
+    } else if (track.kind === "data") {
+      track.on("message", data => {
+        const change = JSON.parse(data);
+
+        setDoc(doc => Automerge.applyChanges(doc, change));
+        const state = Automerge.getHistory(doc);
+        console.log(state);
+      });
+    }
+  }
+
+  /**
+   * Handle an unsubscribed Track.
+   * @param {RemoteParticipant} participant
+   * @param {Track} track
+   * @returns {void}
+   */
+  function trackUnsubscribed(participant, track) {
+    console.log(
+      `LocalParticipant unsubscribed from RemoteParticipant "${
+        participant.identity
+      }"'s ${track.kind} Track ${track.sid}`
+    );
+    if (track.kind === "audio" || track.kind === "video") {
+      track.detach();
+    }
+  }
+
+  /**
+   * Update the UI in response to disconnecting.
+   * @returns {void}
+   */
+  function didDisconnect(error) {
+    if (room) {
+      if (error) {
+        console.error(error);
+      }
+      room.participants.forEach(participantDisconnected);
+    }
+    // identityInput.disabled = false;
+    // nameInput.disabled = false;
+    // connectButton.disabled = false;
+    // disconnectButton.disabled = true;
+  }
+
+  /**
+   * Handle an unpublished Track.
+   * @param {RemoteParticipant} participant
+   * @param {RemoteTrackPublication} publication
+   */
+  function trackUnpublished(participant, publication) {
+    console.log(
+      `RemoteParticipant "${participant.identity}" unpublished ${
+        publication.kind
+      } Track ${publication.trackSid}`
+    );
+  }
 
   useEffect(() => {
-    if (!channel) {
+    if (!room) {
       return;
     }
 
+    room.once("disconnected", didDisconnect);
+
+    room.participants.forEach(participantConnected);
+    room.on("participantConnected", participantConnected);
+    room.on("participantDisconnected", participantDisconnected);
+  }, [room]);
+
+  useEffect(() => {
     const doc1 = Automerge.init();
     setDoc(doc1);
-
-    channel.bind("client-docchange", (data, metadata) => {
-      const newDoc = Automerge.applyChanges(doc1, data);
-      setDoc(newDoc);
-    });
-  }, [channel]);
+  }, []);
 
   const toChange = cb => {
-    const newRevision = Automerge.change(doc, "effect change", cb);
+    const change = Math.floor(Math.random() * 10000) + "--change";
+    const newRevision = Automerge.change(doc, change, cb);
     let changes = Automerge.getChanges(doc, newRevision);
-    channel.trigger("client-docchange", changes);
+    dataTrack.send(JSON.stringify(changes));
+    setDoc(doc => newRevision);
   };
 
   return { doc, change: toChange };

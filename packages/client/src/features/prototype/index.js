@@ -145,7 +145,7 @@ const Designer = ({ location }) => {
   const docId = params.get("docId");
 
   const { doc: editorDoc, change } = useDocument(docId);
-  const activeUsers = useActiveUsers(docId);
+  const activeUsers = useActiveUsers();
   const { data, loading, error } = useQuery(ORIGIN_BY_ID, {
     variables: { host: docId }
   });

@@ -52,7 +52,7 @@ router.get("/token", async (req, res) => {
     );
     token.addGrant(syncGrant);
     token.addGrant(grant);
-    token.identity = user.sub;
+    token.identity = user.sub + "-" + Math.floor(Math.random() * 1000);
 
     // Serialize the token to a JWT string and include it in a JSON response
     res.send({
