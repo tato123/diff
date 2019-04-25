@@ -1,37 +1,41 @@
-import React from 'react';
-import ReactWebComponent from 'react-web-component';
+import React from "react";
+import ReactWebComponent from "react-web-component";
 
-import Toolbar from './components/toolbar';
-import Box from './components/selection/box';
+import Toolbar from "./components/toolbar";
+import Box from "./components/selection/box";
 
-import SelectionContext from './context/Selection';
-import CSSInsepctor from './components/inspectors/CSSInspector';
-
-import './index.css';
-
-
+import SelectionContext from "./context/Selection";
+import CSSInsepctor from "./components/inspectors/CSSInspector";
+import "./webcomponents/selection.element";
+import "./index.css";
 
 class App extends React.Component {
-    state = {
-        sel: '',
-        elm: null
-    }
+  state = {
+    sel: "",
+    elm: null
+  };
 
-    onChange = (val) => {
-        this.setState({ sel: val })
-    }
+  onChange = val => {
+    this.setState({ sel: val });
+  };
 
-    render() {
-        const { state: { sel, elm } } = this;
+  render() {
+    const {
+      state: { sel, elm }
+    } = this;
 
-        return (
-            <SelectionContext.Provider value={elm}>
-                <Box active={sel === 'css'} onSelect={elment => this.setState({ elm: elment })} />
-                <Toolbar onChange={this.onChange} />
-                <CSSInsepctor />
-            </SelectionContext.Provider>
-        )
-    }
+    return (
+      <SelectionContext.Provider value={elm}>
+        <Box
+          active={sel === "css"}
+          onSelect={elment => this.setState({ elm: elment })}
+        />
+        <Toolbar onChange={this.onChange} />
+        <CSSInsepctor />
+        <diff-selection />
+      </SelectionContext.Provider>
+    );
+  }
 }
 
-ReactWebComponent.create(<App />, 'my-component');
+ReactWebComponent.create(<App />, "my-component");

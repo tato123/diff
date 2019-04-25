@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useContext } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Layout, Radio, Typography } from "antd";
 import { useQuery } from "react-apollo-hooks";
 import { ORIGIN_BY_ID } from "../../graphql/query";
@@ -6,7 +6,6 @@ import styled from "styled-components";
 import RxPostmessenger from "rx-postmessenger";
 import { useDebounce } from "use-debounce";
 import { Tabs } from "antd";
-import StyledElements from "./StyledElements";
 import Theme from "./Theme";
 import _ from "lodash";
 import { useDocument, useActiveUsers } from "./useDocument";
@@ -35,7 +34,7 @@ const Iframe = styled.iframe`
 
 const Pagelayout = styled(Layout)`
   .header {
-    border-bottom: 1px solid #ebedf0;
+    border-bottom: 1px solid #ccc;
     background: #fff;
     height: 42px;
     line-height: 42px;
@@ -62,11 +61,12 @@ const Editor = styled.div`
   height: 100%;
 
   > div:first-child {
-    width: 70%;
+    width: 80%;
   }
 
   > div:last-child {
-    width: 30%;
+    width: 20%;
+    border-left: 1px solid #ccc;
   }
 
   .tools {
@@ -171,6 +171,7 @@ const Designer = ({ location }) => {
       return;
     }
     messanger.request("getPageTheme").subscribe(val => setComponents(val));
+    messanger.request("selection").subscribe(console.log);
   }, [messanger]);
 
   useEffect(() => {
@@ -200,9 +201,10 @@ const Designer = ({ location }) => {
       {!loading && (
         <React.Fragment>
           <Header className="header">
-            <div className="documentName">
+            <div className="documentName" style={{ paddingRight: 32 }}>
               <Title level={4}>{data.origin.name}</Title>
             </div>
+
             <div className="right">
               {activeUsers && activeUsers.map(user => <Avatar />)}
               <Radio.Group defaultValue="a" buttonStyle="solid">
