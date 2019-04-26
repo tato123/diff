@@ -10,9 +10,29 @@ import "./index.css";
 
 class App extends React.Component {
   state = {
-    sel: "",
+    tool: "",
     elm: null
   };
+
+  componentDidMount() {
+    window.diff.parentMessanger
+      .notifications("tool:change")
+      .subscribe(({ tool }) => {
+        console.log("Received a tool change", tool);
+        this.setState({ tool });
+      });
+
+    window.diff.parentMessanger
+      .notifications("element:search")
+      .subscribe(val => {
+        console.log("attempting to get", val);
+        if (!val) {
+          return;
+        }
+        const elements = document.querySelectorAll(val);
+        elements.forEach(e => (e.style.border = "1px solid red"));
+      });
+  }
 
   onChange = val => {
     this.setState({ sel: val });
@@ -31,12 +51,18 @@ class App extends React.Component {
 
   render() {
     const {
-      state: { sel, elm }
+      state: { tool, elm }
     } = this;
 
     return (
       <SelectionContext.Provider value={elm}>
-        <Box active onSelect={this.onSelect} />
+        <Box active={tool === "select"} onSelect={this.onSelect} />
+        <h1 style={{ display: tool === "search" ? "block" : "none" }}>
+          search
+        </h1>
+        <h1 style={{ display: tool === "annotate" ? "block" : "none" }}>
+          annotate
+        </h1>
       </SelectionContext.Provider>
     );
   }

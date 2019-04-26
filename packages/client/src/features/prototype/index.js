@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useContext } from "react";
-import { Layout, Avatar, Typography, Button } from "antd";
+import { Layout, Avatar, Typography, Button, Select, Input } from "antd";
 import { useQuery } from "react-apollo-hooks";
 import { ORIGIN_BY_ID } from "../../graphql/query";
 import styled from "styled-components";
@@ -72,9 +72,6 @@ const Editor = styled.div`
 
     .profile {
       padding: 32px;
-      h4 {
-        text-transform: uppercase;
-      }
 
       .field-group {
         margin-top: 2em;
@@ -182,14 +179,54 @@ const ColorBox = styled.div`
   border: 1px solid #ccc;
 `;
 
+const FieldTitle = styled(Title)`
+  font-size: 14px !important;
+  text-transform: uppercase;
+  margin-bottom: 16px !important;
+`;
+
+const SelectToolDetails = ({ value: element }) => (
+  <div className="profile">
+    <Title>{element.tag}</Title>
+    <div className="field-group">
+      <FieldTitle>Selector</FieldTitle>
+      <div>...</div>
+    </div>
+    <div className="field-group">
+      <FieldTitle>Typography</FieldTitle>
+      <div>{element.style.fontFamily}</div>
+    </div>
+    <div className="field-group">
+      <FieldTitle>Background</FieldTitle>
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <ColorBox color={element.style.backgroundColor} />
+        {element.style.backgroundColor}
+      </div>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          marginTop: "0.5em"
+        }}
+      >
+        <ColorBox color={element.style.color} />
+        {element.style.color}
+      </div>
+    </div>
+  </div>
+);
+
 const Designer = ({ location }) => {
   const params = new URLSearchParams(location.search);
   const iframe = useRef(null);
   const [textbox] = useState("");
+
+  const [search, setSearch] = useState("");
   const [messanger, setMessanger] = useState(null);
   const user = useContext(UserContext);
   const [userImage, setUserImage] = useState();
   const [element, setElement] = useState();
+  const [tool, setTool] = useState("select");
 
   const docId = params.get("docId");
 
@@ -244,6 +281,15 @@ const Designer = ({ location }) => {
     setUserImage(profile.picture);
   }, [user]);
 
+  useEffect(() => {
+    if (!messanger || !tool) {
+      return;
+    }
+    setTimeout(() => {
+      messanger.notify("tool:change", { tool });
+    }, 500);
+  }, [tool, messanger]);
+
   return (
     <Pagelayout style={{ height: "100vh", overflow: "hidden" }}>
       {loading && <div>Loading page</div>}
@@ -253,14 +299,46 @@ const Designer = ({ location }) => {
             <div className="documentName" style={{ paddingRight: 32 }}>
               <Title level={4}>{data.origin.name}</Title>
             </div>
-
+            <Input.Search
+              placeholder="Search Elements"
+              style={{ width: "50%" }}
+              value={search}
+              onChange={e => {
+                messanger.notify("element:search", e.currentTarget.value);
+                setSearch(e.currentTarget.value);
+              }}
+            />
             <div className="right">
               {activeUsers && activeUsers.map(user => <Avatar />)}
               <div>
+                <Avatar
+                  style={{
+                    backgroundColor: "orange",
+                    border: "2px solid #fff",
+                    verticalAlign: "middle",
+                    marginRight: "-10px",
+                    zIndex: 200
+                  }}
+                >
+                  B
+                </Avatar>
+                <Avatar
+                  style={{
+                    backgroundColor: "green",
+                    border: "2px solid #fff",
+                    verticalAlign: "middle"
+                  }}
+                >
+                  J
+                </Avatar>
                 <Avatar src={userImage} />
               </div>
             </div>
+            <div style={{ height: 64, width: "100%" }}>
+              <input style={{ width: "100%" }} />
+            </div>
           </Header>
+
           <Content style={{ position: "relative" }}>
             <Editor>
               <div>
@@ -272,46 +350,12 @@ const Designer = ({ location }) => {
               </div>
               <div>
                 {!element && <div className="empty">Nothing selected</div>}
-                {element && (
-                  <div className="profile">
-                    <Title>{element.tag}</Title>
-                    <div className="field-group">
-                      <Title level={4}>Selector</Title>
-                      <div>...</div>
-                    </div>
-                    <div className="field-group">
-                      <Title level={4}>Typography</Title>
-                      <div>{element.style.fontFamily}</div>
-                    </div>
-                    <div className="field-group">
-                      <Title level={4}>Background</Title>
-                      <div style={{ display: "flex", alignItems: "center" }}>
-                        <ColorBox color={element.style.backgroundColor} />
-                        {element.style.backgroundColor}
-                      </div>
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          marginTop: "0.5em"
-                        }}
-                      >
-                        <ColorBox color={element.style.color} />
-                        {element.style.color}
-                      </div>
-                    </div>
-                    <div className="field-group">
-                      <Title level={4}>Custom CSS</Title>
-                      <textarea />
-                    </div>
-                  </div>
-                )}
+                {element && <SelectToolDetails value={element} />}
               </div>
               <Tools>
-                <Button shape="circle">
+                <Button shape="circle" onClick={() => setTool(t => "select")}>
                   <Icon icon={pointer} size={20} />
                 </Button>
-                <Button shape="circle" icon="search" />
               </Tools>
             </Editor>
           </Content>
