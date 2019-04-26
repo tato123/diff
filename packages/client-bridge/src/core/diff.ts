@@ -48,6 +48,7 @@ export default class Diff implements WindowTool {
   private context: Context;
 
   private postMessageSource?: Observable<Event>;
+  private parentMessanger?: RxPostmessenger.Messenger;
 
   /**
    * Registered reactions to event types
@@ -96,6 +97,8 @@ export default class Diff implements WindowTool {
       window.parent,
       innerUrl.origin
     );
+
+    this.parentMessanger = parentMessenger;
 
     type Event = (s: any) => {};
     type EventArray = {

@@ -6,7 +6,6 @@ import Box from "./components/selection/box";
 
 import SelectionContext from "./context/Selection";
 import CSSInsepctor from "./components/inspectors/CSSInspector";
-import "./webcomponents/selection.element";
 import "./index.css";
 
 class App extends React.Component {
@@ -19,6 +18,17 @@ class App extends React.Component {
     this.setState({ sel: val });
   };
 
+  onSelect = element => {
+    const computed = window.getComputedStyle(element);
+
+    window.diff.parentMessanger.notify("element:selected", {
+      tag: element.tagName,
+      style: {
+        ...computed
+      }
+    });
+  };
+
   render() {
     const {
       state: { sel, elm }
@@ -26,13 +36,7 @@ class App extends React.Component {
 
     return (
       <SelectionContext.Provider value={elm}>
-        <Box
-          active={sel === "css"}
-          onSelect={elment => this.setState({ elm: elment })}
-        />
-        <Toolbar onChange={this.onChange} />
-        <CSSInsepctor />
-        <diff-selection />
+        <Box active onSelect={this.onSelect} />
       </SelectionContext.Provider>
     );
   }

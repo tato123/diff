@@ -1,15 +1,16 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Layout, Radio, Typography } from "antd";
+import React, { useEffect, useRef, useState, useContext } from "react";
+import { Layout, Avatar, Typography, Button } from "antd";
 import { useQuery } from "react-apollo-hooks";
 import { ORIGIN_BY_ID } from "../../graphql/query";
 import styled from "styled-components";
 import RxPostmessenger from "rx-postmessenger";
 import { useDebounce } from "use-debounce";
 import { Tabs } from "antd";
-import Theme from "./Theme";
 import _ from "lodash";
 import { useDocument, useActiveUsers } from "./useDocument";
-import CustomComponent from "./CustomComponent";
+import UserContext from "../../utils/context";
+import { pointer } from "react-icons-kit/entypo/pointer";
+import Icon from "react-icons-kit";
 
 const TabPane = Tabs.TabPane;
 
@@ -17,19 +18,13 @@ const { Content, Header } = Layout;
 
 const { Title } = Typography;
 
-const Avatar = styled.div`
-  height: 16px;
-  width: 16px;
-  background-color: #ccc;
-  border-radius: 50%;
-  display: inline-block;
-`;
-
 const Iframe = styled.iframe`
   height: 100%;
   width: 100%;
   outline: none;
   border: none;
+  box-shadow: rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+  border-radius: 2px;
 `;
 
 const Pagelayout = styled(Layout)`
@@ -53,25 +48,41 @@ const Pagelayout = styled(Layout)`
 `;
 
 const Editor = styled.div`
-  @import url("https://rsms.me/inter/inter.css");
-
-  display: flex;
-  flex-direction: row;
-  flex: 1 auto;
+  display: grid;
+  grid-template-areas: ". . .";
+  grid-template-columns: 1fr 300px 64px;
+  grid-template-rows: 1fr;
   height: 100%;
+  background-color: #f8f9fa
 
   > div:first-child {
-    width: 80%;
+    width: 100%;
   }
 
-  > div:last-child {
-    width: 20%;
-    border-left: 1px solid #ccc;
+  > div:nth-child(2) {
+    display: flex;
+    flex: 1 auto;
+
+    .empty {
+      display: flex;
+      flex: 1 auto;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .profile {
+      padding: 32px;
+      h4 {
+        text-transform: uppercase;
+      }
+
+      .field-group {
+        margin-top: 2em;
+      }
+    }
   }
 
   .tools {
-    font-family: "Inter", sans-serif;
-
     border-left: 1px solid #ebedf0;
     background-color: #fff;
     padding: 16px;
@@ -135,12 +146,50 @@ const Editor = styled.div`
   }
 `;
 
+const Tools = styled.div`
+  z-index: 1001;
+  right: 0px;
+  top: 0px;
+  display: flex;
+  flex: 1 auto;
+  flex-direction: column;
+  height: 100%;
+  padding: 16px;
+  border-left: 1px solid #ccc;
+  background-color: #fff;
+
+  button {
+    display: flex;
+    color: #1890ff;
+    justify-content: center;
+  }
+`;
+
+const ColorBox = styled.div`
+  background-color: ${props => props.color};
+  width: 44px;
+  height: 44px;
+
+  max-width: 44px;
+  max-height: 44px;
+  border-radius: 4px;
+  margin-right: 1em;
+
+  display: inline-flex;
+  flex: 1 auto;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #ccc;
+`;
+
 const Designer = ({ location }) => {
   const params = new URLSearchParams(location.search);
   const iframe = useRef(null);
   const [textbox] = useState("");
   const [messanger, setMessanger] = useState(null);
-  const [theme, setTheme] = useState({});
+  const user = useContext(UserContext);
+  const [userImage, setUserImage] = useState();
+  const [element, setElement] = useState();
 
   const docId = params.get("docId");
 
@@ -172,21 +221,12 @@ const Designer = ({ location }) => {
     }
     messanger.request("getPageTheme").subscribe(val => setComponents(val));
     messanger.request("selection").subscribe(console.log);
-  }, [messanger]);
 
-  useEffect(() => {
-    if (components) {
-      const newTheme = _.chain(_.values(components))
-        .reduce((acc, val) => {
-          return {
-            colors: _.uniq([..._.get(acc, "colors", []), val.color]),
-            fontSize: _.uniq([..._.get(acc, "fontSize", []), val.fontSize])
-          };
-        }, {})
-        .value();
-      setTheme(newTheme);
-    }
-  }, [components]);
+    messanger.notifications("element:selected").subscribe(elm => {
+      console.log(elm);
+      setElement(elm);
+    });
+  }, [messanger]);
 
   useEffect(() => {
     if (!messanger) {
@@ -195,11 +235,20 @@ const Designer = ({ location }) => {
     messanger.request("stylesheet", textbox).subscribe(console.log);
   }, [debouncedText]);
 
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+
+    const profile = user.getProfile();
+    setUserImage(profile.picture);
+  }, [user]);
+
   return (
     <Pagelayout style={{ height: "100vh", overflow: "hidden" }}>
       {loading && <div>Loading page</div>}
       {!loading && (
-        <React.Fragment>
+        <>
           <Header className="header">
             <div className="documentName" style={{ paddingRight: 32 }}>
               <Title level={4}>{data.origin.name}</Title>
@@ -207,43 +256,66 @@ const Designer = ({ location }) => {
 
             <div className="right">
               {activeUsers && activeUsers.map(user => <Avatar />)}
-              <Radio.Group defaultValue="a" buttonStyle="solid">
-                <Radio.Button value="a">Edit</Radio.Button>
-                <Radio.Button value="b">Preview</Radio.Button>
-              </Radio.Group>
+              <div>
+                <Avatar src={userImage} />
+              </div>
             </div>
           </Header>
           <Content style={{ position: "relative" }}>
             <Editor>
-              <div style={{ padding: 8 }}>
+              <div>
                 <Iframe
                   ref={iframe}
                   onLoad={initConnection}
                   src={data.origin.protocol + "://" + data.origin.origin}
                 />
               </div>
-
-              <div className="tools">
-                <Tabs defaultActiveKey="1">
-                  <TabPane tab="Components" key="1">
-                    <div className="view">
-                      <CustomComponent
-                        value={_.get(editorDoc, "style", "")}
-                        onChange={val => change(doc => (doc.style = val))}
-                      />
+              <div>
+                {!element && <div className="empty">Nothing selected</div>}
+                {element && (
+                  <div className="profile">
+                    <Title>{element.tag}</Title>
+                    <div className="field-group">
+                      <Title level={4}>Selector</Title>
+                      <div>...</div>
                     </div>
-                  </TabPane>
-                  <TabPane tab="Theme" key="2">
-                    <Theme items={theme} />
-                  </TabPane>
-                  <TabPane tab="Comments" key="3">
-                    comment
-                  </TabPane>
-                </Tabs>
+                    <div className="field-group">
+                      <Title level={4}>Typography</Title>
+                      <div>{element.style.fontFamily}</div>
+                    </div>
+                    <div className="field-group">
+                      <Title level={4}>Background</Title>
+                      <div style={{ display: "flex", alignItems: "center" }}>
+                        <ColorBox color={element.style.backgroundColor} />
+                        {element.style.backgroundColor}
+                      </div>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "0.5em"
+                        }}
+                      >
+                        <ColorBox color={element.style.color} />
+                        {element.style.color}
+                      </div>
+                    </div>
+                    <div className="field-group">
+                      <Title level={4}>Custom CSS</Title>
+                      <textarea />
+                    </div>
+                  </div>
+                )}
               </div>
+              <Tools>
+                <Button shape="circle">
+                  <Icon icon={pointer} size={20} />
+                </Button>
+                <Button shape="circle" icon="search" />
+              </Tools>
             </Editor>
           </Content>
-        </React.Fragment>
+        </>
       )}
     </Pagelayout>
   );
