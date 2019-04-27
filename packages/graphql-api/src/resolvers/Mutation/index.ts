@@ -1,11 +1,16 @@
-import subscribeCustomerToPlan from "./subscribeCustomerToPlan";
-import cancelSubscription from "./cancelSubscription";
-import createSiteOrigin from "./createSiteOrigin";
-import saveSiteDeltas from "./saveSiteDeltas";
+// projects
+import createProject from "./createProject.resolver";
 
-module.exports = {
-  createSiteOrigin,
-  saveSiteDeltas,
+// changes as deltas
+import createDelta from "./createDelta.resolver";
+
+// customer subscriptions
+import subscribeCustomerToPlan from "./subscribeCustomerToPlan.resolver";
+import cancelSubscription from "./cancelSubscription.resolver";
+
+export default {
+  createProject,
+  createDelta,
   subscribeCustomerToPlan,
   cancelSubscription
 };

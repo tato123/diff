@@ -1,24 +1,20 @@
 import path = require("path");
-import resolvers = require("./resolvers");
+import resolvers from "./resolvers";
 import context from "./context";
 import webhooks from "./webhooks";
 import getUser from "./context/auth0";
 import _ from "lodash";
+
 import express from "express";
 import { SubscriptionServer } from "subscriptions-transport-ws";
 import { execute, subscribe } from "graphql";
 import { makeExecutableSchema } from "graphql-tools";
 import twilioRoutes from "./routes/twilio";
 import bodyParser from "body-parser";
-var Pusher = require("pusher");
 
-var pusher = new Pusher({
-  appId: "662290",
-  key: "738f996660519e1aade6",
-  secret: "62db73487c4c961e43ff",
-  cluster: "mt1",
-  encrypted: true
-});
+// launch mongoose
+import { connect as connectMongoose } from "./aws/documentdb";
+
 const { importSchema } = require("graphql-import");
 const cors = require("cors");
 
@@ -28,6 +24,9 @@ const { ApolloServer, gql } = require("apollo-server-express");
 const port = process.env.PORT || 8081;
 
 const app = express();
+
+// start our connection to mongodb
+connectMongoose();
 
 app.use("*", cors({ origin: true }));
 
@@ -70,25 +69,6 @@ const server = app.listen(port, () => {
       path: "/graphql"
     }
   );
-});
-
-// ----------------------------------------
-// configure our server
-
-app.post("/pusher/auth", function(req, res) {
-  var socketId = req.body.socket_id;
-  var channel = req.body.channel_name;
-
-  const id = Math.floor(Math.random() * 10000);
-  var presenceData = {
-    user_id: "user-" + id,
-    user_info: {
-      name: "Mr Channels",
-      twitter_id: "@pusher"
-    }
-  };
-  var auth = pusher.authenticate(socketId, channel, presenceData);
-  res.send(auth);
 });
 
 webhooks(app);

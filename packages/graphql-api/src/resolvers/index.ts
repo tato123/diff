@@ -1,10 +1,11 @@
-import Subscription from './Subscription'
+// import Subscription from "./Subscription";
+import Mutation from "./Mutation";
+import Query from "./Query";
+import Model from "./Model";
 
-const Query = require('./Query');
-const Mutation = require('./Mutation');
-const Model = require('./Model')
-
-
-module.exports = Object.assign({
-    Query, Mutation, Subscription
-}, Model)
+export default {
+  Query,
+  Mutation,
+  //   Subscription,
+  ...Model
+};

@@ -1,19 +1,35 @@
-type Origin {
-  host: String
-  origin: String
+type Project {
+  id: String
+  hostname: String
   protocol: String
-  uid: String
+  creator: String
   created: String
-  customerSubscription: CustomerSubscription
   name: String
+
+  # User information
+  contributors: [User]
+
+  # changes
+  changes: [Delta]
+}
+
+type User {
+  sub: String!
+  picture: String
+  email: String
+  subscription: CustomerSubscription
 }
 
 type Delta {
-  host: String
-  css: String
-  changes: String
-  uid: String
-  created: String
+  id: String
+  projectId: String
+  checksum: String
+  type: String
+  as: String
+  value: String
+
+  # Parent relationship
+  project: Project
 }
 
 type CustomerSubscription {
@@ -21,68 +37,77 @@ type CustomerSubscription {
   status: String
 }
 
-type SaveSiteDeltasResult {
-  prototypeUrl: String!
+# ## ----------------------------------
+# ## Inputs
+
+input ProjectFilter {
+  showArchived: Boolean
 }
 
-type CreateSiteOriginResult {
-  prototypeUrl: String!
+input DeltaFilter {
+  projectId: String
+  userId: String
 }
 
-## ----------------------------------
-## Inputs
-
-input CreateSiteOriginInput {
-  url: String!
+input CreateProjectInput {
+  url: String
   name: String
+  description: String
 }
 
-input SaveSiteDeltasInput {
-  host: String!
-  deltas: String!
+enum DeltaType {
+  file
+  base64
 }
 
-input LimitQuery {
-  mine: Boolean
-}
-
-input CreateCustomerInput {
-  source: String!
-}
-
-input Test {
-  source: String
+input CreateDeltaInput {
+  projectId: String
+  value: String
+  type: DeltaType
+  as: String
 }
 
 input NullMutation {
   _: String
 }
 
-## ----------------------------------
-## Queries
-
-type Query {
-  origin(Host: String!): Origin
-  origins(limit: LimitQuery): [Origin]
-  deltas(Host: String!): Delta
-  customerSubscription(limit: LimitQuery): CustomerSubscription
+input CreateCustomerInput {
+  source: String!
 }
 
-## ----------------------------------
-## Subscriptions
+# ## ----------------------------------
+# ## Queries
+
+type Query {
+  # Project queries
+  project(id: String!): Project
+  projects(filter: ProjectFilter): [Project]
+
+  # Delta queries
+  delta(id: String!): Project
+  deltas(filter: DeltaFilter): Delta
+
+  # User queries
+  user(id: String): User
+}
+
+# ## ----------------------------------
+# ## Subscriptions
 
 type Subscription {
   customerSubscriptionChange: CustomerSubscription
-  onAddPrototype: Origin
+  onAddProject: Project
+  onDeleteProject: Project
+  onAddDelta: Delta
+  onDeleteDelta: Delta
 }
 
-## ----------------------------------
-## Mutations
+# ## ----------------------------------
+# ## Mutations
 
 type Mutation {
-  createSiteOrigin(input: CreateSiteOriginInput!): CreateSiteOriginResult
+  createProject(input: CreateProjectInput): Project
+  createDelta(input: CreateDeltaInput): Delta
   subscribeCustomerToPlan(input: CreateCustomerInput!): CustomerSubscription
   cancelSubscription(input: NullMutation): CustomerSubscription
-  saveSiteDeltas(input: SaveSiteDeltasInput!): SaveSiteDeltasResult
-  testSubscriptionChange(input: Test): CustomerSubscription
 }
