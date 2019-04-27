@@ -73,6 +73,7 @@ type Query {
 
 type Subscription {
   customerSubscriptionChange: CustomerSubscription
+  onAddPrototype: Origin
 }
 
 ## ----------------------------------
