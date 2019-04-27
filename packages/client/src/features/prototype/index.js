@@ -11,6 +11,7 @@ import { useDocument, useActiveUsers } from "./useDocument";
 import UserContext from "../../utils/context";
 import { pointer } from "react-icons-kit/entypo/pointer";
 import Icon from "react-icons-kit";
+import { socialCss3 } from "react-icons-kit/ionicons/socialCss3";
 
 const TabPane = Tabs.TabPane;
 
@@ -43,7 +44,7 @@ const Pagelayout = styled(Layout)`
   .right {
     float: right;
     display: inline-block;
-    margin-right: -30px;
+    margin-right: -34px;
   }
 `;
 
@@ -159,16 +160,21 @@ const Tools = styled.div`
     display: flex;
     color: #1890ff;
     justify-content: center;
+    margin-top: 1.2em;
+  }
+
+  button:first-child {
+    margin-top: 0px;
   }
 `;
 
 const ColorBox = styled.div`
   background-color: ${props => props.color};
-  width: 44px;
-  height: 44px;
+  width: 24px;
+  height: 24px;
 
-  max-width: 44px;
-  max-height: 44px;
+  max-width: 24px;
+  max-height: 24px;
   border-radius: 4px;
   margin-right: 1em;
 
@@ -183,6 +189,15 @@ const FieldTitle = styled(Title)`
   font-size: 14px !important;
   text-transform: uppercase;
   margin-bottom: 16px !important;
+`;
+
+const FieldInput = styled.div`
+  border: 1px solid transparent;
+  box-sizing: border-box;
+
+  &:hover {
+    border: 1px solid #ccc;
+  }
 `;
 
 const SelectToolDetails = ({ value: element }) => (
@@ -202,7 +217,7 @@ const SelectToolDetails = ({ value: element }) => (
         <ColorBox color={element.style.backgroundColor} />
         {element.style.backgroundColor}
       </div>
-      <div
+      <FieldInput
         style={{
           display: "flex",
           alignItems: "center",
@@ -211,10 +226,16 @@ const SelectToolDetails = ({ value: element }) => (
       >
         <ColorBox color={element.style.color} />
         {element.style.color}
-      </div>
+      </FieldInput>
+    </div>
+    <div className="field-group">
+      <FieldTitle>CSS</FieldTitle>
+      <div>{element.style.fontFamily}</div>
     </div>
   </div>
 );
+
+const CodeEditor = () => <Input.TextArea />;
 
 const Designer = ({ location }) => {
   const params = new URLSearchParams(location.search);
@@ -349,12 +370,24 @@ const Designer = ({ location }) => {
                 />
               </div>
               <div>
-                {!element && <div className="empty">Nothing selected</div>}
-                {element && <SelectToolDetails value={element} />}
+                {!element && tool === "select" && (
+                  <div className="empty">Nothing selected</div>
+                )}
+                {element && tool === "select" && (
+                  <SelectToolDetails value={element} />
+                )}
+                {tool === "css" && <CodeEditor />}
               </div>
               <Tools>
                 <Button shape="circle" onClick={() => setTool(t => "select")}>
                   <Icon icon={pointer} size={20} />
+                </Button>
+                <Button shape="circle" onClick={() => setTool(t => "css")}>
+                  <Icon
+                    icon={socialCss3}
+                    size={20}
+                    style={{ color: "orange" }}
+                  />
                 </Button>
               </Tools>
             </Editor>
