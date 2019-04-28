@@ -1,5 +1,7 @@
-import Delta from "../../aws/models/Delta";
+import aws from "../../aws";
 import _ from "lodash";
+
+const { Delta } = aws.models;
 
 interface IProjectParent {
   id: string;

@@ -4,6 +4,8 @@ interface IDeltaSchema extends Document {
   projectId: String;
   checksum: String;
   url: String;
+  creator: String;
+  created: String;
 }
 
 const deltaSchema = new Schema({

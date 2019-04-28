@@ -1,9 +1,11 @@
-import Project from "../../aws/models/Project";
+import aws from "../../aws";
 import { Context } from "../../context/type";
 import _ from "lodash";
 import { requireUser } from "../utils";
 import normalizeUrl = require("normalize-url");
 import sslChecker = require("ssl-checker");
+
+const { Project } = aws.models;
 
 // pubsub
 import pubsub from "../../redis/pubsub";

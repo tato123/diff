@@ -1,8 +1,9 @@
-import Delta from "../../aws/models/Delta";
+import aws from "../../aws";
 import { Context } from "../../context/type";
 import _ from "lodash";
 import { requireUser } from "../utils";
 
+const { Delta } = aws.models;
 // pubsub
 import pubsub from "../../redis/pubsub";
 import { DELTA } from "../Subscription/channels";

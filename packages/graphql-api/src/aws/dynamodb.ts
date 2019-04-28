@@ -1,11 +1,27 @@
+import dynamoose = require("dynamoose");
 import AWS = require("aws-sdk");
 
-// Create the DynamoDB service object
-export const dynamo = new AWS.DynamoDB({
-    apiVersion: "2012-10-08",
-    region: "us-east-1"
-});
+AWS.config.region = "us-east-1";
 
-export const DELTAS = process.env.DELTAS || '';
-export const ORIGINS = process.env.ORIGINS || '';
-export const USERS = process.env.USERS || '';
+const createDynamooseInstance = (): void => {
+  dynamoose.AWS.config.update({
+    accessKeyId: "fakeMyKeyId",
+    secretAccessKey: "fakeSecretAccessKey",
+    region: "us-east-1"
+  });
+
+  dynamoose.local("http://localhost:8000");
+};
+
+const DELTAS = process.env.DELTAS || "";
+const ORIGINS = process.env.ORIGINS || "";
+const USERS = process.env.USERS || "";
+
+export default {
+  tables: {
+    DELTAS,
+    ORIGINS,
+    USERS
+  },
+  connect: createDynamooseInstance
+};

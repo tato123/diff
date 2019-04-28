@@ -17,3 +17,6 @@ env
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+
+
+shared-local-instance.db

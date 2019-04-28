@@ -1,11 +1,13 @@
 import { AuthenticationError } from "apollo-server-express";
-import Project from "../../aws/models/Project";
+import aws from "../../aws";
 import { Context } from "../../context/type";
 import _ from "lodash";
 
+const { Project } = aws.models;
+
 interface ProjectFilter {
   filter: {
-    showArchived: Boolean;
+    showArchived: boolean;
   };
 }
 
@@ -21,12 +23,6 @@ const requireUser = async context => {
 
 export default async (_parent, args: ProjectFilter, context: Context) => {
   const user = await requireUser(context);
-
-  const result = await Project.find({
-    creator: { $eq: user.sub },
-    archived: { $eq: _.get(args.filter, "showArchived", false) }
-  });
-
-  console.log("data received", result);
+  const result = await Project.get({ creatorArchived: `${user.sub}_false` });
   return result;
 };

@@ -1,13 +1,15 @@
-import Delta from "../../aws/models/Delta";
+import aws from "../../aws";
 import { Context } from "../../context/type";
 import { requireUser } from "../utils";
+
+const { Delta } = aws.models;
 
 interface DeltaFilterArgs {}
 
 export default async (_parent, args: DeltaFilterArgs, context: Context) => {
   const user = await requireUser(context);
-  const result = await Delta.find({
-    creator: { $eq: user.sub }
+  const result = await Delta.get({
+    creator: user.sub
   });
 
   return result;

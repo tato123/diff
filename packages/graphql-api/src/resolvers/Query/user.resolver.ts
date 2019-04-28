@@ -1,8 +1,10 @@
 import { AuthenticationError } from "apollo-server-express";
-import User from "../../aws/models/User";
+import aws from "../../aws";
 import { Context } from "../../context/type";
 import _ from "lodash";
 import { requireUser } from "../utils";
+
+const { User } = aws.models;
 
 interface UserArgs {
   id: String;

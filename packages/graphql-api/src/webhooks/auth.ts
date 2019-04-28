@@ -1,8 +1,10 @@
-import * as Users from "../aws/tables/Users";
+import aws from "../aws";
 const passport = require("passport");
 const querystring = require("querystring");
 const express = require("express");
 const router = express.Router();
+
+const { User } = aws.models;
 
 const Auth0Strategy = require("passport-auth0");
 const strategy = new Auth0Strategy(
@@ -15,7 +17,9 @@ const strategy = new Auth0Strategy(
   },
   async (accessToken, refreshToken, extraParams, profile, done) => {
     try {
-      await Users.createUidIfNotExists(profile.id);
+      // check if one exist
+
+      // await Users.createUidIfNotExists(profile.id);
       return done(null, extraParams);
     } catch (err) {
       return done(err.message);

@@ -13,7 +13,7 @@ import twilioRoutes from "./routes/twilio";
 import bodyParser from "body-parser";
 
 // launch mongoose
-import { connect as connectMongoose } from "./aws/documentdb";
+import aws from "./aws";
 
 const { importSchema } = require("graphql-import");
 const cors = require("cors");
@@ -25,8 +25,8 @@ const port = process.env.PORT || 8081;
 
 const app = express();
 
-// start our connection to mongodb
-connectMongoose();
+// start our connection to our databas
+aws.dynamo.connect();
 
 app.use("*", cors({ origin: true }));
 
