@@ -1,5 +1,7 @@
 import dynamoose from "dynamoose";
 
+const Schema = dynamoose.Schema;
+
 interface KeySchema {
   id?: String;
   creator?: String; // global secondary index
@@ -13,14 +15,15 @@ interface DataSchema {
   created: String;
 }
 
-const deltaSchema = {
+const deltaSchema = new Schema({
   projectId: String,
   checksum: String,
   url: String
-};
+});
 
 const Delta = dynamoose.model<DataSchema, KeySchema>("Delta", deltaSchema, {
-  create: false
+  create: true,
+  update: true
 });
 
 export default Delta;

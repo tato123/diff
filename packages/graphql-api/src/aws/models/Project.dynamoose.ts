@@ -1,8 +1,9 @@
 import dynamoose from "dynamoose";
 
+const Schema = dynamoose.Schema;
 interface KeySchema {
-  id?: string;
-  creatorArchived?: string;
+  id: string;
+  creatorArchivedIndex?: string;
 }
 
 interface DataSchema {
@@ -15,21 +16,38 @@ interface DataSchema {
   archived?: boolean;
 }
 
-const projectSchema = {
+const projectSchema = new Schema({
+  id: {
+    type: String,
+    required: true,
+    hashKey: true
+  },
   hostname: String,
   protocol: String,
   creator: String,
   created: Date,
   name: String,
   description: String,
-  archived: { type: Boolean, default: false }
-};
+  archived: { type: Boolean, default: false },
+  creatorArchived: {
+    type: String,
+    required: true,
+    index: {
+      global: true,
+      rangeKey: "id",
+      name: "creatorArchivedIndex",
+      project: true, // ProjectionType: ALL
+      throughput: 5 // read and write are both 5
+    }
+  }
+});
 
 const Project = dynamoose.model<DataSchema, KeySchema>(
   "Project",
   projectSchema,
   {
-    create: false
+    create: true,
+    update: true
   }
 );
 
