@@ -40,8 +40,17 @@ const contributors = async (parent, _args, _ctx, _info) => {
   }
 
   // get the array of deltas
+  const result = await Delta.find({
+    projectId: { $eq: parent.id }
+  });
 
   // map them to users
+  const ids = _.chain(result)
+    .map(delta => delta.creator)
+    .uniq()
+    .values();
+
+  // lookup these ids in the appropriate place
 
   // return result
   return null;

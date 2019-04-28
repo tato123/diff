@@ -27,6 +27,8 @@ type Delta {
   type: String
   as: String
   value: String
+  creator: String
+  created: String
 
   # Parent relationship
   project: Project
