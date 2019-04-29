@@ -2,7 +2,7 @@ import dynamoose from "dynamoose";
 
 const Schema = dynamoose.Schema;
 interface KeySchema {
-  id: string;
+  id?: string;
   creatorArchivedIndex?: string;
 }
 

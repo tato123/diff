@@ -8,9 +8,6 @@ interface DeltaFilterArgs {}
 
 export default async (_parent, args: DeltaFilterArgs, context: Context) => {
   const user = await requireUser(context);
-  const result = await Delta.get({
-    creator: user.sub
-  });
-
+  const result = await Delta.scan().all();
   return result;
 };

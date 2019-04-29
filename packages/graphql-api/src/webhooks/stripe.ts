@@ -1,6 +1,9 @@
-import * as Users from "../aws/tables/Users";
+import aws from "../aws";
 const express = require("express");
 const router = express.Router();
+
+const { User } = aws.models;
+
 /**
  * We need to rely on our testing suite to handle these
  */
@@ -10,11 +13,13 @@ const handleCustomerSubscriptionCancelled = async event => {
   console.log("Handling cancellation for", event.data.object.customer);
   const customerId = event.data.object.customer;
 
-  const user = await Users.getUserByCustomerId(customerId);
+  const user = await User.queryOne({ customerIdIndex: customerId }).exec();
   console.log("user", user);
 
-  await Users.updateByUid(user.uid, "plan", "trial");
-  await Users.updateByUid(user.uid, "plan_status", "cancelled");
+  await User.update(
+    { id: user.id },
+    { $PUT: { subscription_plan: "trial", subscription_status: "cancelled" } }
+  );
 };
 
 // we can

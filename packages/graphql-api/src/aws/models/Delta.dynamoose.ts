@@ -4,7 +4,8 @@ const Schema = dynamoose.Schema;
 
 interface KeySchema {
   id?: String;
-  creator?: String; // global secondary index
+  creatorIndex?: String;
+  projectIdIndex?: String;
 }
 
 interface DataSchema {
@@ -16,9 +17,37 @@ interface DataSchema {
 }
 
 const deltaSchema = new Schema({
-  projectId: String,
+  id: {
+    type: String,
+    required: true,
+    hashKey: true
+  },
   checksum: String,
-  url: String
+  as: String,
+  value: String,
+  type: String,
+  creator: {
+    type: String,
+    required: true,
+    index: {
+      global: true,
+      name: "creatorIndex",
+      project: true,
+      throughput: 5
+    }
+  },
+  created: Date,
+
+  projectId: {
+    type: String,
+    required: true,
+    index: {
+      global: true,
+      name: "projectIdIndex",
+      project: true,
+      throughput: 5
+    }
+  }
 });
 
 const Delta = dynamoose.model<DataSchema, KeySchema>("Delta", deltaSchema, {

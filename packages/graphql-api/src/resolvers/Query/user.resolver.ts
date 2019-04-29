@@ -12,6 +12,6 @@ interface UserArgs {
 
 export default async (_parent, args: UserArgs, context: Context) => {
   const user = await requireUser(context);
-  const result = await User.findById(args.id);
+  const result = await User.get({ id: args.id });
   return result;
 };

@@ -23,6 +23,8 @@ const requireUser = async context => {
 
 export default async (_parent, args: ProjectFilter, context: Context) => {
   const user = await requireUser(context);
-  const result = await Project.get({ creatorArchived: `${user.sub}_false` });
+  const result = await Project.query({
+    creatorArchived: { eq: `${user.sub}_false` }
+  });
   return result;
 };

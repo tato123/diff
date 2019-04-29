@@ -1,7 +1,9 @@
 import _ from "lodash";
-import * as Users from "../../aws/tables/Users";
+import aws from "../../aws";
 import { CUSTOMER_SUBSCRIPTION_CHANGE } from "../Subscription/channels";
 import pubsub from "../../redis/pubsub";
+
+const { User } = aws.models;
 
 const stripe = require("stripe")(process.env.STRIPE_KEY);
 const DIFF_PLAN = process.env.STRIPE_PLAN_ID;
@@ -14,7 +16,7 @@ interface CustomerInput {
 const getCustomerId = (uid: string): Promise<string | null> => {
   console.log(`[getCustomerId] [uid:${uid}]`);
 
-  return Users.getUserByUid(uid).then(user => user.customerId);
+  return User.get({ id: uid }).then(user => user.customerId);
 };
 
 const createStripeCustomer = async (_parent, args: CustomerInput, context) => {
