@@ -65,19 +65,22 @@ export default async (
 
   console.log("project is ", project);
 
-  project.save(err => {
-    if (err) {
-      return null;
-    }
+  return new Promise((resolve, reject) => {
+    project.save(err => {
+      if (err) {
+        console.error("Error occured persisting project", err);
+        return reject(err);
+      }
 
-    console.log("completed save");
-    console.log("Publishing to", PROJECT.ADDED);
-    pubsub.publish(PROJECT.ADDED, {
-      onAddProject: project
+      console.log("completed save");
+      console.log("Publishing to", PROJECT.ADDED);
+      pubsub.publish(PROJECT.ADDED, {
+        onAddProject: project
+      });
+
+      console.log("completed publish");
+
+      return resolve(project);
     });
-
-    console.log("completed publish");
-
-    return project;
   });
 };

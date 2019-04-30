@@ -3,6 +3,7 @@ const passport = require("passport");
 const querystring = require("querystring");
 const express = require("express");
 const router = express.Router();
+import _ from "lodash";
 
 const { User } = aws.models;
 
@@ -19,7 +20,23 @@ const strategy = new Auth0Strategy(
     try {
       // check if one exist
 
-      // await Users.createUidIfNotExists(profile.id);
+      const user = await User.get({ id: profile.id });
+      console.log("user exists?", user);
+
+      const timestamp = Date.now().toString();
+
+      if (_.isNil(user)) {
+        const newUser = new User({
+          id: profile.id,
+          subscriptionPlan: "trial",
+          subscriptionStatus: "not_started",
+          created: timestamp,
+          updated: timestamp
+        });
+
+        await newUser.save();
+      }
+
       return done(null, extraParams);
     } catch (err) {
       return done(err.message);

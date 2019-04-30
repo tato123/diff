@@ -1,4 +1,5 @@
 import dynamoose from "dynamoose";
+import Tables from "./Tables";
 
 const Schema = dynamoose.Schema;
 
@@ -8,11 +9,11 @@ interface KeySchema {
 
 interface DataSchema {
   id: string;
-  picture?: string;
-  email?: string;
-  subscription_plan?: string;
-  subscription_status?: string;
+  subscriptionPlan?: string;
+  subscriptionStatus?: string;
   customerId?: string;
+  created?: String;
+  updated: String;
 }
 
 const userSchema = new Schema({
@@ -21,16 +22,16 @@ const userSchema = new Schema({
     required: true,
     hashKey: true
   },
-  picture: String,
-  email: String,
-  subscription_plan: String,
-  subscription_status: String
+  subscriptionPlan: String,
+  subscriptionStatus: String,
+  created: String,
+  updated: String,
+  customerId: String
 });
 
-const User = dynamoose.model<DataSchema, KeySchema>("User", userSchema, {
+const User = dynamoose.model<DataSchema, KeySchema>(Tables.User, userSchema, {
   create: true,
-  update: true,
-  waitForActive: false
+  update: true
 });
 
 export default User;

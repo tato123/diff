@@ -21,8 +21,8 @@ const changes = async (parent, _args, _ctx, _info) => {
     return null;
   }
 
-  const result = await Delta.find({
-    projectId: { $eq: parent.id }
+  const result = await Delta.get({
+    id: parent.id
   });
 
   return result;
@@ -42,8 +42,8 @@ const contributors = async (parent, _args, _ctx, _info) => {
   }
 
   // get the array of deltas
-  const result = await Delta.find({
-    projectId: { $eq: parent.id }
+  const result = await Delta.get({
+    id: parent.id
   });
 
   // map them to users

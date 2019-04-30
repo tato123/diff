@@ -1,4 +1,5 @@
 import dynamoose from "dynamoose";
+import Tables from "./Tables";
 
 const Schema = dynamoose.Schema;
 interface KeySchema {
@@ -45,12 +46,11 @@ const projectSchema = new Schema({
 });
 
 const Project = dynamoose.model<DataSchema, KeySchema>(
-  "Project",
+  Tables.Project,
   projectSchema,
   {
     create: true,
-    update: true,
-    waitForActive: false
+    update: true
   }
 );
 

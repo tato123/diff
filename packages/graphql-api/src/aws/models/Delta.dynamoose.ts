@@ -1,4 +1,5 @@
 import dynamoose from "dynamoose";
+import Tables from "./Tables";
 
 const Schema = dynamoose.Schema;
 
@@ -50,10 +51,13 @@ const deltaSchema = new Schema({
   }
 });
 
-const Delta = dynamoose.model<DataSchema, KeySchema>("Delta", deltaSchema, {
-  create: true,
-  update: true,
-  waitForActive: false
-});
+const Delta = dynamoose.model<DataSchema, KeySchema>(
+  Tables.Delta,
+  deltaSchema,
+  {
+    create: true,
+    update: true
+  }
+);
 
 export default Delta;
