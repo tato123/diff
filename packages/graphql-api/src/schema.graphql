@@ -5,6 +5,7 @@ type Project {
   creator: String
   created: String
   name: String
+  description: String
 
   # User information
   contributors: [User]
@@ -42,15 +43,6 @@ type CustomerSubscription {
 # ## ----------------------------------
 # ## Inputs
 
-input ProjectFilter {
-  showArchived: Boolean
-}
-
-input DeltaFilter {
-  projectId: String
-  userId: String
-}
-
 input CreateProjectInput {
   url: String
   name: String
@@ -83,11 +75,11 @@ input CreateCustomerInput {
 type Query {
   # Project queries
   project(id: String!): Project
-  projects(filter: ProjectFilter): [Project]
+  projects(uid: String, archived: Boolean): [Project]
 
   # Delta queries
   delta(id: String!): Project
-  deltas(filter: DeltaFilter): Delta
+  deltas(projectId: String): Delta
 
   # User queries
   user(id: String): User
@@ -98,8 +90,8 @@ type Query {
 
 type Subscription {
   customerSubscriptionChange: CustomerSubscription
-  onAddProject: Project
-  onDeleteProject: Project
+  onAddProject(uid: String): Project
+  onDeleteProject(uid: String): Project
   onAddDelta: Delta
   onDeleteDelta: Delta
 }

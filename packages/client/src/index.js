@@ -8,22 +8,18 @@ import { getMainDefinition } from "apollo-utilities";
 import "normalize.css";
 import React from "react";
 import { ApolloProvider } from "react-apollo";
-import { ApolloProvider as ApolloHooksProvider } from 'react-apollo-hooks';
+import { ApolloProvider as ApolloHooksProvider } from "react-apollo-hooks";
 import ReactDOM from "react-dom";
-import { StripeProvider } from 'react-stripe-elements';
+import { StripeProvider } from "react-stripe-elements";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
-import Auth from './utils/auth';
-
+import Auth from "./utils/auth";
 
 const auth = new Auth();
 
-
-
-
 const bearerToken = () => {
-  return `Bearer ${auth.getAccessToken()}`
-}
+  return `Bearer ${auth.getAccessToken()}`;
+};
 
 const authLink = setContext((_, { headers }) => {
   // return the headers to the context so httpLink can read them
@@ -46,10 +42,9 @@ const wsLink = new WebSocketLink({
   options: {
     reconnect: true,
     connectionParams: () => ({
-      idToken: auth.getAccessToken(),
+      idToken: auth.getAccessToken()
     })
-  },
-
+  }
 });
 
 // using the ability to split links, you can send data to each link
@@ -61,7 +56,7 @@ const link = split(
     return kind === "OperationDefinition" && operation === "subscription";
   },
   wsLink,
-  authLink.concat(httpLink),
+  authLink.concat(httpLink)
 );
 
 const cache = new InMemoryCache();

@@ -63,8 +63,13 @@ server.listen(port, () => {
       execute,
       subscribe,
       schema,
-      onConnect: () => {
-        console.log("connected");
+      onConnect: (connectionParams, webSocket) => {
+        if (connectionParams.idToken) {
+          const jwtToken = connectionParams.idToken;
+          return getUser(jwtToken).then(user => user);
+        }
+
+        throw new Error("Missing auth token!");
       },
       onDisconnect: () => {
         console.log("disconnected");

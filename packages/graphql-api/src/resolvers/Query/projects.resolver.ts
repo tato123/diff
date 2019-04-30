@@ -6,9 +6,8 @@ import _ from "lodash";
 const { Project } = aws.models;
 
 interface ProjectFilter {
-  filter: {
-    showArchived: boolean;
-  };
+  uid: string;
+  archived: boolean;
 }
 
 const requireUser = async context => {
@@ -22,9 +21,17 @@ const requireUser = async context => {
 };
 
 export default async (_parent, args: ProjectFilter, context: Context) => {
-  const user = await requireUser(context);
-  const result = await Project.query({
-    creatorArchived: { eq: `${user.sub}_false` }
-  }).exec();
-  return result;
+  // verify we are logged in
+  await requireUser(context);
+
+  // if userid is provided then use that
+  if (args.uid) {
+    const result = await Project.query({
+      creatorArchived: { eq: `${args.uid}_${_.get(args, "archived", false)}` }
+    }).exec();
+    return result;
+  }
+
+  const results = await Project.scan().exec();
+  return results;
 };

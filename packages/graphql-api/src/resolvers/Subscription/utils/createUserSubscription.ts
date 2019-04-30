@@ -9,7 +9,7 @@ export default channelName => ({
       console.log("variables", variables);
       console.log("context", context);
       console.log("info", info);
-      return true;
+      return !!variables.uid ? variables.uid !== payload.creator : true;
     }
   )
 });

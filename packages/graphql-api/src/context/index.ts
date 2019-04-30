@@ -6,7 +6,7 @@ const graphqlContext = async ({ req, connection }) => {
   // if we already have a context, from an alternate connection
   // use that
   if (connection) {
-    console.log("received a connection");
+    console.log("[context] received a connection");
     // check connection for metadata
     return connection.context;
   }
