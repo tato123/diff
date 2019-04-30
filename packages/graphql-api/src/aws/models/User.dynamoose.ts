@@ -8,7 +8,6 @@ interface KeySchema {
 
 interface DataSchema {
   id: string;
-  sub: string;
   picture?: string;
   email?: string;
   subscription_plan?: string;
@@ -22,23 +21,16 @@ const userSchema = new Schema({
     required: true,
     hashKey: true
   },
-  sub: String,
   picture: String,
   email: String,
   subscription_plan: String,
-  subscription_status: String,
-  customerId: {
-    type: String,
-    required: false,
-    index: {
-      global: true,
-      name: "customerIdIndex",
-      project: true,
-      throughput: 5
-    }
-  }
+  subscription_status: String
 });
 
-const User = dynamoose.model<DataSchema, KeySchema>("User", userSchema);
+const User = dynamoose.model<DataSchema, KeySchema>("User", userSchema, {
+  create: true,
+  update: true,
+  waitForActive: false
+});
 
 export default User;

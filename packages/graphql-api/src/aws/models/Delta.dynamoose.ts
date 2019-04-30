@@ -52,7 +52,8 @@ const deltaSchema = new Schema({
 
 const Delta = dynamoose.model<DataSchema, KeySchema>("Delta", deltaSchema, {
   create: true,
-  update: true
+  update: true,
+  waitForActive: false
 });
 
 export default Delta;

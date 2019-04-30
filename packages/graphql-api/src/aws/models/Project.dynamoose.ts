@@ -7,6 +7,8 @@ interface KeySchema {
 }
 
 interface DataSchema {
+  id?: string;
+  creatorArchived?: string;
   hostname?: string;
   protocol?: string;
   creator?: string;
@@ -47,7 +49,8 @@ const Project = dynamoose.model<DataSchema, KeySchema>(
   projectSchema,
   {
     create: true,
-    update: true
+    update: true,
+    waitForActive: false
   }
 );
 

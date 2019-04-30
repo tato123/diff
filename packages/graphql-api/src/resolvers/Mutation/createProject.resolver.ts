@@ -4,6 +4,7 @@ import _ from "lodash";
 import { requireUser } from "../utils";
 import normalizeUrl = require("normalize-url");
 import sslChecker = require("ssl-checker");
+import uniqueSlug = require("unique-slug");
 
 const { Project } = aws.models;
 
@@ -50,8 +51,10 @@ export default async (
     inputHost.split(".").length === 2 ? `www.${inputHost}` : inputHost;
 
   const protocol = await checkProtocol(projectUrl);
-
+  const id: string = uniqueSlug();
   const project = new Project({
+    id: id,
+    creatorArchived: `${user.sub}_false`,
     // input data
     creator: user.sub,
     hostname: projectUrl,
@@ -60,11 +63,21 @@ export default async (
     description: _.get(args.input, "description", "")
   });
 
-  await project.save();
+  console.log("project is ", project);
 
-  pubsub.publish(`${PROJECT.ADDED}_${user.sub}`, {
-    onAddProject: project
+  project.save(err => {
+    if (err) {
+      return null;
+    }
+
+    console.log("completed save");
+    console.log("Publishing to", PROJECT.ADDED);
+    pubsub.publish(PROJECT.ADDED, {
+      onAddProject: project
+    });
+
+    console.log("completed publish");
+
+    return project;
   });
-
-  return project;
 };

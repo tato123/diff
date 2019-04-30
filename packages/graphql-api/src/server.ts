@@ -4,6 +4,7 @@ import context from "./context";
 import webhooks from "./webhooks";
 import getUser from "./context/auth0";
 import _ from "lodash";
+import { createServer } from "http";
 
 import express from "express";
 import { SubscriptionServer } from "subscriptions-transport-ws";
@@ -49,23 +50,28 @@ const apolloServer = new ApolloServer({
 
 apolloServer.applyMiddleware({ app });
 
-const server = app.listen(port, () => {
+const server = createServer(app);
+
+server.listen(port, () => {
   console.log(`Server is running on localhost:${port}`);
   console.log(
     `🚀 Server ready at http://localhost:${port}${apolloServer.graphqlPath}`
   );
 
-  const WebSocket = require("ws");
-  const wss = new WebSocket.Server({ server: server });
-
   new SubscriptionServer(
     {
       execute,
       subscribe,
-      schema
+      schema,
+      onConnect: () => {
+        console.log("connected");
+      },
+      onDisconnect: () => {
+        console.log("disconnected");
+      }
     },
     {
-      server: wss,
+      server: server,
       path: "/graphql"
     }
   );

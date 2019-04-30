@@ -1,10 +1,15 @@
 import pubsub from "../../../redis/pubsub";
+import { withFilter } from "graphql-subscriptions";
 
 export default channelName => ({
-  subscribe: (_, args, context) => {
-    const user = context.user;
-    const channel = `${channelName}_${user.sub}`;
-    console.log("subscribing to", channel);
-    return pubsub.asyncIterator(channel);
-  }
+  subscribe: withFilter(
+    () => pubsub.asyncIterator(channelName),
+    (payload, variables, context, info) => {
+      console.log("payload", payload);
+      console.log("variables", variables);
+      console.log("context", context);
+      console.log("info", info);
+      return true;
+    }
+  )
 });

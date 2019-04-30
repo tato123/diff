@@ -1,14 +1,11 @@
-import dynamoose = require("dynamoose");
-import AWS = require("aws-sdk");
-
-AWS.config.region = "us-east-1";
+import dynamoose from "dynamoose";
 
 const createDynamooseInstance = (): void => {
-  dynamoose.AWS.config.update({
-    accessKeyId: "fakeMyKeyId",
-    secretAccessKey: "fakeSecretAccessKey",
-    region: "us-east-1"
-  });
+  // dynamoose.AWS.config.update({
+  //   accessKeyId: "fakeMyKeyId",
+  //   secretAccessKey: "fakeSecretAccessKey",
+  //   region: "us-east-1"
+  // });
 
   dynamoose.local("http://localhost:8000");
 };
