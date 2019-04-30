@@ -4,7 +4,7 @@ import jwtDecode from "jwt-decode";
 import _ from "lodash";
 
 export default class Auth {
-  tokenRenewalTimeout;
+  private tokenRenewalTimeout;
 
   auth0 = new auth0.WebAuth({
     domain: process.env.REACT_APP_AUTH0_DOMAIN,
@@ -21,6 +21,10 @@ export default class Auth {
 
   scheduleRenewal() {
     let expiresAt = this.getExpiresAt();
+    if (expiresAt == null) {
+      return;
+    }
+
     const timeout = expiresAt - Date.now();
     if (timeout > 0) {
       this.tokenRenewalTimeout = setTimeout(() => {
@@ -151,7 +155,7 @@ export default class Auth {
 
     const decodedIdToken = jwtDecode(authResult.idToken);
 
-    localStorage.setItem("expiresAt", expiresAt);
+    localStorage.setItem("expiresAt", expiresAt + "");
     localStorage.setItem("userProfile", JSON.stringify(decodedIdToken));
 
     // schedule a token renewal

@@ -14,6 +14,7 @@ const { Title } = Typography;
 const GET_PROJECTS = gql`
   query getProjects($uid: String!) {
     projects(uid: $uid) {
+      id
       protocol
       hostname
       name
@@ -25,6 +26,7 @@ const GET_PROJECTS = gql`
 const ON_ADD_PROJECT = gql`
   subscription onAddProjectSub($uid: String!) {
     onAddProject(uid: $uid) {
+      id
       protocol
       hostname
       name
@@ -36,6 +38,7 @@ const ON_ADD_PROJECT = gql`
 const ON_DELETE_PROJECT = gql`
   subscription onDeleteProjectSub($uid: String!) {
     onDeleteProject(uid: $uid) {
+      id
       protocol
       hostname
       name
@@ -92,8 +95,7 @@ const Prototypes = ({ history, filter, onClick }) => {
 
   useEffect(() => {
     if (onAddProjectData && onAddProjectData.onAddProject) {
-      debugger;
-      setProjects(p => [...p, onAddProjectData.onAddProject]);
+      setProjects(p => [onAddProjectData.onAddProject, ...p]);
     }
   }, [onAddProjectData]);
 
@@ -118,59 +120,36 @@ const Prototypes = ({ history, filter, onClick }) => {
     return <div>Error! {error.message}</div>;
   }
 
-  const groups = _.chain(projects)
-    .filter(x => (_.isEmpty(filter) ? true : x.origin.indexOf(filter) !== -1))
-    .reduce((acc, x) => {
-      const { origin: host } = x;
-      if (!acc[host]) {
-        return {
-          ...acc,
-          [host]: [x]
-        };
-      }
-
-      return {
-        ...acc,
-        [host]: [...acc[host], x]
-      };
-    }, {})
-    .value();
-
   return (
     <div>
-      {projects.length === 0 && (
-        <Empty
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-          imageStyle={{ height: 120 }}
-          description={
-            <label>Looks like you haven't created any prototypes yet</label>
-          }
-        />
-      )}
-      {_.keys(groups).map(key => {
-        return (
-          <div style={{ marginBottom: 32 }} key={key}>
-            <Title level={4}>{key}</Title>
-            <Block layout>
-              {groups[key].map(origin => (
-                <Card
-                  onClick={() => onClick(origin)}
-                  hoverable
-                  style={CardStyles}
-                  key={origin.host}
-                  cover={
-                    <CardCover>
-                      <Icon size={32} icon={images} />
-                    </CardCover>
-                  }
-                >
-                  <Meta title={origin.name} />
-                </Card>
-              ))}
-            </Block>
-          </div>
-        );
-      })}
+      {!projects ||
+        (projects.length === 0 && (
+          <Empty
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            imageStyle={{ height: 120 }}
+            description={
+              <label>Looks like you haven't created any prototypes yet</label>
+            }
+          />
+        ))}
+      <Block layout>
+        {_.map(projects, x => (
+          <Card
+            key={x.id}
+            onClick={() => onClick(x)}
+            hoverable
+            style={CardStyles}
+            cover={
+              <CardCover>
+                <Icon size={32} icon={images} />
+              </CardCover>
+            }
+          >
+            <Meta title={x.name} />
+            <small>{x.hostname}</small>
+          </Card>
+        ))}
+      </Block>
     </div>
   );
 };

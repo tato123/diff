@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { Button, Input, Typography, Row, Col } from "antd";
+import { Button, Input, Typography, Row, Col, Alert } from "antd";
 import styled from "styled-components";
 import { useFormState } from "react-use-form-state";
 
 import { config, animated, useTransition } from "react-spring";
 import _ from "lodash";
 
-import { CREATE_SITE } from "../../../../graphql/mutations";
+import { CREATE_PROJECT } from "../../../../graphql/mutations";
 import { useMutation } from "react-apollo-hooks";
 
 const { Title, Text } = Typography;
@@ -75,10 +75,11 @@ const Field = styled.div`
 `;
 
 const Create = ({ visible, onClose }) => {
-  const createSite = useMutation(CREATE_SITE);
+  const createProject = useMutation(CREATE_PROJECT);
 
   const [formState, { text }] = useFormState();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState();
 
   const transitions = useTransition(visible, null, {
     config: { ...config.default, velocity: 20 },
@@ -87,8 +88,8 @@ const Create = ({ visible, onClose }) => {
     leave: { opacity: 0 }
   });
   const onCreate = form => {
-    const siteResponse = createSite({
-      variables: { input: { url: form.values.website, name: form.values.name } }
+    const siteResponse = createProject({
+      variables: { url: form.values.website, name: form.values.name }
     });
     setLoading(true);
     siteResponse
@@ -99,13 +100,13 @@ const Create = ({ visible, onClose }) => {
       })
       .catch(err => {
         setLoading(false);
+        setError(err.message);
         console.error(err);
       });
     return false;
   };
 
   const handleSubmit = e => {
-    debugger;
     e.preventDefault();
     if (!_.isEmpty(formState.values.website)) {
       onCreate(formState);
@@ -136,9 +137,18 @@ const Create = ({ visible, onClose }) => {
                 </Col>
               </Row>
               <Row>
+                {error && (
+                  <Alert
+                    message="Uh oh, there was a problem creating a new project"
+                    description={error}
+                    type="error"
+                  />
+                )}
+              </Row>
+              <Row>
                 <Col>
                   <Field>
-                    <label>Name of your prototype</label>
+                    <label>Name of your prototype*</label>
                     <Input
                       {...text("name", {
                         validate: value => !_.isEmpty(value)
@@ -150,7 +160,7 @@ const Create = ({ visible, onClose }) => {
               <Row>
                 <Col>
                   <Field>
-                    <label>Enter your website url</label>
+                    <label>Enter your website url*</label>
                     <Input
                       {...text("website", {
                         validate: value => !_.isEmpty(value)
@@ -159,21 +169,7 @@ const Create = ({ visible, onClose }) => {
                   </Field>
                 </Col>
               </Row>
-              <Row>
-                <Col>
-                  <Field>
-                    <label>
-                      Add the following Snippet to your website (only needed
-                      when adding a new website)
-                    </label>
-                    <Text
-                      copyable
-                      code
-                      className="code"
-                    >{`<script src="http://localhost:10001/diff.js?API_KEY=123" />`}</Text>
-                  </Field>
-                </Col>
-              </Row>
+
               <Row style={{ marginTop: 64 }}>
                 <Col>
                   <Button

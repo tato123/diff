@@ -1,18 +1,14 @@
 import gql from "graphql-tag";
 
-export const CREATE_SITE = gql`
-  mutation CreateSiteOrigin($input: CreateSiteOriginInput!) {
-    createSiteOrigin(input: $input) {
-      prototypeUrl
-    }
-  }
-`;
-
-export const ALL_ORIGINS = gql`
-  {
-    allOrigins {
-      host
-      origin
+export const CREATE_PROJECT = gql`
+  mutation createProject($url: String!, $name: String!, $description: String) {
+    createProject(
+      input: { url: $url, name: $name, description: $description }
+    ) {
+      id
+      hostname
+      name
+      description
     }
   }
 `;

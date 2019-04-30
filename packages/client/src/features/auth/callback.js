@@ -1,8 +1,7 @@
-import React, { useContext } from 'react';
-import AuthContext from '../../utils/context';
-import { Redirect } from 'react-router';
-import AuthenticationLayout from '../../components/Layouts/Authentication'
-
+import React, { useContext } from "react";
+import AuthContext from "../../utils/context";
+import { Redirect } from "react-router";
+import { Layout, Spin } from "antd";
 
 const AuthCallback = ({ location }) => {
   const auth = useContext(AuthContext);
@@ -16,19 +15,23 @@ const AuthCallback = ({ location }) => {
   if (/access_token|id_token|error/.test(location.hash)) {
     auth.handleAuthentication(location.hash);
 
-    return (<AuthenticationLayout>
-      <label>Logging in...</label>
-    </AuthenticationLayout>)
+    return (
+      <Layout style={{ height: "100vh" }}>
+        <Layout.Content
+          style={{
+            justifyContent: "center",
+            display: "flex",
+            alignItems: "center"
+          }}
+        >
+          <Spin tip="Logging In..." />
+        </Layout.Content>
+      </Layout>
+    );
   }
 
-
   // if we don't boot them out of this page to login
-  return <Redirect to="/login" />
-
-
-}
-
-
-
+  return <Redirect to="/login" />;
+};
 
 export default AuthCallback;

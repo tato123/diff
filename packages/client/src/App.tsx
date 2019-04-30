@@ -2,15 +2,15 @@ import React from "react";
 import ReactGA from "react-ga";
 import { Router, Route, Switch } from "react-router-dom";
 import { ThemeProvider } from "styled-components";
-import AuthCallback from './features/auth/callback';
-import Login from './features/auth/login';
+import AuthCallback from "./features/auth/callback";
+import Login from "./features/auth/login";
 import Prototyper from "./features/prototype";
-import Dashboard from './features/dashboard';
-import history from './history';
-import PrivateRoute from './components/PrivateRoute';
-import AuthContext, { auth } from './utils/context'
+import Dashboard from "./features/dashboard";
+import history from "./history";
+import PrivateRoute from "./components/PrivateRoute";
+import AuthContext, { auth } from "./utils/context";
 
-import 'antd/dist/antd.css';
+import "antd/dist/antd.css";
 import "./index.css";
 
 if (process.env.NODE_ENV === "production") {
@@ -28,13 +28,16 @@ const App = () => (
             <Route path="/callback" component={AuthCallback} />
             <Route exact path="/" component={Login} />
             <PrivateRoute auth={auth} path="/dashboard" component={Dashboard} />
-            <PrivateRoute auth={auth} path="/prototype" component={Prototyper} />
+            <PrivateRoute
+              auth={auth}
+              path="/doc/p/:id"
+              component={Prototyper}
+            />
           </Switch>
         </Router>
       </React.Fragment>
     </AuthContext.Provider>
   </ThemeProvider>
 );
-
 
 export default App;
