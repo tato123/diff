@@ -6,6 +6,7 @@ import Logo from "./logo.svg";
 import Prototypes from "./pages/Prototypes";
 import Account from "./pages/Account";
 import { Route, Switch, Redirect } from "react-router";
+import Upgrade from "./pages/Upgrade";
 
 const SubMenu = Menu.SubMenu;
 const { Header, Content } = Layout;
@@ -118,6 +119,7 @@ const Dashboard = ({ history, location }) => {
         <Switch>
           <Route exact path="/dashboard/account" component={Account} />
           <Route exact path="/dashboard/prototypes" component={Prototypes} />
+          <Route exact path="/dashboard/upgrade" component={Upgrade} />
           <Redirect to="/dashboard/prototypes" />
         </Switch>
       </Content>

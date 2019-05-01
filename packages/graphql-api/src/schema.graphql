@@ -1,3 +1,7 @@
+enum ProjectType {
+  prototype
+}
+
 type Project {
   id: String
   hostname: String
@@ -6,6 +10,7 @@ type Project {
   created: String
   name: String
   description: String
+  type: ProjectType
 
   # User information
   contributors: [User]

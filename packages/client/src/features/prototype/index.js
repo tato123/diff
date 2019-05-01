@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useContext } from "react";
 import { Layout, Avatar, Typography, Button, Select, Input } from "antd";
 import { useQuery } from "react-apollo-hooks";
-import { ORIGIN_BY_ID } from "../../graphql/query";
+import { PROJECT_BY_ID } from "../../graphql/query";
 import styled from "styled-components";
 import RxPostmessenger from "rx-postmessenger";
 import { useDebounce } from "use-debounce";
@@ -237,8 +237,9 @@ const SelectToolDetails = ({ value: element }) => (
 
 const CodeEditor = () => <Input.TextArea />;
 
-const Designer = ({ location }) => {
+const Designer = ({ location, match }) => {
   const params = new URLSearchParams(location.search);
+  const path = match.params;
   const iframe = useRef(null);
   const [textbox] = useState("");
 
@@ -249,12 +250,12 @@ const Designer = ({ location }) => {
   const [element, setElement] = useState();
   const [tool, setTool] = useState("select");
 
-  const docId = params.get("docId");
+  const docId = path.id;
 
   const { doc: editorDoc, change } = useDocument(docId);
   const activeUsers = useActiveUsers();
-  const { data, loading, error } = useQuery(ORIGIN_BY_ID, {
-    variables: { host: docId }
+  const { data, loading, error } = useQuery(PROJECT_BY_ID, {
+    variables: { id: docId }
   });
 
   const [components, setComponents] = useState(null);
@@ -264,7 +265,7 @@ const Designer = ({ location }) => {
   const initConnection = () => {
     const childMessenger = RxPostmessenger.connect(
       iframe.current.contentWindow,
-      data.origin.protocol + "://" + data.origin.origin
+      data.project.protocol + "://" + data.project.hostname
     );
     setMessanger(childMessenger);
   };
@@ -318,7 +319,7 @@ const Designer = ({ location }) => {
         <>
           <Header className="header">
             <div className="documentName" style={{ paddingRight: 32 }}>
-              <Title level={4}>{data.origin.name}</Title>
+              <Title level={4}>{data.project.name}</Title>
             </div>
             <Input.Search
               placeholder="Search Elements"
@@ -366,7 +367,7 @@ const Designer = ({ location }) => {
                 <Iframe
                   ref={iframe}
                   onLoad={initConnection}
-                  src={data.origin.protocol + "://" + data.origin.origin}
+                  src={data.project.protocol + "://" + data.project.hostname}
                 />
               </div>
               <div>

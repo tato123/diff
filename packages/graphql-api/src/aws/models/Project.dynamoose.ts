@@ -17,6 +17,7 @@ interface DataSchema {
   name?: string;
   description?: string;
   archived?: boolean;
+  type: string;
 }
 
 const projectSchema = new Schema({
@@ -42,7 +43,8 @@ const projectSchema = new Schema({
       project: true, // ProjectionType: ALL
       throughput: 5 // read and write are both 5
     }
-  }
+  },
+  type: String
 });
 
 const Project = dynamoose.model<DataSchema, KeySchema>(

@@ -60,7 +60,8 @@ export default async (
     hostname: projectUrl,
     protocol,
     name: _.get(args.input, "name", ""),
-    description: _.get(args.input, "description", "")
+    description: _.get(args.input, "description", ""),
+    type: "prototype"
   });
 
   console.log("project is ", project);
