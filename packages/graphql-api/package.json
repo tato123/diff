@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "tsc && npx forever build/index.js",
-    "start:dev": "cross-env NODE_ENV=development ts-node-dev --respawn --transpileOnly ./src/index.ts",
+    "start:dev": "cross-env NODE_ENV=development AWS_REGION=us-east-1 ts-node-dev --respawn --transpileOnly ./src/index.ts",
     "test": "jest",
     "tsc": "tsc",
     "switch:stage": "rsync -a --stats .deploy/stage/ ./",

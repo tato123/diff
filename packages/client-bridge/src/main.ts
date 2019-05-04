@@ -26,7 +26,7 @@ let diff = build("diff")
   // Event Types
   .onEventType(StylesheetType, Stylesheet)
   .onEventType("getPageTheme", getPageTheme)
-  .onEventType("selection", () => {
+  .onEventType("designer", () => {
     window["diff"]["designer"]();
   })
 

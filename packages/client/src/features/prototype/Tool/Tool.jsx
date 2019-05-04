@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState, useEffect, useReducer } from "react";
 import styled from "styled-components";
 import { Col, Button, InputNumber, Checkbox, Input, Select } from "antd";
 import { SketchPicker } from "react-color";
 import Draggable from "react-draggable";
+import _ from "lodash";
 
 const Option = Select.Option;
 
@@ -94,7 +95,6 @@ Input.Custom = styled(Input)`
   border-radius: 0px !important;
   border: none !important;
   border-bottom: 1px solid #dadce0 !important;
-  margin-left: 8px !important;
 `;
 
 const DragHandle = styled.div`
@@ -131,104 +131,158 @@ const Field = ({ title, children }) => (
   </ToolField>
 );
 
-const ColorPicker = ({ color = "transparent", value }) => (
+const ColorPicker = ({ value, valueKey, dispatch }) => (
   <>
     <ColorPreview color={value} />
-    <Input.Custom style={{ width: 100 }} value={value} />
+    <Input.Custom
+      style={{ width: 100 }}
+      value={value}
+      onChange={e =>
+        dispatch({
+          type: "mod",
+          payload: { key: valueKey, value: e.currentTarget.value }
+        })
+      }
+    />
   </>
 );
 
-const Tool = ({ state }) => (
-  <Draggable handle=".handle">
-    <Container>
-      <DragHandle className="handle" />
-      <Row>
-        <div style={{ flex: 1 }}>
-          <span className="title">Diff</span>
-          <span className="sub-title">{state.selector}</span>
-        </div>
-        <Col style={{ justifyContent: "flex-end" }}>
-          <Button
-            icon="close-circle"
-            style={{ border: "none", fontSize: 20 }}
-          />
-        </Col>
-      </Row>
-      <HR />
-      <Row mt>
-        <Button>Move</Button>
-        <Button>Rotate</Button>
-      </Row>
-      <Row mt col2>
-        <div>
-          <span>W</span>
-          <InputNumber.Custom
-            min={1}
-            max={100000}
-            defaultValue={0}
-            value={state.style.width}
-          />
-          <Checkbox>auto</Checkbox>
-        </div>
-        <div>
-          <span>H</span>
-          <InputNumber.Custom
-            min={1}
-            max={100000}
-            defaultValue={0}
-            value={state.style.height}
-          />
-          <Checkbox>auto</Checkbox>
-        </div>
-      </Row>
-      <Row mt col2>
-        <Field title="Background Color">
-          <ColorPicker value={state.style.backgroundColor} />
-        </Field>
-        <Field title="Text Color">
-          <ColorPicker value={state.style.color} />
-        </Field>
-      </Row>
-      <Row mt>
-        <Field title="Font">
-          <FontGrid>
+const createReducer = sendElementChange =>
+  function reducer(state, action) {
+    switch (action.type) {
+      case "mod":
+        const newValue = _.cloneDeep(
+          _.set(state, action.payload.key, action.payload.value)
+        );
+        sendElementChange(newValue);
+        return newValue;
+      case "asyncInit":
+        return action.payload.value;
+      default:
+        return state;
+    }
+  };
+
+const Tool = ({ state: initialState, onClose, sendElementChange }) => {
+  const [state, dispatch] = useReducer(
+    createReducer(sendElementChange),
+    initialState
+  );
+
+  const mod = (key, value) =>
+    dispatch({ type: "mod", payload: { key, value } });
+
+  if (!state) {
+    return null;
+  }
+
+  return (
+    <Draggable handle=".handle">
+      <Container>
+        <DragHandle className="handle" />
+        <Row>
+          <div style={{ flex: 1 }}>
+            <span className="title">Diff</span>
+            <span className="sub-title">{state.selector}</span>
+          </div>
+          <Col style={{ justifyContent: "flex-end" }}>
+            <Button
+              icon="close-circle"
+              onClick={onClose}
+              style={{ border: "none", fontSize: 20 }}
+            />
+          </Col>
+        </Row>
+        <HR />
+        <Row mt>
+          <Button>Move</Button>
+          <Button>Rotate</Button>
+        </Row>
+        <Row mt col2>
+          <div>
+            <span>W</span>
             <InputNumber.Custom
               min={1}
-              max={120}
-              value={state.style.fontSize}
-              className="fw font-size"
+              max={100000}
+              defaultValue={0}
+              value={state.style.width}
             />
-            <Select defaultValue={state.style.fontWeight}>
-              <Option value={100}>100</Option>
-              <Option value={300}>300</Option>
-              <Option value={500}>500</Option>
-            </Select>
-            <Select defaultValue="lucy" className="fw">
-              <Option value="jack">Jack</Option>
-              <Option value="lucy">Lucy</Option>
-              <Option value="disabled" disabled>
-                Disabled
-              </Option>
-              <Option value="Yiminghe">yiminghe</Option>
-            </Select>
-          </FontGrid>
-        </Field>
-      </Row>
-      <Row mt>
-        <Field title="Border Radius">
-          <label>{state.style.borderRadius}</label>
-        </Field>
-      </Row>
-      <Row mt>
-        <Field title="Text">
-          <div style={{ overflow: "auto" }}>
-            <Input value={state.html.innerText} />
+            <Checkbox>auto</Checkbox>
           </div>
-        </Field>
-      </Row>
-    </Container>
-  </Draggable>
-);
+          <div>
+            <span>H</span>
+            <InputNumber.Custom
+              min={1}
+              max={100000}
+              defaultValue={0}
+              value={state.style.height}
+            />
+            <Checkbox>auto</Checkbox>
+          </div>
+        </Row>
+        <Row mt col2>
+          <Field title="Background Color">
+            <ColorPicker
+              valueKey="style.backgroundColor"
+              dispatch={dispatch}
+              value={state.style.backgroundColor}
+            />
+          </Field>
+          <Field title="Text Color">
+            <ColorPicker
+              value={state.style.color}
+              dispatch={dispatch}
+              valueKey="style.color"
+            />
+          </Field>
+        </Row>
+        <Row mt>
+          <Field title="Font">
+            <FontGrid>
+              <InputNumber.Custom
+                min={1}
+                max={120}
+                value={state.style.fontSize}
+                className="fw font-size"
+              />
+              <Select defaultValue={state.style.fontWeight}>
+                <Option value={100}>100</Option>
+                <Option value={300}>300</Option>
+                <Option value={500}>500</Option>
+              </Select>
+              <Select defaultValue="lucy" className="fw">
+                <Option value="jack">Jack</Option>
+                <Option value="lucy">Lucy</Option>
+                <Option value="disabled" disabled>
+                  Disabled
+                </Option>
+                <Option value="Yiminghe">yiminghe</Option>
+              </Select>
+            </FontGrid>
+          </Field>
+        </Row>
+        <Row mt>
+          <Field title="Border Radius">
+            <Input.Custom
+              value={state.style.borderRadius}
+              onChange={e => mod("style.borderRadius", e.currentTarget.value)}
+            />
+          </Field>
+        </Row>
+        <Row mt>
+          <Field title="Text">
+            <div style={{ overflow: "auto" }}>
+              <Input.Custom
+                value={state.html.innerText}
+                onChange={e => mod("html.innerText", e.currentTarget.value)}
+              />
+            </div>
+          </Field>
+        </Row>
+      </Container>
+    </Draggable>
+  );
+};
 
 const sampleState = {
   selector: ".cta_button_hero",

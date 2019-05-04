@@ -11,46 +11,81 @@ import "./index.css";
 class App extends React.Component {
   state = {
     tool: "",
-    elm: null
+    elm: null,
+    activeRequest: null,
+    selected: null
   };
 
   componentDidMount() {
     window.diff.parentMessanger
-      .notifications("tool:change")
-      .subscribe(({ tool }) => {
-        console.log("Received a tool change", tool);
-        this.setState({ tool });
+      .requests("element:select")
+      .subscribe(request => {
+        this.setState({
+          activeRequest: request,
+          tool: "select",
+          selected: null
+        });
       });
 
+    const cache = {};
+
     window.diff.parentMessanger
-      .notifications("element:search")
+      .notifications("element:modify")
       .subscribe(val => {
-        console.log("attempting to get", val);
-        if (!val) {
-          return;
-        }
-        const elements = document.querySelectorAll(val);
-        elements.forEach(e => (e.style.border = "1px solid red"));
+        //
+        const { selector, style, html } = val;
+        const whitelistedCss = [
+          "borderRadius",
+          "backgroundColor",
+          "color",
+          "fontSize",
+          "fontWeight",
+          "fontFamily",
+          "width",
+          "height"
+        ];
+        const whitelistedHtml = ["innerText"];
+        // get the document selector
+        const selectedElements =
+          cache[selector] || document.querySelectorAll(selector);
+        cache[selector] = selectedElements;
+        // apply for each element
+        selectedElements.forEach(node => {
+          // apply whitelisted changes, this is nasty because it re-renders multiple times per node, instead we should just
+          // bulk edit the style attribute
+          whitelistedCss.forEach(attr => {
+            node.style[attr] = style[attr];
+          });
+
+          // apply whitelisted changes, this is nasty because it re-renders multiple times per node, instead we should just
+          // bulk edit the style attribute
+          whitelistedHtml.forEach(attr => {
+            node[attr] = html[attr];
+          });
+        });
       });
   }
 
-  onChange = val => {
-    this.setState({ sel: val });
-  };
-
   onSelect = element => {
+    const {
+      state: { activeRequest }
+    } = this;
     const computed = window.getComputedStyle(element);
 
-    window.diff.parentMessanger.notify("element:selected", {
-      tag: element.tagName,
-      style: {
-        ...computed
-      },
-      html: {
-        innerText: element.innerText,
-        innerHTML: element.innerHTML
-      }
-    });
+    if (activeRequest) {
+      const payload = {
+        tag: element.tagName,
+        style: {
+          ...computed
+        },
+        html: {
+          innerText: element.innerText,
+          innerHTML: element.innerHTML
+        }
+      };
+      activeRequest.respond(payload);
+      this.setState({ activeRequest: null, selected: element, tool: "" });
+    }
   };
 
   render() {
@@ -61,12 +96,6 @@ class App extends React.Component {
     return (
       <SelectionContext.Provider value={elm}>
         <Box active={tool === "select"} onSelect={this.onSelect} />
-        <h1 style={{ display: tool === "search" ? "block" : "none" }}>
-          search
-        </h1>
-        <h1 style={{ display: tool === "annotate" ? "block" : "none" }}>
-          annotate
-        </h1>
       </SelectionContext.Provider>
     );
   }

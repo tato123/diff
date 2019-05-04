@@ -68,16 +68,13 @@ const FieldInput = styled.div`
 `;
 
 const Designer = ({ location, match }) => {
-  const params = new URLSearchParams(location.search);
   const path = match.params;
   const iframe = useRef(null);
-  const [textbox] = useState("");
 
   const [messanger, setMessanger] = useState(null);
   const user = useContext(UserContext);
   const [userImage, setUserImage] = useState();
   const [element, setElement] = useState();
-  const [tool, setTool] = useState("select");
 
   const docId = path.id;
 
@@ -86,10 +83,6 @@ const Designer = ({ location, match }) => {
   const { data, loading, error } = useQuery(PROJECT_BY_ID, {
     variables: { id: docId }
   });
-
-  const [components, setComponents] = useState(null);
-
-  const [debouncedText] = useDebounce(textbox, 100);
 
   const initConnection = () => {
     const childMessenger = RxPostmessenger.connect(
@@ -107,10 +100,23 @@ const Designer = ({ location, match }) => {
     if (!messanger) {
       return;
     }
-    messanger.request("getPageTheme").subscribe(val => setComponents(val));
-    messanger.request("selection").subscribe(console.log);
 
-    messanger.notifications("element:selected").subscribe(elm => {
+    // wait until we receive a wake up of some sort
+    // @todo add a wake up from the designer
+
+    // enter designer mode
+    messanger.request("designer").subscribe(console.log);
+
+    // // get a selection
+    setTimeout(() => {
+      requestElement();
+    }, 500);
+  }, [messanger]);
+
+  const sendMessage = payload => messanger.notify("element:modify", payload);
+
+  const requestElement = () => {
+    messanger.request("element:select").subscribe(elm => {
       console.log(elm);
 
       const data = {
@@ -125,14 +131,7 @@ const Designer = ({ location, match }) => {
       };
       setElement(data);
     });
-  }, [messanger]);
-
-  useEffect(() => {
-    if (!messanger) {
-      return;
-    }
-    messanger.request("stylesheet", textbox).subscribe(console.log);
-  }, [debouncedText]);
+  };
 
   useEffect(() => {
     if (!user) {
@@ -142,15 +141,6 @@ const Designer = ({ location, match }) => {
     const profile = user.getProfile();
     setUserImage(profile.picture);
   }, [user]);
-
-  useEffect(() => {
-    if (!messanger || !tool) {
-      return;
-    }
-    setTimeout(() => {
-      messanger.notify("tool:change", { tool });
-    }, 500);
-  }, [tool, messanger]);
 
   const url = _.has(data, "project.protocol")
     ? data.project.protocol + "://" + data.project.hostname
@@ -203,7 +193,16 @@ const Designer = ({ location, match }) => {
               initConnection={initConnection}
               project={data && data.project}
             />
-            <Tool state={element} />
+            {element != null && (
+              <Tool
+                state={element}
+                onClose={() => {
+                  setElement(null);
+                  requestElement();
+                }}
+                sendElementChange={sendMessage}
+              />
+            )}
           </Content>
         </>
       )}
