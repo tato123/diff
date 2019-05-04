@@ -11,7 +11,8 @@ const Container = styled.div`
   width: 400px;
   height: 500px;
   background: #fff;
-  border: 3px solid #000;
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 0.5em 3em;
+  border: none;
   border-radius: 16px;
   position: absolute;
   z-index: 2;
@@ -83,7 +84,7 @@ const ColorPreview = styled.div`
   background: ${props => props.color || "transparent"};
 `;
 
-InputNumber.Custom = styled(InputNumber)`
+InputNumber.Custom = styled(Input)`
   border-radius: 0px !important;
   border: none !important;
   border-bottom: 1px solid #dadce0 !important;
@@ -113,7 +114,7 @@ const DragHandle = styled.div`
 const FontGrid = styled.div`
   display: grid;
   grid-template-areas: ". . .";
-  grid-template-columns: 48px 70px 1fr;
+  grid-template-columns: 70px 70px 1fr;
   grid-template-rows: 1fr;
   grid-column-gap: 16px;
   width: 100%;
@@ -194,10 +195,7 @@ const Tool = ({ state: initialState, onClose, sendElementChange }) => {
           </Col>
         </Row>
         <HR />
-        <Row mt>
-          <Button>Move</Button>
-          <Button>Rotate</Button>
-        </Row>
+
         <Row mt col2>
           <div>
             <span>W</span>
@@ -249,6 +247,7 @@ const Tool = ({ state: initialState, onClose, sendElementChange }) => {
                 <Option value={100}>100</Option>
                 <Option value={300}>300</Option>
                 <Option value={500}>500</Option>
+                <Option value={700}>700</Option>
               </Select>
               <Select defaultValue="lucy" className="fw">
                 <Option value="jack">Jack</Option>
@@ -284,25 +283,8 @@ const Tool = ({ state: initialState, onClose, sendElementChange }) => {
   );
 };
 
-const sampleState = {
-  selector: ".cta_button_hero",
-  style: {
-    width: 0,
-    height: 0,
-    backgroundColor: "#ffffff",
-    color: "#000",
-    borderRadius: 0,
-    fontFamily: "Arial",
-    fontSize: "0",
-    fontWeight: 0
-  },
-  html: {
-    innerText: "Hello world"
-  }
-};
-
 Tool.defaultProps = {
-  state: sampleState
+  state: null
 };
 
 export default Tool;

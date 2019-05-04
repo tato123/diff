@@ -6,7 +6,7 @@ import styled from "styled-components";
 import RxPostmessenger from "rx-postmessenger";
 import { useDebounce } from "use-debounce";
 import _ from "lodash";
-import { useDocument, useActiveUsers } from "./useDocument";
+import { useDocument } from "./useDocument";
 import UserContext from "../../utils/context";
 import Editor from "./Editor";
 import Tool from "./Tool";
@@ -35,55 +35,27 @@ const Pagelayout = styled(Layout)`
   }
 `;
 
-const ColorBox = styled.div`
-  background-color: ${props => props.color};
-  width: 24px;
-  height: 24px;
+const DesignHeader = ({ data, activeUsers, userImage, url }) => (
+  <Header className="header">
+    <div className="documentName" style={{ paddingRight: 32 }}>
+      <Title level={4} style={{ lineHeight: "64px" }}>
+        {data.project.name}
+      </Title>
+      <small style={{ top: -55, position: "relative" }}>{url}</small>
+    </div>
 
-  max-width: 24px;
-  max-height: 24px;
-  border-radius: 4px;
-  margin-right: 1em;
+    <div className="right">
+      {activeUsers && activeUsers.map(user => <Avatar />)}
+      <div>
+        <Avatar src={userImage} />
+      </div>
+    </div>
+  </Header>
+);
 
-  display: inline-flex;
-  flex: 1 auto;
-  justify-content: center;
-  align-items: center;
-  border: 1px solid #dadce0;
-`;
-
-const FieldTitle = styled(Title)`
-  font-size: 14px !important;
-  text-transform: uppercase;
-  margin-bottom: 16px !important;
-`;
-
-const FieldInput = styled.div`
-  border: 1px solid transparent;
-  box-sizing: border-box;
-
-  &:hover {
-    border: 1px solid #dadce0;
-  }
-`;
-
-const Designer = ({ location, match }) => {
-  const path = match.params;
-  const iframe = useRef(null);
-
+const useConnectToFrame = (data, cb) => {
   const [messanger, setMessanger] = useState(null);
-  const user = useContext(UserContext);
-  const [userImage, setUserImage] = useState();
-  const [element, setElement] = useState();
-
-  const docId = path.id;
-
-  const { doc: editorDoc, change } = useDocument(docId);
-  const activeUsers = useActiveUsers();
-  const { data, loading, error } = useQuery(PROJECT_BY_ID, {
-    variables: { id: docId }
-  });
-
+  const iframe = useRef(null);
   const initConnection = () => {
     const childMessenger = RxPostmessenger.connect(
       iframe.current.contentWindow,
@@ -92,9 +64,9 @@ const Designer = ({ location, match }) => {
     setMessanger(childMessenger);
   };
 
-  if (error) {
-    return null;
-  }
+  const requestElement = () => {
+    messanger.request("element:select").subscribe(cb);
+  };
 
   useEffect(() => {
     if (!messanger) {
@@ -107,85 +79,80 @@ const Designer = ({ location, match }) => {
     // enter designer mode
     messanger.request("designer").subscribe(console.log);
 
-    // // get a selection
     setTimeout(() => {
       requestElement();
     }, 500);
   }, [messanger]);
 
-  const sendMessage = payload => messanger.notify("element:modify", payload);
+  return { messanger, iframe, initConnection, requestElement };
+};
 
-  const requestElement = () => {
-    messanger.request("element:select").subscribe(elm => {
-      console.log(elm);
+const useProfile = () => {
+  const user = useContext(UserContext);
+  const profile = user.getProfile();
+  return { user, profile };
+};
 
-      const data = {
-        selector: elm.tag,
-        style: {
-          ...elm.style
-        },
-        html: {
-          innerText: elm.html.innerText,
-          innerHTML: elm.html.innerHTML
-        }
-      };
-      setElement(data);
-    });
+const toIframeUrl = project => {
+  return _.has(project, "protocol")
+    ? project.protocol + "://" + project.hostname
+    : "";
+};
+
+const Designer = ({ location, match }) => {
+  const onElementSelected = elm => {
+    console.log(elm);
+
+    const data = {
+      selector: elm.tag,
+      style: {
+        ...elm.style
+      },
+      html: {
+        innerText: elm.html.innerText,
+        innerHTML: elm.html.innerHTML
+      }
+    };
+    setElement(data);
   };
 
-  useEffect(() => {
-    if (!user) {
-      return;
-    }
+  const path = match.params;
+  const { profile } = useProfile();
 
-    const profile = user.getProfile();
-    setUserImage(profile.picture);
-  }, [user]);
+  const [element, setElement] = useState();
 
-  const url = _.has(data, "project.protocol")
-    ? data.project.protocol + "://" + data.project.hostname
-    : "";
+  const docId = path.id;
+
+  const { data, loading, error } = useQuery(PROJECT_BY_ID, {
+    variables: { id: docId }
+  });
+
+  const {
+    messanger,
+    iframe,
+    initConnection,
+    requestElement
+  } = useConnectToFrame(data, onElementSelected);
+
+  if (error) {
+    return null;
+  }
+
+  const sendMessage = payload => {
+    // notify the page of the change
+    messanger.notify("element:modify", payload);
+  };
 
   return (
     <Pagelayout style={{ height: "100vh", overflow: "hidden" }}>
       {loading && <div>Loading page</div>}
       {!loading && (
         <>
-          <Header className="header">
-            <div className="documentName" style={{ paddingRight: 32 }}>
-              <Title level={4} style={{ lineHeight: "64px" }}>
-                {data.project.name}
-              </Title>
-              <small style={{ top: -55, position: "relative" }}>{url}</small>
-            </div>
-
-            <div className="right">
-              {activeUsers && activeUsers.map(user => <Avatar />)}
-              <div>
-                <Avatar
-                  style={{
-                    backgroundColor: "orange",
-                    border: "2px solid #fff",
-                    verticalAlign: "middle",
-                    marginRight: "-10px",
-                    zIndex: 200
-                  }}
-                >
-                  B
-                </Avatar>
-                <Avatar
-                  style={{
-                    backgroundColor: "green",
-                    border: "2px solid #fff",
-                    verticalAlign: "middle"
-                  }}
-                >
-                  J
-                </Avatar>
-                <Avatar src={userImage} />
-              </div>
-            </div>
-          </Header>
+          <DesignHeader
+            data={data}
+            userImage={profile.picture}
+            url={toIframeUrl(data.project)}
+          />
 
           <Content style={{ position: "relative" }}>
             <Editor
