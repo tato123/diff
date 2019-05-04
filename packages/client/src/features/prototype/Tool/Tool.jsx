@@ -166,7 +166,7 @@ const Tool = ({ state }) => (
             min={1}
             max={100000}
             defaultValue={0}
-            value={state.css.width}
+            value={state.style.width}
           />
           <Checkbox>auto</Checkbox>
         </div>
@@ -176,17 +176,17 @@ const Tool = ({ state }) => (
             min={1}
             max={100000}
             defaultValue={0}
-            value={state.css.height}
+            value={state.style.height}
           />
           <Checkbox>auto</Checkbox>
         </div>
       </Row>
       <Row mt col2>
         <Field title="Background Color">
-          <ColorPicker value={state.css.backgroundColor} />
+          <ColorPicker value={state.style.backgroundColor} />
         </Field>
         <Field title="Text Color">
-          <ColorPicker value={state.css.color} />
+          <ColorPicker value={state.style.color} />
         </Field>
       </Row>
       <Row mt>
@@ -195,10 +195,10 @@ const Tool = ({ state }) => (
             <InputNumber.Custom
               min={1}
               max={120}
-              value={state.css.fontSize}
+              value={state.style.fontSize}
               className="fw font-size"
             />
-            <Select defaultValue={state.css.fontWeight}>
+            <Select defaultValue={state.style.fontWeight}>
               <Option value={100}>100</Option>
               <Option value={300}>300</Option>
               <Option value={500}>500</Option>
@@ -216,12 +216,14 @@ const Tool = ({ state }) => (
       </Row>
       <Row mt>
         <Field title="Border Radius">
-          <label>{state.css.borderRadius}</label>
+          <label>{state.style.borderRadius}</label>
         </Field>
       </Row>
       <Row mt>
         <Field title="Text">
-          <label>{state.html.innerText}</label>
+          <div style={{ overflow: "auto" }}>
+            <Input value={state.html.innerText} />
+          </div>
         </Field>
       </Row>
     </Container>
@@ -230,15 +232,15 @@ const Tool = ({ state }) => (
 
 const sampleState = {
   selector: ".cta_button_hero",
-  css: {
-    width: 300,
-    height: 10,
+  style: {
+    width: 0,
+    height: 0,
     backgroundColor: "#ffffff",
     color: "#000",
     borderRadius: 0,
     fontFamily: "Arial",
-    fontSize: "12px",
-    fontWeight: 300
+    fontSize: "0",
+    fontWeight: 0
   },
   html: {
     innerText: "Hello world"

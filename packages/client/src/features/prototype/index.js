@@ -115,11 +115,12 @@ const Designer = ({ location, match }) => {
 
       const data = {
         selector: elm.tag,
-        css: {
+        style: {
           ...elm.style
         },
         html: {
-          innerText: ""
+          innerText: elm.html.innerText,
+          innerHTML: elm.html.innerHTML
         }
       };
       setElement(data);

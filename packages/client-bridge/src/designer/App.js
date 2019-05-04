@@ -45,6 +45,10 @@ class App extends React.Component {
       tag: element.tagName,
       style: {
         ...computed
+      },
+      html: {
+        innerText: element.innerText,
+        innerHTML: element.innerHTML
       }
     });
   };
