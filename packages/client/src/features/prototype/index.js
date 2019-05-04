@@ -9,6 +9,7 @@ import _ from "lodash";
 import { useDocument, useActiveUsers } from "./useDocument";
 import UserContext from "../../utils/context";
 import Editor from "./Editor";
+import Tool from "./Tool";
 
 const { Content, Header } = Layout;
 
@@ -111,7 +112,17 @@ const Designer = ({ location, match }) => {
 
     messanger.notifications("element:selected").subscribe(elm => {
       console.log(elm);
-      setElement(elm);
+
+      const data = {
+        selector: elm.tag,
+        css: {
+          ...elm.style
+        },
+        html: {
+          innerText: ""
+        }
+      };
+      setElement(data);
     });
   }, [messanger]);
 
@@ -191,6 +202,7 @@ const Designer = ({ location, match }) => {
               initConnection={initConnection}
               project={data && data.project}
             />
+            <Tool state={element} />
           </Content>
         </>
       )}

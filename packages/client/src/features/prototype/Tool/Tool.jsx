@@ -56,6 +56,7 @@ const Row = styled.div`
 `;
 
 const ToolField = styled.div`
+  width: 100%;
   label.title {
     text-transform: uppercase;
     font-size: 10px;
@@ -72,16 +73,21 @@ const HR = styled.hr`
 
 const ColorPreview = styled.div`
   width: 22px;
-  height: 16px;
+  height: 22px;
   border: 1px solid #dadce0;
   display: inline-block;
+  border-radius: 4px;
+  position: relative;
+  bottom: -4px;
+  background: ${props => props.color || "transparent"};
 `;
 
 InputNumber.Custom = styled(InputNumber)`
   border-radius: 0px !important;
   border: none !important;
   border-bottom: 1px solid #dadce0 !important;
-  margin-left: 8px !important;
+  margin: 0 8px !important;
+  width: 75px !important;
 `;
 
 Input.Custom = styled(Input)`
@@ -104,6 +110,20 @@ const DragHandle = styled.div`
   transition: all 250ms ease-in;
 `;
 
+const FontGrid = styled.div`
+  display: grid;
+  grid-template-areas: ". . .";
+  grid-template-columns: 48px 70px 1fr;
+  grid-template-rows: 1fr;
+  grid-column-gap: 16px;
+  width: 100%;
+
+  .fw {
+    width: 100% !important;
+    margin: 0px !important;
+  }
+`;
+
 const Field = ({ title, children }) => (
   <ToolField>
     <label className="title">{title}:</label>
@@ -111,10 +131,10 @@ const Field = ({ title, children }) => (
   </ToolField>
 );
 
-const ColorPicker = ({ color = "transparent" }) => (
+const ColorPicker = ({ color = "transparent", value }) => (
   <>
-    <ColorPreview color={color} />
-    <Input.Custom style={{ width: 100 }} />
+    <ColorPreview color={value} />
+    <Input.Custom style={{ width: 100 }} value={value} />
   </>
 );
 
@@ -125,7 +145,7 @@ const Tool = ({ state }) => (
       <Row>
         <div style={{ flex: 1 }}>
           <span className="title">Diff</span>
-          <span className="sub-title">.cta_button_hero</span>
+          <span className="sub-title">{state.selector}</span>
         </div>
         <Col style={{ justifyContent: "flex-end" }}>
           <Button
@@ -142,61 +162,91 @@ const Tool = ({ state }) => (
       <Row mt col2>
         <div>
           <span>W</span>
-          <InputNumber.Custom min={1} max={100000} defaultValue={3} />
+          <InputNumber.Custom
+            min={1}
+            max={100000}
+            defaultValue={0}
+            value={state.css.width}
+          />
           <Checkbox>auto</Checkbox>
         </div>
         <div>
           <span>H</span>
-          <InputNumber.Custom min={1} max={100000} defaultValue={3} />
+          <InputNumber.Custom
+            min={1}
+            max={100000}
+            defaultValue={0}
+            value={state.css.height}
+          />
           <Checkbox>auto</Checkbox>
         </div>
       </Row>
       <Row mt col2>
         <Field title="Background Color">
-          <ColorPicker />
+          <ColorPicker value={state.css.backgroundColor} />
         </Field>
         <Field title="Text Color">
-          <ColorPicker />
+          <ColorPicker value={state.css.color} />
         </Field>
       </Row>
       <Row mt>
         <Field title="Font">
-          <InputNumber.Custom
-            min={1}
-            max={100000}
-            style={{ width: 55, margin: 0 }}
-          />
-          <Select defaultValue="100">
-            <Option value="100">100</Option>
-            <Option value="300">300</Option>
-            <Option value="500">500</Option>
-          </Select>
-          <Select defaultValue="lucy" style={{ width: 120 }}>
-            <Option value="jack">Jack</Option>
-            <Option value="lucy">Lucy</Option>
-            <Option value="disabled" disabled>
-              Disabled
-            </Option>
-            <Option value="Yiminghe">yiminghe</Option>
-          </Select>
+          <FontGrid>
+            <InputNumber.Custom
+              min={1}
+              max={120}
+              value={state.css.fontSize}
+              className="fw font-size"
+            />
+            <Select defaultValue={state.css.fontWeight}>
+              <Option value={100}>100</Option>
+              <Option value={300}>300</Option>
+              <Option value={500}>500</Option>
+            </Select>
+            <Select defaultValue="lucy" className="fw">
+              <Option value="jack">Jack</Option>
+              <Option value="lucy">Lucy</Option>
+              <Option value="disabled" disabled>
+                Disabled
+              </Option>
+              <Option value="Yiminghe">yiminghe</Option>
+            </Select>
+          </FontGrid>
         </Field>
       </Row>
       <Row mt>
         <Field title="Border Radius">
-          <label>123</label>
+          <label>{state.css.borderRadius}</label>
         </Field>
       </Row>
       <Row mt>
         <Field title="Text">
-          <label>123</label>
+          <label>{state.html.innerText}</label>
         </Field>
       </Row>
     </Container>
   </Draggable>
 );
 
+const sampleState = {
+  selector: ".cta_button_hero",
+  css: {
+    width: 300,
+    height: 10,
+    backgroundColor: "#ffffff",
+    color: "#000",
+    borderRadius: 0,
+    fontFamily: "Arial",
+    fontSize: "12px",
+    fontWeight: 300
+  },
+  html: {
+    innerText: "Hello world"
+  }
+};
+
 Tool.defaultProps = {
-  state: null
+  state: sampleState
 };
 
 export default Tool;

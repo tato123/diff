@@ -9,7 +9,6 @@ import _ from "lodash";
 import { pointer } from "react-icons-kit/entypo/pointer";
 import Icon from "react-icons-kit";
 import { socialCss3 } from "react-icons-kit/ionicons/socialCss3";
-import Tool from "../Tool";
 const Iframe = styled.iframe`
   height: 100%;
   width: 100%;
@@ -75,7 +74,6 @@ const PageEditor: React.FC<PageEditorProps> = ({
   return (
     <Editor>
       <Iframe ref={iframe} onLoad={initConnection} src={url} />
-      <Tool />
     </Editor>
   );
 };

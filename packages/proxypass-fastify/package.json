@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npx forever src/index.js -- --max-http-header-size=80000",
-    "start:dev": "cross-env NODE_ENV=development nodemon src/index.js -- --max-http-header-size=80000",
+    "start:dev" :  "echo \"nothing to start\"",
+    "start:dev:old": "cross-env NODE_ENV=development nodemon src/index.js -- --max-http-header-size=80000",
     "switch:stage": "rsync -a --stats .deploy/stage/ ./",
     "switch:prod": "rsync -a --stats .deploy/prod/ ./"
   },
