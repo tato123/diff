@@ -1,9 +1,11 @@
-import React, { useState, useEffect, useReducer } from "react";
+import React, { useState, useReducer } from "react";
 import styled from "styled-components";
 import { Col, Button, InputNumber, Checkbox, Input, Select } from "antd";
 import { SketchPicker } from "react-color";
 import Draggable from "react-draggable";
 import _ from "lodash";
+
+import font from "./fonts";
 
 const Option = Select.Option;
 
@@ -82,6 +84,8 @@ const ColorPreview = styled.div`
   position: relative;
   bottom: -4px;
   background: ${props => props.color || "transparent"};
+
+  cursor: pointer;
 `;
 
 InputNumber.Custom = styled(Input)`
@@ -132,21 +136,42 @@ const Field = ({ title, children }) => (
   </ToolField>
 );
 
-const ColorPicker = ({ value, valueKey, dispatch }) => (
-  <>
-    <ColorPreview color={value} />
-    <Input.Custom
-      style={{ width: 100 }}
-      value={value}
-      onChange={e =>
-        dispatch({
-          type: "mod",
-          payload: { key: valueKey, value: e.currentTarget.value }
-        })
-      }
-    />
-  </>
-);
+const ColorPicker = ({ value, valueKey, dispatch }) => {
+  const [isColorPickerVisible, setColorPickerVisible] = useState(false);
+
+  const onColorChange = color => {
+    console.log("color change", color);
+
+    dispatch({
+      type: "mod",
+      payload: { key: valueKey, value: color.hex }
+    });
+  };
+
+  return (
+    <>
+      <ColorPreview
+        color={value}
+        onClick={() => setColorPickerVisible(s => !s)}
+      />
+      <Input.Custom
+        style={{ width: 100 }}
+        value={value}
+        onChange={e =>
+          dispatch({
+            type: "mod",
+            payload: { key: valueKey, value: e.currentTarget.value }
+          })
+        }
+      />
+      {isColorPickerVisible && (
+        <div style={{ position: "absolute", zIndex: 3 }}>
+          <SketchPicker color={value} onChange={onColorChange} />
+        </div>
+      )}
+    </>
+  );
+};
 
 const createReducer = sendElementChange =>
   function reducer(state, action) {
@@ -204,6 +229,7 @@ const Tool = ({ state: initialState, onClose, sendElementChange }) => {
               max={100000}
               defaultValue={0}
               value={state.style.width}
+              onChange={e => mod("style.width", e.currentTarget.value)}
             />
             <Checkbox>auto</Checkbox>
           </div>
@@ -214,6 +240,7 @@ const Tool = ({ state: initialState, onClose, sendElementChange }) => {
               max={100000}
               defaultValue={0}
               value={state.style.height}
+              onChange={e => mod("style.height", e.currentTarget.value)}
             />
             <Checkbox>auto</Checkbox>
           </div>
@@ -242,20 +269,27 @@ const Tool = ({ state: initialState, onClose, sendElementChange }) => {
                 max={120}
                 value={state.style.fontSize}
                 className="fw font-size"
+                onChange={e => mod("style.fontSize", e.currentTarget.value)}
               />
-              <Select defaultValue={state.style.fontWeight}>
+              <Select
+                defaultValue={state.style.fontWeight}
+                onChange={value => mod("style.fontWeight", value)}
+              >
                 <Option value={100}>100</Option>
                 <Option value={300}>300</Option>
                 <Option value={500}>500</Option>
                 <Option value={700}>700</Option>
               </Select>
-              <Select defaultValue="lucy" className="fw">
-                <Option value="jack">Jack</Option>
-                <Option value="lucy">Lucy</Option>
-                <Option value="disabled" disabled>
-                  Disabled
-                </Option>
-                <Option value="Yiminghe">yiminghe</Option>
+              <Select
+                defaultValue={state.style.fontFamily}
+                className="fw"
+                onChange={value => mod("style.fontFamily", value)}
+              >
+                {font.families.map(family => (
+                  <Option value={family} key={family}>
+                    {family}
+                  </Option>
+                ))}
               </Select>
             </FontGrid>
           </Field>

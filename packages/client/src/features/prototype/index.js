@@ -1,12 +1,10 @@
 import React, { useEffect, useRef, useState, useContext } from "react";
-import { Layout, Avatar, Typography, Button, Select, Input } from "antd";
+import { Layout, Avatar, Typography } from "antd";
 import { useQuery } from "react-apollo-hooks";
 import { PROJECT_BY_ID } from "../../graphql/query";
 import styled from "styled-components";
 import RxPostmessenger from "rx-postmessenger";
-import { useDebounce } from "use-debounce";
 import _ from "lodash";
-import { useDocument } from "./useDocument";
 import UserContext from "../../utils/context";
 import Editor from "./Editor";
 import Tool from "./Tool";
@@ -30,7 +28,6 @@ const Pagelayout = styled(Layout)`
 
   .right {
     float: right;
-    display: inline-block;
     margin-right: -34px;
   }
 `;
