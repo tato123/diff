@@ -9,7 +9,7 @@ import _ from "lodash";
 import { CREATE_PROJECT } from "../../../../graphql/mutations";
 import { useMutation } from "react-apollo-hooks";
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 const Backdrop = styled(animated.div)`
   width: 100vw;

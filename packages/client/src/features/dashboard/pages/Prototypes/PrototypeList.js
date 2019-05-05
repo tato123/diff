@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from "react";
 import { useQuery, useSubscription } from "react-apollo-hooks";
-import { Card, Typography, Empty } from "antd";
+import { Card, Empty } from "antd";
 import gql from "graphql-tag";
 import Icon from "react-icons-kit";
 import { images } from "react-icons-kit/icomoon/images";
@@ -9,7 +9,6 @@ import _ from "lodash";
 import UserContext from "../../../../utils/context";
 
 const { Meta } = Card;
-const { Title } = Typography;
 
 const GET_PROJECTS = gql`
   query getProjects($uid: String!) {
