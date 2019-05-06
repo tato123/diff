@@ -1,13 +1,11 @@
-import { CommandBuilder, Context, CommandOptions } from '../core/types';
+import { CommandBuilder, Context, CommandOptions } from "../core/types";
+import Designer from "../designer/App";
 
 type Inner = { [records: string]: any[] };
 
 const Designer: CommandBuilder = ({ ctx, win }: CommandOptions) => () => {
-    import('../designer/App').then(() => {
-        console.log('loaded designer');
-        document.body.insertAdjacentHTML('beforeend', '<my-component />')
-    })
-}
-
+  console.log("loaded designer");
+  document.body.insertAdjacentHTML("beforeend", "<diff-designer />");
+};
 
 export default Designer;

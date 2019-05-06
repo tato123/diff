@@ -101,4 +101,4 @@ class App extends React.Component {
   }
 }
 
-ReactWebComponent.create(<App />, "my-component");
+ReactWebComponent.create(<App />, "diff-designer");
