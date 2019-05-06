@@ -7,7 +7,7 @@ import { requireUser } from "../utils";
 const { User } = aws.models;
 
 interface UserArgs {
-  id: String;
+  id: string;
 }
 
 export default async (_parent, args: UserArgs, context: Context) => {

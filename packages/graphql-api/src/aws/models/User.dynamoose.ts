@@ -13,7 +13,8 @@ interface DataSchema {
   subscriptionStatus?: string;
   customerId?: string;
   created?: String;
-  updated: String;
+  updated?: String;
+  planId?: string;
 }
 
 const userSchema = new Schema({
@@ -26,7 +27,8 @@ const userSchema = new Schema({
   subscriptionStatus: String,
   created: String,
   updated: String,
-  customerId: String
+  customerId: String,
+  planId: String
 });
 
 const User = dynamoose.model<DataSchema, KeySchema>(Tables.User, userSchema, {

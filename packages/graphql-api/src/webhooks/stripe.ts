@@ -18,7 +18,7 @@ const handleCustomerSubscriptionCancelled = async event => {
 
   await User.update(
     { id: user.id },
-    { $PUT: { subscription_plan: "trial", subscription_status: "cancelled" } }
+    { $PUT: { subscriptionPlan: "trial", subscriptionStatus: "cancelled" } }
   );
 };
 

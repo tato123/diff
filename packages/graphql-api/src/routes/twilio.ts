@@ -34,6 +34,10 @@ router.get("/token", async (req, res) => {
     const [_header, jwtToken] = bearer.split(" ");
     const user = await getUser(jwtToken);
 
+    if (!user) {
+      return res.status(404).send();
+    }
+
     // Create a "grant" identifying the Sync service instance for this app.
     var syncGrant = new SyncGrant({
       serviceSid: process.env.TWILIO_SYNC_SERVICE_SID

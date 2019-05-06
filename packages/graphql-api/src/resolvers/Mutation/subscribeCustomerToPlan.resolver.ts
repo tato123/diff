@@ -13,10 +13,10 @@ interface CustomerInput {
   };
 }
 
-const getCustomerId = (uid: string): Promise<string | null> => {
+const getCustomerId = (uid: string): Promise<string | null | undefined> => {
   console.log(`[getCustomerId] [uid:${uid}]`);
 
-  return User.get({ id: uid }).then(user => user.customerId);
+  return User.get({ id: uid }).then(user => user && user.customerId);
 };
 
 const createStripeCustomer = async (_parent, args: CustomerInput, context) => {
@@ -48,7 +48,17 @@ const createStripeCustomer = async (_parent, args: CustomerInput, context) => {
 
     // store the information against their
     console.log("customer created", customer);
-    await Users.updateByUid(user.sub, "stripe_customer_id", customer.id);
+
+    // update with the cancellation value
+    await User.update(
+      { id: user.sub },
+      {
+        $PUT: {
+          customerId: customer.id
+        }
+      }
+    );
+
     const subOptions = {
       customer: customer.id,
       items: [{ plan: DIFF_PLAN }]
@@ -61,9 +71,17 @@ const createStripeCustomer = async (_parent, args: CustomerInput, context) => {
 
     const FULL_PLAN = "full";
 
-    await Users.updateByUid(user.sub, "stripe_plan_id", subscription.id);
-    await Users.updateByUid(user.sub, "plan", FULL_PLAN);
-    await Users.updateByUid(user.sub, "plan_status", subscription.status);
+    // update with the cancellation value
+    await User.update(
+      { id: user.sub },
+      {
+        $PUT: {
+          subscriptionPlan: FULL_PLAN,
+          subscriptionStatus: subscription.status,
+          planId: subscription.id
+        }
+      }
+    );
 
     // store the information against their
     console.log("subscription created", subscription);

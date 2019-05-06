@@ -48,7 +48,7 @@ const contributors = async (parent, _args, _ctx, _info) => {
 
   // map them to users
   const ids = _.chain(result)
-    .map(delta => delta.creator)
+    .map(delta => delta && delta["creator"])
     .uniq()
     .values();
 

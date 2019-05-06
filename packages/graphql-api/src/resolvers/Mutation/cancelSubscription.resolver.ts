@@ -21,18 +21,18 @@ const cancelSubscription = async (_parent, args, context) => {
       return null;
     }
 
-    stripe.subscriptions.update(dbUser.subscription_plan, {
+    stripe.subscriptions.update(dbUser.subscriptionPlan, {
       cancel_at_period_end: true
     });
 
     // update with the cancellation value
     await User.update(
       { id: user.sub },
-      { $PUT: { subscription_plan: CANCEL_TYPE } }
+      { $PUT: { subscriptionPlan: CANCEL_TYPE } }
     );
 
     return {
-      plan: dbUser.subscription_plan,
+      plan: dbUser.subscriptionPlan,
       status: CANCEL_TYPE
     };
   } catch (err) {
