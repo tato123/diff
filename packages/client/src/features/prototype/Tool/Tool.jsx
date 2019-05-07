@@ -189,11 +189,8 @@ const createReducer = sendElementChange =>
     }
   };
 
-const Tool = ({ state: initialState, onClose, sendElementChange }) => {
-  const [state, dispatch] = useReducer(
-    createReducer(sendElementChange),
-    initialState
-  );
+const Tool = ({ state: initialState, onClose, onChange }) => {
+  const [state, dispatch] = useReducer(createReducer(onChange), initialState);
 
   const mod = (key, value) =>
     dispatch({ type: "mod", payload: { key, value } });

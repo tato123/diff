@@ -8,6 +8,17 @@ import SelectionContext from "./context/Selection";
 import CSSInsepctor from "./components/inspectors/CSSInspector";
 import "./index.css";
 
+const whitelistedCss = [
+  "borderRadius",
+  "backgroundColor",
+  "color",
+  "fontSize",
+  "fontWeight",
+  "fontFamily",
+  "width",
+  "height"
+];
+
 class App extends React.Component {
   state = {
     tool: "",
@@ -34,16 +45,7 @@ class App extends React.Component {
       .subscribe(val => {
         //
         const { selector, style, html } = val;
-        const whitelistedCss = [
-          "borderRadius",
-          "backgroundColor",
-          "color",
-          "fontSize",
-          "fontWeight",
-          "fontFamily",
-          "width",
-          "height"
-        ];
+
         const whitelistedHtml = ["innerText"];
         // get the document selector
         const selectedElements =
@@ -76,7 +78,11 @@ class App extends React.Component {
       const payload = {
         tag: element.tagName,
         style: {
-          ...computed
+          ..._.reduce(
+            whitelistedCss,
+            (acc, x) => ({ ...acc, [x]: computed[x] }),
+            {}
+          )
         },
         html: {
           innerText: element.innerText,

@@ -8,6 +8,7 @@ import _ from "lodash";
 import UserContext from "../../utils/context";
 import Editor from "./Editor";
 import Tool from "./Tool";
+import { useDocument } from "./useDocument";
 
 const { Content, Header } = Layout;
 
@@ -96,7 +97,23 @@ const toIframeUrl = project => {
     : "";
 };
 
+/**
+ * Our designer view
+ * @param {*} param0
+ */
 const Designer = ({ location, match }) => {
+  const path = match.params;
+  const { profile } = useProfile();
+
+  const [element, setElement] = useState();
+
+  const docId = path.id;
+  const { doc, change } = useDocument(docId, profile.sub);
+
+  const { data, loading, error } = useQuery(PROJECT_BY_ID, {
+    variables: { id: docId }
+  });
+
   const onElementSelected = elm => {
     console.log(elm);
 
@@ -110,19 +127,19 @@ const Designer = ({ location, match }) => {
         innerHTML: elm.html.innerHTML
       }
     };
-    setElement(data);
+
+    if (!_.has(doc.changes.elements, data.selector)) {
+      change(doc => {
+        doc.changes.elements[data.selector] = data;
+      });
+
+      console.log(doc.changes.elements[data.selector]);
+
+      setElement(data.selector);
+    } else {
+      setElement(data.selector);
+    }
   };
-
-  const path = match.params;
-  const { profile } = useProfile();
-
-  const [element, setElement] = useState();
-
-  const docId = path.id;
-
-  const { data, loading, error } = useQuery(PROJECT_BY_ID, {
-    variables: { id: docId }
-  });
 
   const {
     messanger,
@@ -134,11 +151,6 @@ const Designer = ({ location, match }) => {
   if (error) {
     return null;
   }
-
-  const sendMessage = payload => {
-    // notify the page of the change
-    messanger.notify("element:modify", payload);
-  };
 
   return (
     <Pagelayout style={{ height: "100vh", overflow: "hidden" }}>
@@ -159,12 +171,20 @@ const Designer = ({ location, match }) => {
             />
             {element != null && (
               <Tool
-                state={element}
+                state={doc.changes.elements[element]}
+                onChange={newState => {
+                  const { selector } = newState;
+                  // perform change
+                  change(doc => {
+                    doc.changes.elements[selector] = newState;
+                  });
+
+                  messanger.notify("element:modify", newState);
+                }}
                 onClose={() => {
                   setElement(null);
                   requestElement();
                 }}
-                sendElementChange={sendMessage}
               />
             )}
           </Content>

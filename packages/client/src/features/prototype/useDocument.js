@@ -47,7 +47,7 @@ export const useActiveUsers = docId => {
   return [];
 };
 
-export const useDocument = docId => {
+export const useDocument = (docId, actorId) => {
   // first lets create a document
   const [doc, setDoc] = useState();
   const user = useContext(UserContext);
@@ -140,8 +140,10 @@ export const useDocument = docId => {
     } else if (track.kind === "data") {
       track.on("message", data => {
         const change = JSON.parse(data);
+        console.log("change", change);
+        const newDoc = Automerge.applyChanges(doc, change);
 
-        setDoc(doc => Automerge.applyChanges(doc, change));
+        setDoc(doc => newDoc);
         const state = Automerge.getHistory(doc);
         console.log(state);
       });
@@ -208,14 +210,26 @@ export const useDocument = docId => {
   }, [room]);
 
   useEffect(() => {
-    const doc1 = Automerge.init();
+    let doc1 = Automerge.init();
+
+    doc1 = Automerge.change(doc1, "Initialize card list", doc => {
+      doc.name = "document name";
+      doc.version = "1.0.0";
+      doc.changes = {
+        elements: {},
+        page: {},
+        scripts: {}
+      };
+    });
+
     setDoc(doc1);
   }, []);
 
   const toChange = cb => {
-    const change = Math.floor(Math.random() * 10000) + "--change";
+    const change = "change";
     const newRevision = Automerge.change(doc, change, cb);
     let changes = Automerge.getChanges(doc, newRevision);
+
     dataTrack.send(JSON.stringify(changes));
     setDoc(doc => newRevision);
   };

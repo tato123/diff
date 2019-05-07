@@ -1,5 +1,5 @@
 import { CommandBuilder, Context, CommandOptions } from "../core/types";
-import Designer from "../designer/App";
+import "../designer/App";
 
 type Inner = { [records: string]: any[] };
 
